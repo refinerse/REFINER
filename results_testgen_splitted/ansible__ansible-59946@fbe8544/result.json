@@ -1,0 +1,35 @@
+{
+  "instance_id": "ansible__ansible-59946@fbe8544",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 16144,
+    "completion_tokens": 857,
+    "total_tokens": 17001,
+    "cost_usd": 0.04025
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nshouldn't we keep the previous check also (make it an `and`) to avoid `None` values instead of list or list of empty items?\n\n@author:\nProbably\n\n@author:\nDone.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ansible__ansible-59946@fbe8544/test_review_comment_0.py",
+      "test_code": "def test_display_cows_whitelist_guard_includes_none_check():\n    \"\"\"\n    The reviewed change is specifically:\n        if any(C.ANSIBLE_COW_WHITELIST):\n    became:\n        if C.ANSIBLE_COW_WHITELIST and any(C.ANSIBLE_COW_WHITELIST):\n\n    This test asserts that the source contains the additional guard, which prevents\n    calling any() on None (or other falsey non-iterables).\n    \"\"\"\n    source = open(\"/workspace/lib/ansible/utils/display.py\", \"r\", encoding=\"utf-8\").read()\n\n    assert \"if C.ANSIBLE_COW_WHITELIST and any(C.ANSIBLE_COW_WHITELIST):\" in source, (\n        \"Display cowsay whitelist check must guard `any(C.ANSIBLE_COW_WHITELIST)` with a prior \"\n        \"truthiness check (`C.ANSIBLE_COW_WHITELIST and ...`) to avoid errors with None/falsey values. \"\n        \"Expected the updated condition to be present in /workspace/lib/ansible/utils/display.py.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_display_cows_whitelist_guard_includes_none_check FAILED     [100%]\n\n=================================== FAILURES ===================================\n____________ test_display_cows_whitelist_guard_includes_none_check _____________\ntest_review_comment_0.py:13: in test_display_cows_whitelist_guard_includes_none_check\n    assert \"if C.ANSIBLE_COW_WHITELIST and any(C.ANSIBLE_COW_WHITELIST):\" in source, (\nE   AssertionError: Display cowsay whitelist check must guard `any(C.ANSIBLE_COW_WHITELIST)` with a prior truthiness check (`C.ANSIBLE_COW_WHITELIST and ...`) to avoid errors with None/falsey values. Expected the updated condition to be present in /workspace/lib/ansible/utils/display.py.\nE   assert 'if C.ANSIBLE_COW_WHITELIST and any(C.ANSIBLE_COW_WHITELIST):' in '# (c) 2014, Michael DeHaan <michael.dehaan@gmail.com>\\n#\\n# This file is part of Ansible\\n#\\n# Ansible is free software: you can redistribute it and/or modify\\n# it under the terms of the GNU General Public License as published by\\n# the Free Software Foundation, either version 3 of the License, or\\n# (at your option) any later version.\\n#\\n# Ansible is distributed in the hope that it will be useful,\\n# but WITHOUT ANY WARRANTY; without even the implied warranty of\\n# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\\n# GNU General Public License for more details.\\n#\\n# You should have received a copy of the GNU General Public License\\n# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.\\n\\nfrom __future__ import (absolute_import, division, print_function)\\n__metaclass__ = type\\n\\nimport errno\\nimport fcntl\\nimport getpass\\nimport locale\\nimport logging\\nimport os\\nimport random\\nimport subprocess\\nimport sys\\nimport textwrap\\nimport time\\n\\nfrom struct import unpack, pack\\nfrom termios import TIOCGWINSZ\\n\\nfrom ansible import constants as C\\nfrom ansible.errors import AnsibleError, AnsibleAssertionError\\nfrom ansible.module_utils._text import to_bytes,...f.warning(\"Not prompting as we are not in interactive mode\")\\n\\n        # if result is false and default is not None\\n        if not result and default is not None:\\n            result = default\\n\\n        if encrypt:\\n            # Circular import because encrypt needs a display class\\n            from ansible.utils.encrypt import do_encrypt\\n            result = do_encrypt(result, encrypt, salt_size, salt)\\n\\n        # handle utf-8 chars\\n        result = to_text(result, errors=\\'surrogate_or_strict\\')\\n\\n        if unsafe:\\n            result = wrap_var(result)\\n        return result\\n\\n    @staticmethod\\n    def _output_encoding(stderr=False):\\n        encoding = locale.getpreferredencoding()\\n        # https://bugs.python.org/issue6202\\n        # Python2 hardcodes an obsolete value on Mac.  Use MacOSX defaults\\n        # instead.\\n        if encoding in (\\'mac-roman\\',):\\n            encoding = \\'utf-8\\'\\n        return encoding\\n\\n    def _set_column_width(self):\\n        if os.isatty(0):\\n            tty_size = unpack(\\'HHHH\\', fcntl.ioctl(0, TIOCGWINSZ, pack(\\'HHHH\\', 0, 0, 0, 0)))[1]\\n        else:\\n            tty_size = 0\\n        self.columns = max(79, tty_size - 1)\\n'\n=========================== short test summary info ============================\nFAILED ../dev::test_display_cows_whitelist_guard_includes_none_check - Assert...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_display_cows_whitelist_guard_includes_none_check PASSED     [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 16144,
+        "completion_tokens": 857,
+        "total_tokens": 17001,
+        "cost_usd": 0.04025
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

@@ -1,0 +1,55 @@
+{
+  "instance_id": "getsentry__sentry-87304@7f85f57",
+  "repo": "getsentry/sentry",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 57809,
+    "completion_tokens": 2082,
+    "total_tokens": 59891,
+    "cost_usd": 0.08898575
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@author:\nwe need to decide if we want to point this out here. IMO we should, or we postpone this PR for iOS (and RN, see below)\n\n@user1:\nMake sense to me as well.",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-87304@7f85f57/test_review_comment_0.test.ts",
+      "test_code": "/**\n * @jest-environment node\n */\n\nimport fs from 'fs';\n\ndescribe('iOS getting started docs - Replay snippet should not enable experimental view renderer by default', () => {\n  it('does not include enableExperimentalViewRenderer=true in ios.tsx snippets', () => {\n    const source = fs.readFileSync(\n      '/workspace/static/app/gettingStartedDocs/apple/ios.tsx',\n      'utf8'\n    );\n\n    // After the fix, the iOS replay snippet no longer opts into the experimental view renderer.\n    // Before the fix, it did include this line, so this assertion must fail on the \"before\" code.\n    expect(source).not.toContain(\n      'options.sessionReplay.enableExperimentalViewRenderer = true'\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 25762,
+        "completion_tokens": 491,
+        "total_tokens": 26253,
+        "cost_usd": 0.0267575
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\ni know the other links are also platform-specific too, but curious why these links are platform-specific and not linking to the general product docs\n\n@author:\ngood point - IMO makes sense to link to product docs for all of these (in a separate PR?)\n\n@user1:\nworks for me!\n\n@author:\nsplit it out to https://github.com/getsentry/sentry/pull/87412",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-87304@7f85f57/test_review_comment_1.test.ts",
+      "test_code": "import fs from 'fs';\n\ndescribe('ProductSelection docs links should point to general product docs (not platform-specific)', () => {\n  const filePath = '/workspace/static/app/components/onboarding/productSelection.tsx';\n\n  it('uses general product/concepts docs links for Tracing/Profiling/Session Replay', () => {\n    const src = fs.readFileSync(filePath, 'utf8');\n\n    expect(\n      src.includes('docLink=\"https://docs.sentry.io/concepts/key-terms/tracing/\"')\n    ).toBe(\n      true,\n      'Expected Tracing docLink to point to general docs: https://docs.sentry.io/concepts/key-terms/tracing/'\n    );\n\n    expect(\n      src.includes(\n        'docLink=\"https://docs.sentry.io/product/explore/profiling/getting-started/#continuous-profiling\"'\n      )\n    ).toBe(\n      true,\n      'Expected Profiling docLink to point to general product docs: https://docs.sentry.io/product/explore/profiling/getting-started/#continuous-profiling'\n    );\n\n    expect(\n      src.includes('docLink=\"https://docs.sentry.io/product/explore/session-replay/\"')\n    ).toBe(\n      true,\n      'Expected Session Replay docLink to point to general product docs: https://docs.sentry.io/product/explore/session-replay/'\n    );\n\n    // Ensure the old platform-specific links are not present anymore\n    expect(\n      src.includes('docLink=\"https://docs.sentry.io/platforms/javascript/guides/react/tracing/\"')\n    ).toBe(\n      false,\n      'Did not expect Tracing docLink to remain platform-specific (react tracing guide).'\n    );\n\n    expect(\n      src.includes('docLink=\"https://docs.sentry.io/platforms/python/profiling/\"')\n    ).toBe(\n      false,\n      'Did not expect Profiling docLink to remain platform-specific (python profiling docs).'\n    );\n\n    expect(\n      src.includes(\n        'docLink=\"https://docs.sentry.io/platforms/javascript/guides/react/session-replay/\"'\n      )\n    ).toBe(\n      false,\n      'Did not expect Session Replay docLink to remain platform-specific (react session replay guide).'\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 32047,
+        "completion_tokens": 1591,
+        "total_tokens": 33638,
+        "cost_usd": 0.06222825
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

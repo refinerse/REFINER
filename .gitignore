@@ -1,0 +1,13 @@
+.env
+.DS_Store
+test_compare.txt
+missing_instances/
+__pycache__/
+.pytest_cache/
+*.pyc
+smoke*
+pr_comments_cache/
+agents_results/
+# results*/
+evaluate_agent_patch_on_split*/
+.claude/

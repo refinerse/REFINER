@@ -1,0 +1,35 @@
+{
+  "instance_id": "python__mypy-15353@65efb01",
+  "repo": "python/mypy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 40004,
+    "completion_tokens": 517,
+    "total_tokens": 40521,
+    "cost_usd": 0.07724500000000001
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nHmm, mutating fdef here seems a little suspicious to me. Why do we need this? (My weak mental model for when it's safe to mutate these kind of things is to try and keep it to semantic analysis, like you do in prepare method signature)\n\n@author:\nAh, good catch, thanks! I'm actually not entirely sure why I added this -- perhaps this was before I made sure the semantic analyzer set the is_static property. At any rate, I've verified that is_static is set correctly for methods named `__new__` by the time we get in typeops, meaning that it is not necessary to modify the attribute here. I've removed it.\n\n@user1:\nThanks! Github is having some problems, so your commit hasn't shown up. The workaround I found is to make an empty commit, push it, then reset to delete the commit, then force push\n\n@author:\nI actually had some issues with my local git client suddenly deciding to use the wrong SSH key -- fixed that now, but I see that the commit still isn't visible. Will make an empty commit and push again, thanks for the tip!",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "python__mypy-15353@65efb01/test_review_comment_0.py",
+      "test_code": "import pytest\n\nimport mypy.typeops as typeops\nfrom mypy.nodes import Argument, Block, FuncDef, Var\nfrom mypy.types import AnyType, TypeOfAny\n\n\ndef test_callable_type_does_not_mutate_funcdef_is_static_for_dunder_new() -> None:\n    \"\"\"\n    callable_type() must not mutate fdef.is_static for '__new__'.\n    \"\"\"\n    # Build a minimal, valid FuncDef with one argument so callable_type can run.\n    v = Var(\"self\", AnyType(TypeOfAny.unannotated))\n    arg = Argument(v, AnyType(TypeOfAny.unannotated), None, 0)\n    fdef = FuncDef(\"__new__\", [arg], Block([]))\n\n    # Avoid needing a real TypeInfo/Instance fallback in this test.\n    fdef.info = None\n    fdef.is_static = False\n\n    _ = typeops.callable_type(fdef, fallback=None)  # type: ignore[arg-type]\n\n    assert (\n        fdef.is_static is False\n    ), \"callable_type() must not mutate FuncDef.is_static for '__new__' (semantic analysis should set it)\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_callable_type_does_not_mutate_funcdef_is_static_for_dunder_new FAILED [100%]\n\n=================================== FAILURES ===================================\n_____ test_callable_type_does_not_mutate_funcdef_is_static_for_dunder_new ______\ntest_review_comment_0.py:23: in test_callable_type_does_not_mutate_funcdef_is_static_for_dunder_new\n    assert (\nE   AssertionError: callable_type() must not mutate FuncDef.is_static for '__new__' (semantic analysis should set it)\nE   assert True is False\nE    +  where True = <mypy.nodes.FuncDef object at 0x7facca61c170>.is_static\n=========================== short test summary info ============================\nFAILED ../dev::test_callable_type_does_not_mutate_funcdef_is_static_for_dunder_new\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.08s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_callable_type_does_not_mutate_funcdef_is_static_for_dunder_new PASSED [100%]\n\n============================== 1 passed in 0.07s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 40004,
+        "completion_tokens": 517,
+        "total_tokens": 40521,
+        "cost_usd": 0.07724500000000001
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

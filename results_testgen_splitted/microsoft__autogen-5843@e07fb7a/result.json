@@ -1,0 +1,35 @@
+{
+  "instance_id": "microsoft__autogen-5843@e07fb7a",
+  "repo": "microsoft/autogen",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 7966,
+    "completion_tokens": 318,
+    "total_tokens": 8284,
+    "cost_usd": 0.0183925
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nPotentially a breaking change, but it's small enough that I think it is likely okay. Probably should have been this way from the start anyway\n\n@author:\nYeah... It should have been this way. I am planning to make it clear in the release note that we require keyword arguments for these classes. \n\n@author:\nI reverted this ... let's wait until a good time.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "microsoft__autogen-5843@e07fb7a/test_review_comment_0.py",
+      "test_code": "import re\n\nSWARM_GROUP_CHAT_PATH = \"/workspace/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_swarm_group_chat.py\"\n\n\ndef test_swarm_constructor_does_not_require_keyword_only_args_for_optional_params() -> None:\n    \"\"\"\n    The review reverted a potentially breaking change: adding '*' to Swarm.__init__\n    (which would force termination_condition/max_turns/runtime to be keyword-only).\n\n    This test asserts the reverted (non-breaking) behavior in the source:\n    Swarm.__init__ should NOT have a '*' after participants.\n    \"\"\"\n    source = open(SWARM_GROUP_CHAT_PATH, \"r\", encoding=\"utf-8\").read()\n\n    # If the breaking change exists, we'd see:\n    # def __init__(..., participants: List[ChatAgent], *, termination_condition=..., ...)\n    kw_only_pattern = re.compile(\n        r\"class\\s+Swarm\\b[\\s\\S]*?def\\s+__init__\\(\\s*self\\s*,\\s*[\\s\\S]*?\"\n        r\"participants\\s*:\\s*List\\[\\s*ChatAgent\\s*\\]\\s*,\\s*\\*\",\n        re.MULTILINE,\n    )\n    assert not kw_only_pattern.search(source), (\n        \"Swarm.__init__ unexpectedly enforces keyword-only arguments (found a '*' after \"\n        \"participants). The reverted behavior should allow passing termination_condition/max_turns/runtime \"\n        \"positionally (i.e., no '*' in the constructor signature).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_swarm_constructor_does_not_require_keyword_only_args_for_optional_params FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_swarm_constructor_does_not_require_keyword_only_args_for_optional_params _\ntest_review_comment_0.py:23: in test_swarm_constructor_does_not_require_keyword_only_args_for_optional_params\n    assert not kw_only_pattern.search(source), (\nE   AssertionError: Swarm.__init__ unexpectedly enforces keyword-only arguments (found a '*' after participants). The reverted behavior should allow passing termination_condition/max_turns/runtime positionally (i.e., no '*' in the constructor signature).\nE   assert not <re.Match object; span=(5025, 8983), match='class Swarm(BaseGroupChat, Component[SwarmConfig]>\nE    +  where <re.Match object; span=(5025, 8983), match='class Swarm(BaseGroupChat, Component[SwarmConfig]> = <built-in method search of re.Pattern object at 0x55b29c5a3a30>('import asyncio\\nfrom typing import Any, Callable, List, Mapping\\n\\nfrom autogen_core import AgentRuntime, Component, ComponentModel\\nfrom pydantic import BaseModel\\n\\nfrom ...base import ChatAgent, TerminationCondition\\nfrom ...messages import AgentEvent, ChatMessage, HandoffMessage\\nfrom ...state import SwarmManagerState\\nfrom ._base_group_chat import BaseGroupChat\\nfrom ._base_group_chat_manager import BaseGroupChatManager\\nfrom ._events import GroupChatTermination\\n\\n\\nclass SwarmGroupChatManager(BaseGroupChatManager):\\n    \"\"\"A group chat manager that selects the next speaker based on handoff message only.\"\"\"\\n\\n    def __init__(\\n        self,\\n        name: str,\\n        group_topic_type: str,\\n        output_topic_type: str,\\n        participant_topic_types: List[str],\\n        participant_names: List[str],\\n        participant_descriptions: List[str],\\n        output_message_queue: asyncio.Queue[AgentEvent | ChatMessage | GroupChatTermination],\\n        termination_condition: TerminationCondition | None,\\n        max_turns: int | None,\\n    ) -> None:\\n        super().__init__(\\n            name,\\n            group_topic_type,\\n            output_topic_type,\\n           ...n                output_topic_type,\\n                participant_topic_types,\\n                participant_names,\\n                participant_descriptions,\\n                output_message_queue,\\n                termination_condition,\\n                max_turns,\\n            )\\n\\n        return _factory\\n\\n    def _to_config(self) -> SwarmConfig:\\n        participants = [participant.dump_component() for participant in self._participants]\\n        termination_condition = self._termination_condition.dump_component() if self._termination_condition else None\\n        return SwarmConfig(\\n            participants=participants,\\n            termination_condition=termination_condition,\\n            max_turns=self._max_turns,\\n        )\\n\\n    @classmethod\\n    def _from_config(cls, config: SwarmConfig) -> \"Swarm\":\\n        participants = [ChatAgent.load_component(participant) for participant in config.participants]\\n        termination_condition = (\\n            TerminationCondition.load_component(config.termination_condition) if config.termination_condition else None\\n        )\\n        return cls(participants, termination_condition=termination_condition, max_turns=config.max_turns)\\n')\nE    +    where <built-in method search of re.Pattern object at 0x55b29c5a3a30> = re.compile('class\\\\s+Swarm\\\\b[\\\\s\\\\S]*?def\\\\s+__init__\\\\(\\\\s*self\\\\s*,\\\\s*[\\\\s\\\\S]*?participants\\\\s*:\\\\s*List\\\\[\\\\s*ChatAgent\\\\s*\\\\]\\\\s*,\\\\s*\\\\*', re.MULTILINE).search\n=========================== short test summary info ============================\nFAILED ../dev::test_swarm_constructor_does_not_require_keyword_only_args_for_optional_params\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_swarm_constructor_does_not_require_keyword_only_args_for_optional_params PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 7966,
+        "completion_tokens": 318,
+        "total_tokens": 8284,
+        "cost_usd": 0.0183925
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

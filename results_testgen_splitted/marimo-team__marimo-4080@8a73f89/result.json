@@ -1,0 +1,35 @@
+{
+  "instance_id": "marimo-team__marimo-4080@8a73f89",
+  "repo": "marimo-team/marimo",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 119834,
+    "completion_tokens": 1804,
+    "total_tokens": 121638,
+    "cost_usd": 0.17428390000000002
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nShould this be adding module names, not package names?\n\n@author:\nThe module names can be lossy, so I need to add package names. We convert it right below though \n\n@user1:\njust double checking \u2014\u00a0any issues with the code below? Will adding package names to `missing_modules` make `module_to_package` unhappy?\r\n\r\n<img width=\"610\" alt=\"image\" src=\"https://github.com/user-attachments/assets/7399f4ee-6da9-482b-8759-b76f0f028a6e\" />\r\n\r\nLike should this be\r\n\r\n```python\r\nmissing_packages: list[str] = []\r\nmissing_modules: set[str] = set()\r\nfor e in module_not_found_errors:\r\n    if isinstance(e, ManyModulesNotFoundError):\r\n        missing_packages.extend([p for p in e.package_names if not self.package_manager.attempted_to_install(p)\r\n```\r\n\n\n@author:\nah i see now, cleaning it up",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "marimo-team__marimo-4080@8a73f89/test_review_comment_0.py",
+      "test_code": "import inspect\n\nfrom marimo._dependencies.errors import ManyModulesNotFoundError\nfrom marimo._runtime.runtime import Kernel\n\n\nclass _FakePackageManager:\n    name = \"fake\"\n\n    def __init__(self) -> None:\n        self._attempted: set[str] = set()\n\n    def should_auto_install(self) -> bool:\n        return False\n\n    def attempted_to_install(self, package: str) -> bool:\n        return package in self._attempted\n\n    def module_to_package(self, mod: str) -> str:\n        return mod\n\n\nclass _FakeModuleRegistry:\n    def missing_modules(self) -> set[str]:\n        return set()\n\n\nclass _FakeRunner:\n    def __init__(self, exc: BaseException) -> None:\n        self.exceptions = {0: exc}\n\n\ndef _make_many_modules_not_found_error(package_names: list[str]) -> ManyModulesNotFoundError:\n    \"\"\"\n    Construct ManyModulesNotFoundError in a way that's compatible with the repo's\n    actual signature (which may be positional-only or have different arg names).\n    \"\"\"\n    sig = inspect.signature(ManyModulesNotFoundError)\n    params = list(sig.parameters.values())\n\n    # Try (package_names,) if the first param looks like it corresponds to package_names\n    # (common for custom error types).\n    try:\n        return ManyModulesNotFoundError(package_names)  # type: ignore[arg-type]\n    except TypeError:\n        pass\n\n    # Try (message, package_names)\n    try:\n        return ManyModulesNotFoundError(\"missing packages\", package_names)  # type: ignore[arg-type]\n    except TypeError:\n        pass\n\n    # Try keyword-only / keyword-capable if present\n    if any(p.name == \"package_names\" for p in params):\n        try:\n            return ManyModulesNotFoundError(package_names=package_names)  # type: ignore[call-arg]\n        except TypeError:\n            pass\n        try:\n            return ManyModulesNotFoundError(\"missing packages\", package_names=package_names)  # type: ignore[call-arg]\n        except TypeError:\n            pass\n\n    raise RuntimeError(\n        \"Unable to construct ManyModulesNotFoundError with package_names; \"\n        f\"signature was: {sig}\"\n    )\n\n\ndef test_broadcast_missing_packages_handles_many_modules_error_as_packages_not_modules():\n    \"\"\"\n    When a ManyModulesNotFoundError provides package_names, those should be treated\n    as packages directly and should NOT be fed through module_to_package.\n\n    This is observable by ensuring module_to_package is never called when the only\n    missing info comes from ManyModulesNotFoundError.package_names.\n    \"\"\"\n    k = Kernel.__new__(Kernel)\n    k.package_manager = _FakePackageManager()\n    k.module_registry = _FakeModuleRegistry()\n\n    called_with: list[str] = []\n\n    def recording_module_to_package(mod: str) -> str:\n        called_with.append(mod)\n        return mod\n\n    # Record any conversions; correct code should not convert package_names.\n    k.package_manager.module_to_package = recording_module_to_package  # type: ignore[method-assign]\n\n    # Ensure no side effects if reached.\n    k._execute_install_missing_packages_callback = lambda *args, **kwargs: None  # type: ignore[method-assign]\n\n    exc = _make_many_modules_not_found_error([\"sklearn\", \"pandas\"])\n    runner = _FakeRunner(exc)\n\n    k._broadcast_missing_packages(runner)\n\n    assert called_with == [], (\n        \"Expected ManyModulesNotFoundError.package_names to be treated as \"\n        \"packages directly (no module_to_package calls). \"\n        f\"Got module_to_package called with: {called_with}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_broadcast_missing_packages_handles_many_modules_error_as_packages_not_modules FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_broadcast_missing_packages_handles_many_modules_error_as_packages_not_modules _\ntest_review_comment_0.py:100: in test_broadcast_missing_packages_handles_many_modules_error_as_packages_not_modules\n    assert called_with == [], (\nE   AssertionError: Expected ManyModulesNotFoundError.package_names to be treated as packages directly (no module_to_package calls). Got module_to_package called with: [' ', 'p', 'k', 'm', 's', 'a', 'i', 'e', 'c', 'n', 'g']\nE   assert [' ', 'p', 'k...'s', 'a', ...] == []\nE     \nE     Left contains 11 more items, first extra item: ' '\nE     \nE     Full diff:\nE     - []\nE     + [\nE     +     ' ',...\nE     \nE     ...Full output truncated (11 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev::test_broadcast_missing_packages_handles_many_modules_error_as_packages_not_modules\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.71s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_broadcast_missing_packages_handles_many_modules_error_as_packages_not_modules PASSED [100%]\n\n============================== 1 passed in 0.59s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 119834,
+        "completion_tokens": 1804,
+        "total_tokens": 121638,
+        "cost_usd": 0.17428390000000002
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

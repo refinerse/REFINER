@@ -1,0 +1,35 @@
+{
+  "instance_id": "scikit-learn__scikit-learn-20575@14a6cd1",
+  "repo": "scikit-learn/scikit-learn",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 59762,
+    "completion_tokens": 959,
+    "total_tokens": 60721,
+    "cost_usd": 0.0879711
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWould it not be enough to cast to bool (and add a small comment because I had to think quite a bit about it :))\r\n\r\n```suggestion\r\n    # we do not use `hasattr` to raise the `AttributeError`\r\n    return lambda self: bool(getattr(self._final_estimator, attr))\r\n```\n\n@user2:\nthe `or True` is certainly not easy to understand... what's it doing?\n\n@author:\nIt's using the same logic as https://github.com/scikit-learn/scikit-learn/blob/beea7838cc8ec61c78255bd9c8b400997e30db32/sklearn/utils/metaestimators.py#L188\r\n\r\nIf the `or True` is not there, then the truthiness of `self._final_estimator_.attr` would be used to evaluate the check.\n\n@author:\nI'll update the implementation to  make it less confusing:\r\n\r\n```python\r\nif not hasattr(self._final_estimator, attr):\r\n    # raise the original `AttributeError`\r\n    getattr(self._final_estimator, attr)\r\nreturn True\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "scikit-learn__scikit-learn-20575@14a6cd1/test_review_comment_0.py",
+      "test_code": "import pytest\n\nfrom sklearn.pipeline import Pipeline\n\n\nclass _FinalEstimatorWithFalseyPredict:\n    # Attribute exists but is falsey (None).\n    predict = None\n\n    def fit(self, X, y=None):\n        return self\n\n\ndef test_available_if_does_not_use_attribute_truthiness():\n    \"\"\"\n    Regression test for Pipeline's available_if predicate.\n\n    The predicate used by @available_if(_final_estimator_has(\"predict\")) should\n    return True whenever the attribute exists on the final estimator, regardless\n    of the attribute's truthiness.\n\n    Before fix: _final_estimator_has returned getattr(..., attr) or True, which\n    evaluates to the attribute value when truthy and to True when falsey; for a\n    falsey attribute it returns True, but for a truthy attribute it returns the\n    attribute itself. In particular, for a falsey attribute it *does not*\n    guarantee a strict boolean return value across cases and can be confusing.\n\n    After fix: _final_estimator_has always returns True after verifying the\n    attribute exists (raising the original AttributeError otherwise).\n    \"\"\"\n    pipe = Pipeline([(\"final\", _FinalEstimatorWithFalseyPredict())])\n\n    # Access the descriptor created by @available_if on the class dict.\n    # (Accessing Pipeline.predict directly triggers descriptor binding and\n    # returns a function-like object.)\n    descriptor = Pipeline.__dict__[\"predict\"]\n    predicate = descriptor.check\n\n    result = predicate(pipe)\n    assert result is True, (\n        \"The available_if predicate for Pipeline.predict must return True when \"\n        \"the final estimator has a 'predict' attribute, even if that attribute \"\n        \"is falsey (e.g. None).\"\n    )",
+      "before_passed": true,
+      "after_passed": true,
+      "success": false,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_available_if_does_not_use_attribute_truthiness PASSED       [100%]\n\n============================== 1 passed in 0.32s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_available_if_does_not_use_attribute_truthiness PASSED       [100%]\n\n============================== 1 passed in 0.32s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 59762,
+        "completion_tokens": 959,
+        "total_tokens": 60721,
+        "cost_usd": 0.0879711
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

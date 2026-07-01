@@ -1,0 +1,35 @@
+{
+  "instance_id": "matplotlib__matplotlib-17892@cb25841",
+  "repo": "matplotlib/matplotlib",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 40028,
+    "completion_tokens": 320,
+    "total_tokens": 40348,
+    "cost_usd": 0.074529
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\ncan you make this a keyword only argument?\n\n@author:\nIt's done. Thanks for the suggestion!",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "matplotlib__matplotlib-17892@cb25841/test_review_comment_0.py",
+      "test_code": "import inspect\nimport pytest\n\nimport matplotlib.cbook as cbook\n\n\ndef test_check_in_list_print_supported_values_is_keyword_only():\n    \"\"\"\n    Ensure `_print_supported_values` was made keyword-only in cbook._check_in_list.\n\n    This is a style/API-safety change: passing the flag positionally should\n    raise TypeError, but passing it as a keyword should work.\n    \"\"\"\n    sig = inspect.signature(cbook._check_in_list)\n\n    param = sig.parameters.get(\"_print_supported_values\")\n    assert param is not None, (\n        \"Expected matplotlib.cbook._check_in_list to accept an argument named \"\n        \"'_print_supported_values'.\"\n    )\n    assert param.kind is inspect.Parameter.KEYWORD_ONLY, (\n        \"Expected matplotlib.cbook._check_in_list(..., *, _print_supported_values=...) \"\n        \"so that '_print_supported_values' is keyword-only.\"\n    )\n\n    # Functional behavior check: positional passing should be rejected.\n    with pytest.raises(TypeError, match=\"positional\"):\n        cbook._check_in_list([\"a\", \"b\"], False, arg=\"c\")\n\n    # Keyword passing should be accepted and influence the error message.\n    with pytest.raises(ValueError) as excinfo:\n        cbook._check_in_list([\"a\", \"b\"], _print_supported_values=False, arg=\"c\")\n    assert \"supported values are\" not in str(excinfo.value), (\n        \"When _print_supported_values=False, the ValueError message should not list \"\n        \"supported values.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_check_in_list_print_supported_values_is_keyword_only FAILED [100%]\n\n=================================== FAILURES ===================================\n__________ test_check_in_list_print_supported_values_is_keyword_only ___________\ntest_review_comment_0.py:21: in test_check_in_list_print_supported_values_is_keyword_only\n    assert param.kind is inspect.Parameter.KEYWORD_ONLY, (\nE   AssertionError: Expected matplotlib.cbook._check_in_list(..., *, _print_supported_values=...) so that '_print_supported_values' is keyword-only.\nE   assert <_ParameterKind.POSITIONAL_OR_KEYWORD: 1> is <_ParameterKind.KEYWORD_ONLY: 3>\nE    +  where <_ParameterKind.POSITIONAL_OR_KEYWORD: 1> = <Parameter \"_print_supported_values=True\">.kind\nE    +  and   <_ParameterKind.KEYWORD_ONLY: 3> = <class 'inspect.Parameter'>.KEYWORD_ONLY\nE    +    where <class 'inspect.Parameter'> = inspect.Parameter\n=============================== warnings summary ===============================\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\n  /workspace/lib/matplotlib/__init__.py:169: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    if LooseVersion(module.__version__) < minver:\n\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n  /usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    other = LooseVersion(other)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_check_in_list_print_supported_values_is_keyword_only - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 10 warnings in 0.64s ========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_check_in_list_print_supported_values_is_keyword_only PASSED [100%]\n\n=============================== warnings summary ===============================\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\nlib/matplotlib/__init__.py:169\n  /workspace/lib/matplotlib/__init__.py:169: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    if LooseVersion(module.__version__) < minver:\n\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n../usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346\n  /usr/local/lib/python3.8/site-packages/setuptools/_distutils/version.py:346: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    other = LooseVersion(other)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 10 warnings in 0.67s ========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 40028,
+        "completion_tokens": 320,
+        "total_tokens": 40348,
+        "cost_usd": 0.074529
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

@@ -1,0 +1,35 @@
+{
+  "instance_id": "skypilot-org__skypilot-1297@fd5782f",
+  "repo": "skypilot-org/skypilot",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 62769,
+    "completion_tokens": 675,
+    "total_tokens": 63444,
+    "cost_usd": 0.11929574999999999
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nGreat catch! How about we use the programmatic API `core.autostop` instead?\r\n\r\nAlso, should we make this an `elif idle_minutes_to_autostop is not None` after L718?\n\n@author:\nGood point!",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "skypilot-org__skypilot-1297@fd5782f/test_review_comment_0.py",
+      "test_code": "import pytest\n\nimport sky.cli as cli\n\n\ndef test_launch_with_confirm_uses_core_autostop_for_up_interactive_nodes():\n    \"\"\"When attaching to an already-UP interactive node and the user requests\n    autostop/autodown, CLI should use the programmatic API core.autostop(),\n    not backend.set_autostop().\n\n    This is validated by:\n      - monkeypatching cli.core.autostop to record calls\n      - using a backend object that would fail if set_autostop() is invoked\n      - forcing cluster status to UP so _launch_with_confirm() won't call sky.launch()\n    \"\"\"\n    # Record calls to core.autostop without using unittest.mock.\n    calls = []\n\n    def _recording_autostop(cluster: str, idle_minutes: int, down: bool):\n        calls.append((cluster, idle_minutes, down))\n\n    # Make sure we never reach sky.launch() in this scenario (UP interactive node).\n    def _launch_should_not_be_called(*args, **kwargs):\n        raise AssertionError(\n            \"sky.launch() should not be called when interactive node is already \"\n            \"UP; CLI should only update autostop/autodown settings.\"\n        )\n\n    class _BackendThatMustNotBeUsedForAutostop:\n        def set_autostop(self, *args, **kwargs):\n            raise AssertionError(\n                \"backend.set_autostop() should not be used; expected \"\n                \"cli.core.autostop() to be called instead.\"\n            )\n\n        def check_resources_fit_cluster(self, handle, task):\n            # Not relevant for this test (we also patch _check_resources_match).\n            return\n\n    cluster_name = \"my-up-node\"\n\n    # Patch dependencies on the imported cli module.\n    cli.core.autostop = _recording_autostop\n    cli.sky.launch = _launch_should_not_be_called\n    cli._check_resources_match = lambda *a, **k: None  # avoid handle lookups\n\n    # Force the cluster status to UP.\n    def _refresh_status_handle(_cluster: str):\n        return (cli.global_user_state.ClusterStatus.UP, None)\n\n    cli.backend_utils.refresh_cluster_status_handle = _refresh_status_handle\n\n    # Create a minimal dag/task that _launch_with_confirm expects.\n    with cli.sky.Dag() as dag:\n        task = cli.sky.Task(\"noop\", run=\"echo noop\")\n        task.set_resources({cli.sky.Resources()})\n\n    backend = _BackendThatMustNotBeUsedForAutostop()\n\n    # Call the function under test: interactive node_type + UP status\n    # should trigger core.autostop(), not backend.set_autostop().\n    cli._launch_with_confirm(\n        dag,\n        backend,\n        cluster_name,\n        dryrun=False,\n        detach_run=True,\n        no_confirm=True,\n        idle_minutes_to_autostop=15,\n        down=False,\n        retry_until_up=False,\n        node_type=\"cpunode\",\n    )\n\n    assert calls == [(cluster_name, 15, False)], (\n        \"Expected _launch_with_confirm() to update autostop settings for an \"\n        \"already-UP interactive node by calling core.autostop(cluster, \"\n        \"idle_minutes, down).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_launch_with_confirm_uses_core_autostop_for_up_interactive_nodes FAILED [100%]\n\n=================================== FAILURES ===================================\n_____ test_launch_with_confirm_uses_core_autostop_for_up_interactive_nodes _____\ntest_review_comment_0.py:62: in test_launch_with_confirm_uses_core_autostop_for_up_interactive_nodes\n    cli._launch_with_confirm(\nsky/cli.py:703: in _launch_with_confirm\n    backend.set_autostop(handle, idle_minutes_to_autostop)\ntest_review_comment_0.py:31: in set_autostop\n    raise AssertionError(\nE   AssertionError: backend.set_autostop() should not be used; expected cli.core.autostop() to be called instead.\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/site-packages/ray/experimental/dag/input_node.py:11\n  /usr/local/lib/python3.10/site-packages/ray/experimental/dag/input_node.py:11: DeprecationWarning: invalid escape sequence '\\ '\n    \"\"\"Ray dag node used in DAG building API to mark entrypoints of a DAG.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_launch_with_confirm_uses_core_autostop_for_up_interactive_nodes\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 1.56s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_launch_with_confirm_uses_core_autostop_for_up_interactive_nodes PASSED [100%]\n\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/site-packages/ray/experimental/dag/input_node.py:11\n  /usr/local/lib/python3.10/site-packages/ray/experimental/dag/input_node.py:11: DeprecationWarning: invalid escape sequence '\\ '\n    \"\"\"Ray dag node used in DAG building API to mark entrypoints of a DAG.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 1.43s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 62769,
+        "completion_tokens": 675,
+        "total_tokens": 63444,
+        "cost_usd": 0.11929574999999999
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

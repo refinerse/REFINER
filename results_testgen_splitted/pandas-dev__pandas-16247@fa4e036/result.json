@@ -1,0 +1,35 @@
+{
+  "instance_id": "pandas-dev__pandas-16247@fa4e036",
+  "repo": "pandas-dev/pandas",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 5541,
+    "completion_tokens": 270,
+    "total_tokens": 5811,
+    "cost_usd": 0.013476750000000001
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n``.rolling(...).quantile()`` and use :func:`Series.quantile` and :func:`DataFrame.quantile`\n\n@user1:\nadd the issue number #9413 and #16211",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-16247@fa4e036/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_whatsnew_0210_rolling_quantile_entry_references_funcs_and_issues():\n    source = open(\"/workspace/doc/source/whatsnew/v0.21.0.txt\", encoding=\"utf-8\").read()\n\n    # The review requested:\n    # 1) use :func:`Series.quantile()` and :func:`DataFrame.quantile()` (not plain text)\n    # 2) add issue numbers #9413 and #16211\n    #\n    # We assert the exact bullet line exists to avoid ambiguous matches elsewhere in the file.\n    pattern = re.compile(\n        r\"- Bug in ``\\.rolling\\.quantile\\(\\)`` which incorrectly used different defaults than \"\n        r\":func:`Series\\.quantile\\(\\)` and :func:`DataFrame\\.quantile\\(\\)` \"\n        r\"\\(:issue:`9413`, :issue:`16211`\\)\"\n    )\n\n    assert pattern.search(source), (\n        \"Expected v0.21.0 whatsnew entry for rolling.quantile to reference \"\n        \":func:`Series.quantile()` and :func:`DataFrame.quantile()` and include issue links \"\n        \"(:issue:`9413`, :issue:`16211`). The required bullet line was not found.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_whatsnew_0210_rolling_quantile_entry_references_funcs_and_issues FAILED [100%]\n\n=================================== FAILURES ===================================\n____ test_whatsnew_0210_rolling_quantile_entry_references_funcs_and_issues _____\ntest_review_comment_0.py:18: in test_whatsnew_0210_rolling_quantile_entry_references_funcs_and_issues\n    assert pattern.search(source), (\nE   AssertionError: Expected v0.21.0 whatsnew entry for rolling.quantile to reference :func:`Series.quantile()` and :func:`DataFrame.quantile()` and include issue links (:issue:`9413`, :issue:`16211`). The required bullet line was not found.\nE   assert None\nE    +  where None = <built-in method search of _sre.SRE_Pattern object at 0x559b78b1f4d0>(\".. _whatsnew_0210:\\n\\nv0.21.0 (???)\\n-------------\\n\\nThis is a major release from 0.20.x and includes a number of API changes, deprecations, new features,\\nenhancements, and performance improvements along with a large number of bug fixes. We recommend that all\\nusers upgrade to this version.\\n\\nHighlights include:\\n\\nCheck the :ref:`API Changes <whatsnew_0210.api_breaking>` and :ref:`deprecations <whatsnew_0210.deprecations>` before updating.\\n\\n.. contents:: What's new in v0.21.0\\n    :local:\\n    :backlinks: none\\n\\n.. _whatsnew_0210.enhancements:\\n\\nNew features\\n~~~~~~~~~~~~\\n\\n- Support for `PEP 519 -- Adding a file system path protocol\\n  <https://www.python.org/dev/peps/pep-0519/>`_ on most readers and writers (:issue:`13823`)\\n- Added ``__fspath__`` method to :class:`~pandas.HDFStore`, :class:`~pandas.ExcelFile`,\\n  and :class:`~pandas.ExcelWriter` to work properly with the file system path protocol (:issue:`13823`)\\n\\n.. _whatsnew_0210.enhancements.other:\\n\\nOther Enhancements\\n^^^^^^^^^^^^^^^^^^\\n\\n- The ``validate`` argument for :func:`merge` function now checks whether a merge is one-to-one, one-to-many, many-to-one, or many-to-many. If a merge is found to not be an...e original object. (:issue:`13873`).\\n- When called on an unsorted ``MultiIndex``, the ``loc`` indexer now will raise ``UnsortedIndexError`` only if proper slicing is used on non-sorted levels (:issue:`16734`).\\n\\n\\nI/O\\n^^^\\n\\n- Bug in :func:`read_csv` in which non integer values for the header argument generated an unhelpful / unrelated error message (:issue:`16338`)\\n\\n\\nPlotting\\n^^^^^^^^\\n\\n\\n\\nGroupby/Resample/Rolling\\n^^^^^^^^^^^^^^^^^^^^^^^^\\n\\n- Bug in ``DataFrame.resample().size()`` where an empty ``DataFrame`` did not return a ``Series`` (:issue:`14962`)\\n- Bug in ``infer_freq`` causing indices with 2-day gaps during the working week to be wrongly inferred as business daily (:issue:`16624`)\\n- Bug in ``.rolling.quantile()`` which incorrectly used different defaults than Series.quantile() and DataFrame.quantile()\\n\\n\\nSparse\\n^^^^^^\\n\\n\\n\\nReshaping\\n^^^^^^^^^\\n\\n\\n\\nNumeric\\n^^^^^^^\\n- Bug in ``.clip()`` with ``axis=1`` and a list-like for ``threshold`` is passed; previously this raised ``ValueError`` (:issue:`15390`)\\n\\n\\nCategorical\\n^^^^^^^^^^^\\n\\n\\n\\nOther\\n^^^^^\\n- Bug in :func:`eval` where the ``inplace`` parameter was being incorrectly handled (:issue:`16732`)\\n\")\nE    +    where <built-in method search of _sre.SRE_Pattern object at 0x559b78b1f4d0> = re.compile('- Bug in ``\\\\.rolling\\\\.quantile\\\\(\\\\)`` which incorrectly used different defaults than :func:`Series\\\\.quantile\\\\(\\\\)` and :func:`DataFrame\\\\.quantile\\\\(\\\\)` \\\\(:issue:`9413`, :issue:`16211`\\\\)').search\n=========================== short test summary info ============================\nFAILED ../dev/::test_whatsnew_0210_rolling_quantile_entry_references_funcs_and_issues\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_whatsnew_0210_rolling_quantile_entry_references_funcs_and_issues PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 5541,
+        "completion_tokens": 270,
+        "total_tokens": 5811,
+        "cost_usd": 0.013476750000000001
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

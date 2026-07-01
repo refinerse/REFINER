@@ -1,0 +1,10 @@
+{
+  "total_comments": 485,
+  "classified": 485,
+  "newly_classified": 485,
+  "model": "qwen3.6-plus",
+  "prompt_tokens": 608296,
+  "completion_tokens": 673019,
+  "total_tokens": 1281315,
+  "cost_usd": 0.0
+}

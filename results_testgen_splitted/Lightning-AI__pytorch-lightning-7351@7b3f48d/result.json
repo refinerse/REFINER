@@ -1,0 +1,35 @@
+{
+  "instance_id": "Lightning-AI__pytorch-lightning-7351@7b3f48d",
+  "repo": "Lightning-AI/pytorch-lightning",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 19760,
+    "completion_tokens": 882,
+    "total_tokens": 20642,
+    "cost_usd": 0.046928
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n    def log_evaluation_step_metrics(self) -> None:\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "Lightning-AI__pytorch-lightning-7351@7b3f48d/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef _get_property_body(source: str, prop_name: str) -> str:\n    # Capture the property body up to the next top-level \"def\" with the same indentation level\n    m = re.search(\n        rf\"@property\\s+def\\s+{re.escape(prop_name)}\\([^)]*\\)\\s*->\\s*Optional\\[int\\]\\s*:\\s*(?P<body>.*?)(?=\\n\\s*def\\s+|\\Z)\",\n        source,\n        flags=re.DOTALL,\n    )\n    assert m is not None, f\"Expected to find the `{prop_name}` property definition in logger_connector.py\"\n    return m.group(\"body\")\n\n\ndef test_logger_connector_evaluation_log_step_explicit_else_return_none():\n    source = open(\n        \"/workspace/pytorch_lightning/trainer/connectors/logger_connector/logger_connector.py\",\n        encoding=\"utf-8\",\n    ).read()\n\n    body = _get_property_body(source, \"evaluation_log_step\")\n\n    # The fixed version includes an explicit else clause:\n    #     else:\n    #         return None\n    # The \"before\" version did not have it.\n    assert (\n        re.search(r\"\\n\\s*else:\\s*\\n\\s*return\\s+None\\s*$\", body, flags=re.MULTILINE) is not None\n    ), (\n        \"The `evaluation_log_step` property must explicitly handle non-validation/testing stages with an \"\n        \"`else: return None` clause.\"\n    )\n\n\ndef test_logger_connector_log_evaluation_step_metrics_has_explicit_return_annotation():\n    source = open(\n        \"/workspace/pytorch_lightning/trainer/connectors/logger_connector/logger_connector.py\",\n        encoding=\"utf-8\",\n    ).read()\n\n    # The review suggestion requests adding `-> None` on the method signature.\n    assert (\n        re.search(r\"\\n\\s*def\\s+log_evaluation_step_metrics\\(\\s*self\\s*\\)\\s*->\\s*None\\s*:\", source) is not None\n    ), (\n        \"Expected `log_evaluation_step_metrics` to have an explicit return annotation `-> None` in its signature.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 2 items\n\n../dev::test_logger_connector_evaluation_log_step_explicit_else_return_none FAILED [ 50%]\n\n=================================== FAILURES ===================================\n_____ test_logger_connector_evaluation_log_step_explicit_else_return_none ______\ntest_review_comment_0.py:27: in test_logger_connector_evaluation_log_step_explicit_else_return_none\n    assert (\nE   AssertionError: The `evaluation_log_step` property must explicitly handle non-validation/testing stages with an `else: return None` clause.\nE   assert None is not None\nE    +  where None = <function search at 0x7f03718b6ca0>('\\\\n\\\\s*else:\\\\s*\\\\n\\\\s*return\\\\s+None\\\\s*$', 'if self.trainer.state.stage is RunningStage.VALIDATING:\\n            return self._val_log_step\\n        elif self.trainer.state.stage is RunningStage.TESTING:\\n            return self._test_log_step', flags=re.MULTILINE)\nE    +    where <function search at 0x7f03718b6ca0> = re.search\nE    +    and   re.MULTILINE = re.MULTILINE\n=========================== short test summary info ============================\nFAILED ../dev::test_logger_connector_evaluation_log_step_explicit_else_return_none\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.04s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 2 items\n\n../dev::test_logger_connector_evaluation_log_step_explicit_else_return_none PASSED [ 50%]\n../dev::test_logger_connector_log_evaluation_step_metrics_has_explicit_return_annotation PASSED [100%]\n\n============================== 2 passed in 0.01s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 19760,
+        "completion_tokens": 882,
+        "total_tokens": 20642,
+        "cost_usd": 0.046928
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

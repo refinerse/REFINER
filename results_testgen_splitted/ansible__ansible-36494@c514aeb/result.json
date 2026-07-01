@@ -1,0 +1,35 @@
+{
+  "instance_id": "ansible__ansible-36494@c514aeb",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 8951,
+    "completion_tokens": 447,
+    "total_tokens": 9398,
+    "cost_usd": 0.02192225
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nProbably not related to this diff but what is the use of this if command when command is already declared so it seems like a  if True type of check.\n\n@author:\nGood point. I will remove this check.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "ansible__ansible-36494@c514aeb/test_review_comment_0.py",
+      "test_code": "import lib.ansible.modules.network.nxos.nxos_vrf as nxos_vrf\n\n\nclass _FakeModule:\n    def __init__(self, state=\"present\", purge=False):\n        self.params = {\"state\": state, \"purge\": purge}\n\n\ndef test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf():\n    \"\"\"\n    Style-driven behavior check: when creating a *new* VRF (obj not in have),\n    map_obj_to_commands() should not contain a redundant/always-true style check\n    that injects 'no vni ...' commands based on unrelated existing VRFs.\n\n    Before: if commands: if vni: for h in have: if h.get('vni'): insert 'no vni ...'\n    After:  that block is removed (only handles vni removal when modifying an existing VRF).\n    \"\"\"\n    module = _FakeModule(state=\"present\", purge=False)\n\n    want = [\n        {\n            \"name\": \"NEWVRF\",\n            \"admin_state\": \"up\",\n            \"vni\": \"5000\",\n            \"rd\": None,\n            \"description\": None,\n            \"interfaces\": [],\n            \"state\": \"present\",\n        }\n    ]\n\n    # 'have' includes some other VRF that already has a VNI configured.\n    # The buggy/undesired behavior in the \"before\" version is to emit a\n    # global 'no vni ...' while creating NEWVRF.\n    have = [\n        {\"name\": \"OTHERVRF\", \"admin_state\": \"up\", \"vni\": \"6000\", \"rd\": \"\", \"description\": \"\", \"interfaces\": []}\n    ]\n\n    commands = nxos_vrf.map_obj_to_commands((want, have), module)\n\n    assert all(not cmd.startswith(\"no vni \") for cmd in commands), (\n        \"Creating a new VRF must not emit 'no vni ...' based on unrelated existing VRFs; \"\n        \"this indicates the redundant always-true style check is still present. \"\n        f\"Commands were: {commands}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf FAILED [100%]\n\n=================================== FAILURES ===================================\n__ test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf __\ntest_review_comment_0.py:41: in test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf\n    assert all(not cmd.startswith(\"no vni \") for cmd in commands), (\nE   AssertionError: Creating a new VRF must not emit 'no vni ...' based on unrelated existing VRFs; this indicates the redundant always-true style check is still present. Commands were: ['vrf context NEWVRF', 'no vni 6000', 'vni 5000', 'no shutdown', 'exit']\nE   assert False\nE    +  where False = all(<generator object test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf.<locals>.<genexpr> at 0x7f0809469f10>)\n=========================== short test summary info ============================\nFAILED ../dev/::test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.12s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_map_obj_to_commands_does_not_emit_global_no_vni_when_creating_new_vrf PASSED [100%]\n\n============================== 1 passed in 0.09s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 8951,
+        "completion_tokens": 447,
+        "total_tokens": 9398,
+        "cost_usd": 0.02192225
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

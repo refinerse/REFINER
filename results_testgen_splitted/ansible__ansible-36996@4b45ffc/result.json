@@ -1,0 +1,35 @@
+{
+  "instance_id": "ansible__ansible-36996@4b45ffc",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 22508,
+    "completion_tokens": 2270,
+    "total_tokens": 24778,
+    "cost_usd": 0.071169
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nI think this should be behind a conditional so that it only runs if `force_init` is true, since the TF docs state:\r\n\r\n>  Though subsequent runs may give errors, this command will never delete your existing configuration or state.\r\n> -- https://www.terraform.io/docs/commands/init.html#usage\r\n\r\nSo while I think it is safe to run, it may cause the module to error out when the user doesn't care to make sure plugins are `init`ed. \n\n@author:\nYeah, nice remark. I'll fix it.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ansible__ansible-36996@4b45ffc/test_review_comment_0.py",
+      "test_code": "import tempfile\n\nimport pytest\n\nimport lib.ansible.modules.cloud.misc.terraform as tf\n\n\nclass _ModuleStub:\n    \"\"\"\n    Stub for the global `module` object used throughout terraform.py.\n    It simulates a failing `terraform init` to make init_plugins observable.\n    \"\"\"\n\n    def __init__(self, project_path, force_init):\n        self.params = {\n            \"project_path\": project_path,\n            \"binary_path\": \"/bin/true\",\n            \"state\": \"planned\",\n            \"variables\": {},\n            \"variables_file\": None,\n            # In planned state, plan_file is ignored; keep it unset/None.\n            \"plan_file\": None,\n            \"state_file\": None,\n            \"targets\": [],\n            \"lock\": True,\n            \"lock_timeout\": None,\n            \"force_init\": force_init,\n        }\n        self.check_mode = True\n        self.init_calls = 0\n\n    def get_bin_path(self, name):\n        return \"/bin/true\"\n\n    def run_command(self, command, cwd=None):\n        # Fail init, succeed everything else.\n        if isinstance(command, (list, tuple)) and len(command) >= 2 and command[1] == \"init\":\n            self.init_calls += 1\n            return 1, \"\", \"init failed\"\n        # validate/plan/output succeed\n        return 0, \"{}\", \"\"\n\n    def fail_json(self, **kwargs):\n        raise RuntimeError(kwargs.get(\"msg\", \"fail_json called\"))\n\n    def warn(self, msg):\n        pass\n\n    def exit_json(self, **kwargs):\n        raise SystemExit(kwargs)\n\n\ndef test_init_only_runs_when_force_init_true(monkeypatch):\n    \"\"\"\n    Ensure init_plugins() is conditional:\n    - when force_init=False: init should not run; module should complete successfully\n    - when force_init=True: init should run; our stub makes it fail with init error\n    \"\"\"\n\n    created = {}\n\n    def _fake_ansible_module_ctor(*args, **kwargs):\n        return created[\"module\"]\n\n    monkeypatch.setattr(tf, \"AnsibleModule\", _fake_ansible_module_ctor)\n\n    with tempfile.TemporaryDirectory() as project_path:\n        # Case 1: force_init=False -> init should NOT run and should exit_json successfully.\n        created[\"module\"] = _ModuleStub(project_path=project_path, force_init=False)\n\n        with pytest.raises(SystemExit) as excinfo:\n            tf.main()\n\n        payload = excinfo.value.args[0]\n        assert isinstance(payload, dict) and payload.get(\"state\") == \"planned\", (\n            \"When force_init=False, the module should complete and call exit_json; \"\n            \"it should not fail during terraform init.\"\n        )\n        assert created[\"module\"].init_calls == 0, (\n            \"Expected terraform init not to be invoked when force_init is False, \"\n            f\"but it was called {created['module'].init_calls} time(s).\"\n        )\n\n        # Case 2: force_init=True -> init should run and fail early due to our stub.\n        created[\"module\"] = _ModuleStub(project_path=project_path, force_init=True)\n\n        with pytest.raises(RuntimeError) as excinfo2:\n            tf.main()\n\n        assert \"Failed to initialize Terraform modules\" in str(excinfo2.value), (\n            \"When force_init=True, expected init_plugins() to run and fail early.\"\n        )\n        assert created[\"module\"].init_calls == 1, (\n            \"Expected terraform init to be invoked exactly once when force_init=True, \"\n            f\"but it was called {created['module'].init_calls} time(s).\"\n        )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_init_only_runs_when_force_init_true FAILED                 [100%]\n\n=================================== FAILURES ===================================\n___________________ test_init_only_runs_when_force_init_true ___________________\ntest_review_comment_0.py:72: in test_init_only_runs_when_force_init_true\n    tf.main()\nlib/ansible/modules/cloud/misc/terraform.py:221: in main\n    init_plugins(command[0], project_path)\nlib/ansible/modules/cloud/misc/terraform.py:163: in init_plugins\n    module.fail_json(msg=\"Failed to initialize Terraform modules:\\r\\n{0}\".format(err))\ntest_review_comment_0.py:44: in fail_json\n    raise RuntimeError(kwargs.get(\"msg\", \"fail_json called\"))\nE   RuntimeError: Failed to initialize Terraform modules:\nE   init failed\n=========================== short test summary info ============================\nFAILED ../dev/::test_init_only_runs_when_force_init_true - RuntimeError: Failed to initialize Terraform modules:\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.05s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_init_only_runs_when_force_init_true PASSED                 [100%]\n\n============================== 1 passed in 0.02s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 22508,
+        "completion_tokens": 2270,
+        "total_tokens": 24778,
+        "cost_usd": 0.071169
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

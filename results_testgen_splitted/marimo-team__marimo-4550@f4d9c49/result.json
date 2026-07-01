@@ -1,0 +1,75 @@
+{
+  "instance_id": "marimo-team__marimo-4550@f4d9c49",
+  "repo": "marimo-team/marimo",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 44448,
+    "completion_tokens": 1983,
+    "total_tokens": 46431,
+    "cost_usd": 0.07974119999999998
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nthis `useCallback` may contain old state. to achieve what you want, we use `useEvent` - it takes no deps but is always the same function (but without stale deps)",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "marimo-team__marimo-4550@f4d9c49/test_review_comment_0.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"useColumnExpansion hooks should avoid stale closures by using useEvent (not useCallback with empty deps)\", () => {\n  it(\"does not define callbacks via useCallback(..., []) which can capture stale state; should use useEvent instead\", () => {\n    const sourcePath =\n      \"/workspace/frontend/src/components/editor/actions/useColumnExpansion.ts\";\n\n    // If the file was removed/relocated in the 'after' version, fail with a clear message.\n    expect(fs.existsSync(sourcePath)).toBe(true);\n\n    const src = fs.readFileSync(sourcePath, \"utf8\");\n\n    const hasUseCallbackEmptyDeps =\n      /useCallback\\s*\\(\\s*async\\s*\\(\\s*\\)\\s*=>[\\s\\S]*?\\}\\s*,\\s*\\[\\s*\\]\\s*\\)/m.test(\n        src,\n      );\n\n    expect(hasUseCallbackEmptyDeps).toBe(false);\n\n    const usesUseEvent = /\\buseEvent\\b/.test(src);\n    expect(usesUseEvent).toBe(\n      true,\n      \"Expected implementation to use `useEvent` to avoid stale state in callbacks (review comment).\",\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 7162,
+        "completion_tokens": 834,
+        "total_tokens": 7996,
+        "cost_usd": 0.0183631
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\ncould we combine these hooks, into `const {expandAllSection,collapseAllSection} = useSectionCollapse()`",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "marimo-team__marimo-4550@f4d9c49/test_review_comment_1.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"useColumnExpansion hooks API consolidation\", () => {\n  test(\"file exists and defines a combined hook `useSectionCollapse` returning { expandAllSection, collapseAllSection }\", () => {\n    const modulePath =\n      \"/workspace/frontend/src/components/editor/actions/useColumnExpansion.ts\";\n\n    expect(\n      fs.existsSync(modulePath),\n    ).toBe(true);\n\n    const src = fs.readFileSync(modulePath, \"utf8\");\n\n    expect(src).toContain(\"useSectionCollapse\");\n    expect(src).toContain(\"collapseAllSection\");\n    expect(src).toContain(\"expandAllSection\");\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 7481,
+        "completion_tokens": 649,
+        "total_tokens": 8130,
+        "cost_usd": 0.016129749999999998
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\ncan this be `Collapse/Expand all sections`? \r\n\r\nand `column` \u2192  `section` in other places",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "marimo-team__marimo-4550@f4d9c49/test_review_comment_2.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"useNotebookActions section collapse/expand wording\", () => {\n  it(\"uses 'sections' (not 'columns') for collapse/expand all action labels\", () => {\n    const filePath =\n      \"/workspace/frontend/src/components/editor/actions/useNotebookActions.tsx\";\n\n    // Ensure we're reading the right file and failing with a clear message if not.\n    expect(fs.existsSync(filePath)).toBe(true);\n\n    const src = fs.readFileSync(filePath, \"utf8\");\n\n    expect(src).toContain('label: \"Collapse all sections\"');\n    expect(src).toContain('label: \"Expand all sections\"');\n\n    expect(src).not.toContain('label: \"Collapse all columns\"');\n    expect(src).not.toContain('label: \"Expand all columns\"');\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 29805,
+        "completion_tokens": 500,
+        "total_tokens": 30305,
+        "cost_usd": 0.04524834999999999
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

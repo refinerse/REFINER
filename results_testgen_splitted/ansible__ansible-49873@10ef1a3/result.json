@@ -1,0 +1,35 @@
+{
+  "instance_id": "ansible__ansible-49873@10ef1a3",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 19929,
+    "completion_tokens": 951,
+    "total_tokens": 20880,
+    "cost_usd": 0.029037749999999998
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nversion_added: 2.8\n\n@user1:\nneeds to be added in the purge attributes",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ansible__ansible-49873@10ef1a3/test_review_comment_0.py",
+      "test_code": "import re\n\nimport lib.ansible.modules.network.onyx.onyx_bgp as onyx_bgp\n\n\ndef _get_purge_option_block(documentation: str) -> str:\n    \"\"\"\n    Extract the YAML-ish option block for 'purge:' from the module DOCUMENTATION.\n    We anchor on exactly two-space indentation since Ansible module docs are structured that way:\n      options:\n        <option_name>:\n          ...\n    \"\"\"\n    # Capture from \"  purge:\" up to (but not including) the next \"  <option>:\" at same indent.\n    m = re.search(r\"(?ms)^\\s{2}purge:\\s*\\n(.*?)(?=^\\s{2}\\S+:\\s*$|\\Z)\", documentation)\n    assert m is not None, (\n        \"Could not find the 'purge:' option block under DOCUMENTATION 'options:'. \"\n        \"Expected a block starting with two-space-indented 'purge:'.\"\n    )\n    return \"  purge:\\n\" + m.group(1)\n\n\ndef test_purge_option_has_version_added_28_in_documentation():\n    \"\"\"\n    Review requires: 'purge' option in DOCUMENTATION includes 'version_added: 2.8'.\n    This should fail on the old code (missing version_added) and pass on the corrected code.\n    \"\"\"\n    purge_block = _get_purge_option_block(onyx_bgp.DOCUMENTATION)\n\n    assert re.search(r\"(?m)^\\s{4}version_added:\\s*2\\.8\\s*$\", purge_block), (\n        \"The 'purge' option must declare 'version_added: 2.8'. \"\n        f\"Current purge block:\\n{purge_block}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_purge_option_has_version_added_28_in_documentation FAILED   [100%]\n\n=================================== FAILURES ===================================\n___________ test_purge_option_has_version_added_28_in_documentation ____________\ntest_review_comment_0.py:30: in test_purge_option_has_version_added_28_in_documentation\n    assert re.search(r\"(?m)^\\s{4}version_added:\\s*2\\.8\\s*$\", purge_block), (\nE   AssertionError: The 'purge' option must declare 'version_added: 2.8'. Current purge block:\nE       purge:\nE         description:\nE           - will remove all neighbors when it is True.\nE         type: bool\nE         default: false\nE     \nE   assert None\nE    +  where None = <function search at 0x7f03b47de340>('(?m)^\\\\s{4}version_added:\\\\s*2\\\\.8\\\\s*$', '  purge:\\n    description:\\n      - will remove all neighbors when it is True.\\n    type: bool\\n    default: false\\n')\nE    +    where <function search at 0x7f03b47de340> = re.search\n=========================== short test summary info ============================\nFAILED ../dev::test_purge_option_has_version_added_28_in_documentation - Asse...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.11s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_purge_option_has_version_added_28_in_documentation PASSED   [100%]\n\n============================== 1 passed in 0.09s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 19929,
+        "completion_tokens": 951,
+        "total_tokens": 20880,
+        "cost_usd": 0.029037749999999998
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

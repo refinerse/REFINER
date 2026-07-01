@@ -1,0 +1,35 @@
+{
+  "instance_id": "getsentry__sentry-75210@d7f4634",
+  "repo": "getsentry/sentry",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 7696,
+    "completion_tokens": 1628,
+    "total_tokens": 9324,
+    "cost_usd": 0.029002399999999998
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nSince it's percentage of sessions that were crashes, should we be using total number sessions instead?\r\n```suggestion\r\n  const crashPercent = (crashSessions / (crashSessions + healthySessions)) * 100;\r\n```\n\n@author:\noh yes good catch",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-75210@d7f4634/test_review_comment_0.test.ts",
+      "test_code": "/**\n * @jest-environment node\n */\n\nimport fs from 'fs';\n\ndescribe('sessionStatusBadge crash percent denominator', () => {\n  it('uses total sessions (crash + healthy) as the denominator when computing crashPercent', () => {\n    const filePath =\n      '/workspace/static/app/components/devtoolbar/components/releases/sessionStatusBadge.tsx';\n    const src = fs.readFileSync(filePath, 'utf8');\n\n    expect(src).toContain('const crashPercent');\n\n    // Accept minor formatting differences while still enforcing the correct denominator.\n    const correctDenominatorRegex =\n      /crashSessions\\s*\\/\\s*\\(\\s*crashSessions\\s*\\+\\s*healthySessions\\s*\\)/;\n\n    expect(\n      correctDenominatorRegex.test(src)\n    ).toBeTruthy();\n\n    // Ensure we are not using only healthySessions as the denominator\n    const wrongDenominatorRegex = /crashSessions\\s*\\/\\s*healthySessions/;\n    expect(\n      wrongDenominatorRegex.test(src)\n    ).toBeFalsy();\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 7696,
+        "completion_tokens": 1628,
+        "total_tokens": 9324,
+        "cost_usd": 0.029002399999999998
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

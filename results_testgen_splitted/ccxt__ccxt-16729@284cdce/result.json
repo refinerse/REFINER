@@ -1,0 +1,35 @@
+{
+  "instance_id": "ccxt__ccxt-16729@284cdce",
+  "repo": "ccxt/ccxt",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 161420,
+    "completion_tokens": 385,
+    "total_tokens": 161805,
+    "cost_usd": 0.287875
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n@author something is off here \r\n```\r\n p huobi balance\r\nPython v3.10.9\r\nCCXT v2.7.33\r\n{}\r\nhuobi requires to release all resources with an explicit call to the .close() coroutine. If you are using the exchange instance with async coroutines, add `await exchange.close()` to your code into a place when you're done with the exchange and don't need the exchange instance anymore (at the end of your async coroutine).\r\n```\r\n\n\n@author:\nah, forgot to place spot. please recheck now.\r\nall I wanted to mean is that, if someone uses `fetchBalance ({marginMode: 'isolated/cross'})` I mean that user is requesting spot margin balance (isolated/cross), without the need to place `margin:true` in params. is not that a correct expectation?\n\n@user1:\n>  fetchBalance ({marginMode: 'isolated/cross'}) I mean that user is requesting spot margin balance \r\n@author yes I think that is correct unless we have the ambiguity between isolated/cross on the swap wallet as well",
+      "comment_type": "functional",
+      "language": "javascript",
+      "test_file": "ccxt__ccxt-16729@284cdce/test_review_comment_0.test.js",
+      "test_code": "const Huobi = require('/workspace/js/huobi.js');\n\ndescribe('huobi.fetchBalance marginMode should not hijack non-spot (swap/future) balances', () => {\n    test('type=swap with marginMode=cross must use contract cross-account endpoint, not spot cross-margin endpoint', async () => {\n        const exchange = new Huobi({ enableRateLimit: false });\n\n        // Avoid network/credentials usage and focus on routing logic.\n        exchange.loadMarkets = async () => {};\n        exchange.handleMarketTypeAndParams = (methodName, market, params) => {\n            return [params.type || 'spot', params];\n        };\n        exchange.handleMarginModeAndParams = (methodName, params) => {\n            return [params.marginMode, params];\n        };\n\n        // If the buggy \"before\" routing happens, it will call this spot margin method.\n        exchange.spotPrivateGetV1CrossMarginAccountsBalance = async () => {\n            throw new Error('BUG: spot cross-margin endpoint should NOT be called for swap type when only marginMode=cross is provided');\n        };\n\n        // The correct endpoint for linear swap cross margin\n        exchange.contractPrivatePostLinearSwapApiV1SwapCrossAccountInfo = async () => {\n            return { status: 'ok', data: [{ margin_asset: 'USDT', margin_balance: '1', margin_frozen: '0' }], ts: 1 };\n        };\n\n        // Ensure subtype resolves to linear (so swap + linear branch applies).\n        exchange.options = exchange.options || {};\n        exchange.options.defaultSubType = 'linear';\n\n        const balance = await exchange.fetchBalance({ type: 'swap', subType: 'linear', marginMode: 'cross' });\n\n        expect(balance).toHaveProperty(\n            'USDT',\n            expect.any(Object),\n        );\n    });\n});",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "jest-haste-map: Haste module naming collision: ccxt\n  The following files share their name; please adjust your hasteImpl:\n    * <rootDir>/package.json\n    * <rootDir>/python/package.json\n\n\nnpm WARN exec The following package was not found and will be installed: jest@30.3.0\nnpm WARN deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm WARN deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nFAIL ./test_review_comment_0.test.js\n  huobi.fetchBalance marginMode should not hijack non-spot (swap/future) balances\n    \u2715 type=swap with marginMode=cross must use contract cross-account endpoint, not spot cross-margin endpoint (15 ms)\n\n  \u25cf huobi.fetchBalance marginMode should not hijack non-spot (swap/future) balances \u203a type=swap with marginMode=cross must use contract cross-account endpoint, not spot cross-margin endpoint\n\n    BUG: spot cross-margin endpoint should NOT be called for swap type when only marginMode=cross is provided\n\n      16 |         // If the buggy \"before\" routing happens, it will call this spot margin method.\n      17 |         exchange.spotPrivateGetV1CrossMarginAccountsBalance = async () => {\n    > 18 |             throw new Error('BUG: spot cross-margin endpoint should NOT be called for swap type when only marginMode=cross is provided');\n         |                   ^\n      19 |         };\n      20 |\n      21 |         // The correct endpoint for linear swap cross margin\n\n      at huobi.exchange.spotPrivateGetV1CrossMarginAccountsBalance (test_review_comment_0.test.js:18:19)\n      at huobi.fetchBalance (js/huobi.js:2972:44)\n      at Object.<anonymous> (test_review_comment_0.test.js:30:25)\n\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        1.411 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "after_output": "PASS ./test_review_comment_0.test.js\n  huobi.fetchBalance marginMode should not hijack non-spot (swap/future) balances\n    \u2713 type=swap with marginMode=cross must use contract cross-account endpoint, not spot cross-margin endpoint (12 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.725 s, estimated 2 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 161420,
+        "completion_tokens": 385,
+        "total_tokens": 161805,
+        "cost_usd": 0.287875
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

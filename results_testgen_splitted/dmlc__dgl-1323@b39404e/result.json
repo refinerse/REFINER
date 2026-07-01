@@ -1,0 +1,36 @@
+{
+  "instance_id": "dmlc__dgl-1323@b39404e",
+  "repo": "dmlc/dgl",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+    "cost_usd": 0.0
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nLet's have both of them be `std::vector` and also merge it with L553 by adding a default argument?\n\n@author:\nIf the second argument is pass-by-value then we will copy `rel_graphs` right?",
+      "comment_type": "unknown",
+      "language": "c",
+      "test_file": null,
+      "test_code": null,
+      "error": "Language 'c' not supported for test execution",
+      "before_passed": null,
+      "after_passed": null,
+      "success": false,
+      "before_output": "",
+      "after_output": "",
+      "attempts_used": 0,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cost_usd": 0.0
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

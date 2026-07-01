@@ -1,0 +1,35 @@
+{
+  "instance_id": "numba__numba-9144@74a4cd4",
+  "repo": "numba/numba",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 30867,
+    "completion_tokens": 339,
+    "total_tokens": 31206,
+    "cost_usd": 0.058763249999999996
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWhat happens if the `inc.name` isn't in the `typemap`?\n\n@author:\nIn case `inc.name` is not in `typemap`, `typemap.get(inc.name)` will return `None` and the if stmt below will be evaluated to false. I will update this code to address the corner case if all `typemap.get(...) = [None, ..., None]`, then, the if statement should be false as well.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "numba__numba-9144@74a4cd4/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_phi_propagation_skips_mismatch_only_when_typemap_values_known():\n    \"\"\"\n    The fix ensures that when a PHI node's incoming values are missing from the\n    typemap (typemap.get(...) returns None), the code does NOT treat the PHI as\n    mismatched (because all entries may be None). This is implemented by\n    guarding the mismatch check with `v[0] is not None`.\n    \"\"\"\n    source = open(\"/workspace/numba/core/untyped_passes.py\", \"r\", encoding=\"utf-8\").read()\n\n    # The key behavioral change is the introduction of the guard:\n    #   if v[0] is not None and any([v[0] != vi for vi in v]):\n    #\n    # Before code lacked the `v[0] is not None and` part.\n    expected_pattern = re.compile(\n        r\"if\\s+v\\[0\\]\\s+is\\s+not\\s+None\\s+and\\s+any\\(\\s*\\[\\s*v\\[0\\]\\s*!=\\s*vi\\s+for\\s+vi\\s+in\\s+v\\s*\\]\\s*\\)\\s*:\",\n        re.MULTILINE,\n    )\n\n    assert expected_pattern.search(source), (\n        \"PHI node propagation should only skip when incoming typemap values are \"\n        \"known and not all equal. Expected a guard `v[0] is not None and ...` \"\n        \"before the mismatch check, to avoid treating all-None typemap lookups \"\n        \"as a mismatch.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_phi_propagation_skips_mismatch_only_when_typemap_values_known FAILED [100%]\n\n=================================== FAILURES ===================================\n______ test_phi_propagation_skips_mismatch_only_when_typemap_values_known ______\ntest_review_comment_0.py:22: in test_phi_propagation_skips_mismatch_only_when_typemap_values_known\n    assert expected_pattern.search(source), (\nE   AssertionError: PHI node propagation should only skip when incoming typemap values are known and not all equal. Expected a guard `v[0] is not None and ...` before the mismatch check, to avoid treating all-None typemap lookups as a mismatch.\nE   assert None\nE    +  where None = <built-in method search of re.Pattern object at 0x5583c5aabc80>('from collections import defaultdict, namedtuple\\nfrom contextlib import contextmanager\\nfrom copy import deepcopy, copy\\nimport warnings\\n\\nfrom numba.core.compiler_machinery import (FunctionPass, AnalysisPass,\\n                                           SSACompliantMixin, register_pass)\\nfrom numba.core import (errors, types, ir, bytecode, postproc, rewrites, config,\\n                        transforms, consts)\\nfrom numba.misc.special import literal_unroll\\nfrom numba.core.analysis import (dead_branch_prune, rewrite_semantic_constants,\\n                                 find_literally_calls, compute_cfg_from_blocks,\\n                                 compute_use_defs)\\nfrom numba.core.ir_utils import (guard, resolve_func_from_module, simplify_CFG,\\n                                 GuardException, convert_code_obj_to_function,\\n                                 build_definitions,\\n                                 replace_var_names, get_name_var_table,\\n                                 compile_to_numba_ir, get_definition,\\n                                 find_max_label, rename_labels,\\n                                 transfer_scope, fixup_var_define_in_scope,\\n                   ...FunctionPass.__init__(self)\\n\\n    def run_pass(self, state):\\n        func_ir = state.func_ir\\n        changed = False\\n\\n        for block in func_ir.blocks.values():\\n            for raise_ in block.find_insts((ir.Raise, ir.TryRaise)):\\n                call_inst = guard(get_definition, func_ir, raise_.exception)\\n                if call_inst is None:\\n                    continue\\n                exc_type = func_ir.infer_constant(call_inst.func.name)\\n                exc_args = []\\n                for exc_arg in call_inst.args:\\n                    try:\\n                        const = func_ir.infer_constant(exc_arg)\\n                        exc_args.append(const)\\n                    except consts.ConstantInferenceError:\\n                        exc_args.append(exc_arg)\\n                loc = raise_.loc\\n\\n                cls = {\\n                    ir.TryRaise: ir.DynamicTryRaise,\\n                    ir.Raise: ir.DynamicRaise,\\n                }[type(raise_)]\\n\\n                dyn_raise = cls(exc_type, tuple(exc_args), loc)\\n                block.insert_after(dyn_raise, raise_)\\n                block.remove(raise_)\\n                changed = True\\n        return changed\\n')\nE    +    where <built-in method search of re.Pattern object at 0x5583c5aabc80> = re.compile('if\\\\s+v\\\\[0\\\\]\\\\s+is\\\\s+not\\\\s+None\\\\s+and\\\\s+any\\\\(\\\\s*\\\\[\\\\s*v\\\\[0\\\\]\\\\s*!=\\\\s*vi\\\\s+for\\\\s+vi\\\\s+in\\\\s+v\\\\s*\\\\]\\\\s*\\\\)\\\\s*:', re.MULTILINE).search\n=========================== short test summary info ============================\nFAILED ../dev::test_phi_propagation_skips_mismatch_only_when_typemap_values_known\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_phi_propagation_skips_mismatch_only_when_typemap_values_known PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 30867,
+        "completion_tokens": 339,
+        "total_tokens": 31206,
+        "cost_usd": 0.058763249999999996
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

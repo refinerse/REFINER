@@ -1,0 +1,55 @@
+{
+  "instance_id": "RasaHQ__rasa-5341@d8b1c24",
+  "repo": "RasaHQ/rasa",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 45240,
+    "completion_tokens": 1412,
+    "total_tokens": 46652,
+    "cost_usd": 0.0751492
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n                \"To make use of lookup tables, add a 'DIETClassifier' or a 'CRFEntityExtractor' with \"\r\n```\r\nWe are not featurizing lookup tables in `DIETClassifier`. We only do that in `CRFEntityExtractor`.\n\n@user2:\nGot it, will fix. How are they used in DIET then?\n\n@user1:\n`RegexFeaturizer` adds them as sparse features. `DIETClassifier` simply uses the sparse features.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "RasaHQ__rasa-5341@d8b1c24/test_review_comment_0.py",
+      "test_code": "import pytest\n\nfrom rasa.nlu.components import validate_required_components_from_data\nfrom rasa.nlu.training_data import TrainingData\n\n\nclass _FakeComponent:\n    def __init__(self, name: str, config=None):\n        self._name = name\n        self.component_config = config or {}\n\n    @property\n    def name(self) -> str:\n        return self._name\n\n\ndef test_lookup_table_warning_message_mentions_make_use_not_featurize():\n    \"\"\"If lookup tables exist and neither DIET nor CRF is in the pipeline,\n    the warning should not claim DIET 'featurizes' lookup tables (it doesn't).\n    It should say 'make use of lookup tables' instead.\n    \"\"\"\n    data = TrainingData()\n    data.lookup_tables = [{\"name\": \"cities\", \"elements\": [\"Berlin\", \"Paris\"]}]\n\n    pipeline = [_FakeComponent(\"RegexFeaturizer\")]\n\n    with pytest.warns(UserWarning) as record:\n        validate_required_components_from_data(pipeline, data)\n\n    messages = \"\\n\".join(str(w.message) for w in record)\n    assert (\n        \"To make use of lookup tables\" in messages\n    ), f\"Expected warning to say DIET/CRF 'make use of lookup tables', but got:\\n{messages}\"\n    assert (\n        \"To featurize lookup tables, add a 'DIETClassifier'\" not in messages\n    ), (\n        \"Warning should not suggest that DIETClassifier featurizes lookup tables. \"\n        f\"Got:\\n{messages}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_lookup_table_warning_message_mentions_make_use_not_featurize FAILED [100%]\n\n=================================== FAILURES ===================================\n______ test_lookup_table_warning_message_mentions_make_use_not_featurize _______\ntest_review_comment_0.py:31: in test_lookup_table_warning_message_mentions_make_use_not_featurize\n    assert (\nE   AssertionError: Expected warning to say DIET/CRF 'make use of lookup tables', but got:\nE     You have defined training data consisting of lookup tables, but your NLU pipeline does not include any components that use these features. To featurize lookup tables, add a 'DIETClassifier' or a 'CRFEntityExtractor' with the 'pattern' feature to your pipeline.\nE   assert 'To make use of lookup tables' in \"You have defined training data consisting of lookup tables, but your NLU pipeline does not include any components that use these features. To featurize lookup tables, add a 'DIETClassifier' or a 'CRFEntityExtractor' with the 'pattern' feature to your pipeline.\"\n=========================== short test summary info ============================\nFAILED ../dev/::test_lookup_table_warning_message_mentions_make_use_not_featurize\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.60s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_lookup_table_warning_message_mentions_make_use_not_featurize PASSED [100%]\n\n============================== 1 passed in 0.55s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 14704,
+        "completion_tokens": 325,
+        "total_tokens": 15029,
+        "cost_usd": 0.030281999999999996
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\n```suggestion\r\n                has_pattern_feature = \"pattern\" in itertools.chain(*crf_features)\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "RasaHQ__rasa-5341@d8b1c24/test_review_comment_1.py",
+      "test_code": "import pytest\n\nfrom rasa.nlu.components import validate_required_components_from_data\n\n\nclass DummyTrainingData:\n    \"\"\"Minimal stand-in for rasa.nlu.training_data.training_data.TrainingData.\n\n    validate_required_components_from_data only relies on these attributes.\n    \"\"\"\n\n    def __init__(\n        self,\n        *,\n        response_examples=None,\n        entity_examples=None,\n        regex_features=None,\n        lookup_tables=None,\n        entity_synonyms=None,\n    ):\n        self.response_examples = response_examples or []\n        self.entity_examples = entity_examples or []\n        self.regex_features = regex_features or []\n        self.lookup_tables = lookup_tables or []\n        self.entity_synonyms = entity_synonyms or []\n\n\nclass DummyComponent:\n    \"\"\"Minimal stand-in for rasa.nlu.components.Component instances in a pipeline.\"\"\"\n\n    def __init__(self, name, features):\n        self._name = name\n        self.component_config = {\"features\": features}\n\n    @property\n    def name(self):\n        return self._name\n\n\ndef test_validate_required_components_from_data_warns_if_last_crf_lacks_pattern_due_to_overwrite_bug():\n    \"\"\"Regression test capturing the behavior change in the review comment.\n\n    When multiple CRFEntityExtractors exist, `has_pattern_feature` was set to True if\n    any CRF had 'pattern'. The reviewed change makes `has_pattern_feature` get assigned\n    each iteration (overwriting previous values), so if the *last* CRF lacks 'pattern',\n    a warning is emitted.\n\n    This test asserts the new (post-review) behavior: a warning is raised in that case.\n    \"\"\"\n    data = DummyTrainingData(lookup_tables=[{\"name\": \"cities\", \"elements\": [\"Berlin\"]}])\n\n    # Include RegexFeaturizer to avoid unrelated warnings about lookup tables.\n    pipeline = [\n        DummyComponent(\"RegexFeaturizer\", features=[]),\n        # First CRF includes pattern.\n        DummyComponent(\"CRFEntityExtractor\", features=[[\"pattern\"], [], []]),\n        # Last CRF does not include pattern -> should trigger warning after change.\n        DummyComponent(\"CRFEntityExtractor\", features=[[\"low\"], [], []]),\n    ]\n\n    with pytest.warns(UserWarning) as recorded:\n        validate_required_components_from_data(pipeline, data)\n\n    assert any(\n        \"does not include the 'pattern' feature\" in str(w.message) for w in recorded\n    ), (\n        \"Expected a warning about CRFEntityExtractor missing the 'pattern' feature when \"\n        \"the last CRFEntityExtractor in the pipeline lacks 'pattern' (post-review behavior).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_validate_required_components_from_data_warns_if_last_crf_lacks_pattern_due_to_overwrite_bug FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_validate_required_components_from_data_warns_if_last_crf_lacks_pattern_due_to_overwrite_bug _\ntest_review_comment_1.py:62: in test_validate_required_components_from_data_warns_if_last_crf_lacks_pattern_due_to_overwrite_bug\n    validate_required_components_from_data(pipeline, data)\nE   Failed: DID NOT WARN. No warnings of type (<class 'UserWarning'>,) were emitted. The list of emitted warnings is: [].\n=========================== short test summary info ============================\nFAILED ../dev/::test_validate_required_components_from_data_warns_if_last_crf_lacks_pattern_due_to_overwrite_bug\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.60s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_validate_required_components_from_data_warns_if_last_crf_lacks_pattern_due_to_overwrite_bug PASSED [100%]\n\n============================== 1 passed in 0.55s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 30536,
+        "completion_tokens": 1087,
+        "total_tokens": 31623,
+        "cost_usd": 0.044867199999999996
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

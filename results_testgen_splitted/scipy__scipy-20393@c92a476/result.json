@@ -1,0 +1,35 @@
+{
+  "instance_id": "scipy__scipy-20393@c92a476",
+  "repo": "scipy/scipy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 453857,
+    "completion_tokens": 619,
+    "total_tokens": 454476,
+    "cost_usd": 0.80291575
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n    r\"\"\"\r\n```\r\n\r\nThese need to be raw strings. It looks like it\u2019s causing a test failure.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "scipy__scipy-20393@c92a476/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_newdoc_beta_entries_use_raw_triple_quoted_strings():\n    source = open(\"/workspace/scipy/special/_add_newdocs.py\", encoding=\"utf-8\").read()\n\n    # The review comment requests that these docstrings be raw strings because\n    # they contain backslashes (e.g. \"\\leq\") that would otherwise be interpreted\n    # as escape sequences. Verify that the \"_beta_pdf\" and \"_beta_ppf\" entries\n    # passed to add_newdoc use r\"\"\"...\"\"\" (not plain \"\"\"...\"\"\").\n    for name in (\"_beta_pdf\", \"_beta_ppf\"):\n        # Find the add_newdoc call block for this name and capture the opening\n        # triple-quoted string prefix (either r\"\"\" or \"\"\").\n        m = re.search(\n            rf'add_newdoc\\(\\s*\"{re.escape(name)}\"\\s*,\\s*(r?)\"\"\"',\n            source,\n            flags=re.MULTILINE,\n        )\n        assert m is not None, f\"Expected to find add_newdoc call for {name!r} in /workspace/scipy/special/_add_newdocs.py\"\n        prefix = m.group(1)\n        assert prefix == \"r\", (\n            f\"Docstring passed to add_newdoc for {name!r} must be a raw string (r\\\"\\\"\\\"...\\\"\\\"\\\") \"\n            f\"to preserve backslashes in Sphinx math markup; found a non-raw triple-quoted string.\"\n        )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_newdoc_beta_entries_use_raw_triple_quoted_strings FAILED    [100%]\n\n=================================== FAILURES ===================================\n____________ test_newdoc_beta_entries_use_raw_triple_quoted_strings ____________\ntest_review_comment_0.py:21: in test_newdoc_beta_entries_use_raw_triple_quoted_strings\n    assert prefix == \"r\", (\nE   AssertionError: Docstring passed to add_newdoc for '_beta_pdf' must be a raw string (r\"\"\"...\"\"\") to preserve backslashes in Sphinx math markup; found a non-raw triple-quoted string.\nE   assert '' == 'r'\nE     \nE     - r\n=========================== short test summary info ============================\nFAILED ../dev::test_newdoc_beta_entries_use_raw_triple_quoted_strings - Asser...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.46s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_newdoc_beta_entries_use_raw_triple_quoted_strings PASSED    [100%]\n\n============================== 1 passed in 0.43s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 453857,
+        "completion_tokens": 619,
+        "total_tokens": 454476,
+        "cost_usd": 0.80291575
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

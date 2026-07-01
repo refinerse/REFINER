@@ -1,0 +1,35 @@
+{
+  "instance_id": "python__mypy-4341@2456414",
+  "repo": "python/mypy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 37531,
+    "completion_tokens": 1462,
+    "total_tokens": 38993,
+    "cost_usd": 0.06679365000000001
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nShould we display some information about the exception, since we are catching arbitrary exceptions? An exception could be caused by a bug in dmypy.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "python__mypy-4341@2456414/test_review_comment_0.py",
+      "test_code": "import argparse\nimport json\nimport os\nimport sys\n\nimport pytest\n\nimport mypy.dmypy as dmypy\n\n\ndef test_do_status_shows_error_details_when_request_returns_error(tmp_path, capsys, monkeypatch) -> None:\n    \"\"\"\n    Verify that when the daemon is unresponsive and request('status') returns {'error': ...},\n    dmypy status prints some information about the error (not just a generic message),\n    even without --verbose.\n\n    This should FAIL on the \"before\" version (no error details printed) and PASS on the\n    \"after\" version (show_stats(response) runs when 'error' in response).\n    \"\"\"\n    # Create a valid status file so do_status gets past read_status()/check_status().\n    status_file = tmp_path / \"dmypy_status.json\"\n    sockname = str(tmp_path / \"no_such_dmypy_socket.sock\")  # connect will fail -> {'error': ...}\n    status_file.write_text(json.dumps({\"pid\": os.getpid(), \"sockname\": sockname}))\n\n    monkeypatch.setattr(dmypy, \"STATUS_FILE\", str(status_file))\n\n    args = argparse.Namespace(verbose=False)\n\n    with pytest.raises(SystemExit) as excinfo:\n        dmypy.do_status(args)\n\n    captured = capsys.readouterr()\n    out, err = captured.out, captured.err\n\n    assert err == \"\", \"do_status() should not write diagnostics to stderr in this scenario.\"\n    assert excinfo.value.code == f\"Daemon is stuck; consider {sys.argv[0]} kill\", (\n        \"When the daemon cannot be reached, do_status() should exit with the stuck-daemon \"\n        \"guidance message.\"\n    )\n\n    # Key behavior check: error details (like \"error : [Errno ...] ...\") should be printed.\n    assert \"error\" in out.lower(), (\n        \"do_status() should display some information about the underlying failure when the \"\n        \"status request returns an error (e.g., show_stats printing an 'error' field), \"\n        \"even without --verbose.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_do_status_shows_error_details_when_request_returns_error FAILED [100%]\n\n=================================== FAILURES ===================================\n________ test_do_status_shows_error_details_when_request_returns_error _________\ntest_review_comment_0.py:30: in test_do_status_shows_error_details_when_request_returns_error\n    dmypy.do_status(args)\nE   TypeError: 'NoneType' object is not callable\n=============================== warnings summary ===============================\nmypy/test/data.py:497\n  /workspace/mypy/test/data.py:497: DeprecationWarning: invalid escape sequence \\d\n    '^([ENW]):((?P<col>\\d+):)? (?P<message>.*)$',\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev/::test_do_status_shows_error_details_when_request_returns_error\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 0.02s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_do_status_shows_error_details_when_request_returns_error PASSED [100%]\n\n=============================== warnings summary ===============================\nmypy/test/data.py:497\n  /workspace/mypy/test/data.py:497: DeprecationWarning: invalid escape sequence \\d\n    '^([ENW]):((?P<col>\\d+):)? (?P<message>.*)$',\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 0.01s =========================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 37531,
+        "completion_tokens": 1462,
+        "total_tokens": 38993,
+        "cost_usd": 0.06679365000000001
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

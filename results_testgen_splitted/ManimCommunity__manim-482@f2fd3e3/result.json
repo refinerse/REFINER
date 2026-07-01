@@ -1,0 +1,35 @@
+{
+  "instance_id": "ManimCommunity__manim-482@f2fd3e3",
+  "repo": "ManimCommunity/manim",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 2691,
+    "completion_tokens": 318,
+    "total_tokens": 3009,
+    "cost_usd": 0.00916125
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nUnfortunatly there is already a test_geometry file, which is for graphical unit tests of geometrey module. Could you please rename this file into something like \"test_unit_geometry.py'\" ? \n\n@author:\nDone",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "ManimCommunity__manim-482@f2fd3e3/test_review_comment_0.py",
+      "test_code": "import os\n\n\ndef test_review_requested_removal_or_rename_of_tests_test_geometry():\n    \"\"\"\n    The review comment asked to rename the newly added tests/test_geometry.py\n    because a test_geometry file already existed for graphical tests.\n\n    Observable outcome in the merged version: tests/test_geometry.py no longer exists.\n    \"\"\"\n    path = \"/workspace/tests/test_geometry.py\"\n    assert not os.path.exists(path), (\n        \"tests/test_geometry.py should not exist after addressing the review comment \"\n        \"requesting the file be renamed/removed to avoid conflict with an existing \"\n        \"test_geometry file.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_review_requested_removal_or_rename_of_tests_test_geometry FAILED [100%]\n\n=================================== FAILURES ===================================\n________ test_review_requested_removal_or_rename_of_tests_test_geometry ________\ntest_review_comment_0.py:12: in test_review_requested_removal_or_rename_of_tests_test_geometry\n    assert not os.path.exists(path), (\nE   AssertionError: tests/test_geometry.py should not exist after addressing the review comment requesting the file be renamed/removed to avoid conflict with an existing test_geometry file.\nE   assert not True\nE    +  where True = <function exists at 0x7fcd351449d8>('/workspace/tests/test_geometry.py')\nE    +    where <function exists at 0x7fcd351449d8> = <module 'posixpath' from '/usr/local/lib/python3.6/posixpath.py'>.exists\nE    +      where <module 'posixpath' from '/usr/local/lib/python3.6/posixpath.py'> = os.path\n=========================== short test summary info ============================\nFAILED ../dev/::test_review_requested_removal_or_rename_of_tests_test_geometry\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_review_requested_removal_or_rename_of_tests_test_geometry PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 2691,
+        "completion_tokens": 318,
+        "total_tokens": 3009,
+        "cost_usd": 0.00916125
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

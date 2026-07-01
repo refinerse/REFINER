@@ -1,0 +1,35 @@
+{
+  "instance_id": "huggingface__datasets-586@034c1c0",
+  "repo": "huggingface/datasets",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 7538,
+    "completion_tokens": 852,
+    "total_tokens": 8390,
+    "cost_usd": 0.0188699
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nLet's merge the PR on multi-threaded `text` and add it in the new script before?\n\n@user2:\nBe careful by putting all these checks in `assert`s - that's not what they should be used for. ValueErrors or filenotfound errors might be better. the issue with using asserts everywhere is that users will miss out on these error messages when they run their scripts in optimized mode, which turns off asserts (which are basically debug statements). This is true for the whole code base - using asserts to check arguments is not always what you'd want from a usability perspective.\r\n\r\nI'd change it to:\r\n\r\n```python\r\nif not self.config.data_files:\r\n    raise ValueError(f\"At least one data file must be specified, but got data_files={self.config.data_files}\")\r\n```\n\n@author:\nYes indeed I'll change that",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "huggingface__datasets-586@034c1c0/test_review_comment_0.py",
+      "test_code": "import types\n\nimport pytest\n\nimport datasets.text.text as text_module\n\n\ndef test_text_split_generators_raises_valueerror_when_data_files_missing():\n    \"\"\"\n    Regression test for review comment: argument validation must not use `assert`.\n    When config.data_files is falsy, _split_generators should raise ValueError\n    with a helpful message (so it's not skipped under Python -O).\n    \"\"\"\n    Text = text_module.Text\n\n    # Avoid instantiating Text() since Builder __init__ tries to create cache lock files.\n    # We only need an object that provides `.config.data_files`.\n    builder = object.__new__(Text)\n    builder.config = types.SimpleNamespace(data_files=None)\n\n    class DummyDLManager:\n        def download_and_extract(self, data_files):\n            raise AssertionError(\n                \"download_and_extract must not be called when data_files is missing; \"\n                \"the code should fail fast with ValueError.\"\n            )\n\n    try:\n        builder._split_generators(DummyDLManager())\n        pytest.fail(\n            \"Expected a ValueError when config.data_files is missing. \"\n            \"If this didn't raise, the code is not validating inputs properly.\"\n        )\n    except Exception as e:\n        assert isinstance(\n            e, ValueError\n        ), f\"Expected ValueError (not assert-based validation). Got {type(e).__name__}: {e}\"\n        assert \"At least one data file must be specified\" in str(\n            e\n        ), \"ValueError message should explain that at least one data file must be specified.\"\n        assert \"data_files=\" in str(\n            e\n        ), \"ValueError message should include the data_files value for debugging.\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_text_split_generators_raises_valueerror_when_data_files_missing FAILED [100%]\n\n=================================== FAILURES ===================================\n_____ test_text_split_generators_raises_valueerror_when_data_files_missing _____\ntest_review_comment_0.py:29: in test_text_split_generators_raises_valueerror_when_data_files_missing\n    builder._split_generators(DummyDLManager())\ndatasets/text/text.py:14: in _split_generators\n    assert bool(self.config.data_files), \"At least one data file must be specified, but got data_files={}\".format(self.config.data_files)\nE   AssertionError: At least one data file must be specified, but got data_files=None\n\nDuring handling of the above exception, another exception occurred:\ntest_review_comment_0.py:35: in test_text_split_generators_raises_valueerror_when_data_files_missing\n    assert isinstance(\nE   AssertionError: Expected ValueError (not assert-based validation). Got AssertionError: At least one data file must be specified, but got data_files=None\nE   assert False\nE    +  where False = isinstance(AssertionError('At least one data file must be specified, but got data_files=None'), ValueError)\n=========================== short test summary info ============================\nFAILED ../dev/::test_text_split_generators_raises_valueerror_when_data_files_missing\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.70s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_text_split_generators_raises_valueerror_when_data_files_missing PASSED [100%]\n\n============================== 1 passed in 0.67s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 7538,
+        "completion_tokens": 852,
+        "total_tokens": 8390,
+        "cost_usd": 0.0188699
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

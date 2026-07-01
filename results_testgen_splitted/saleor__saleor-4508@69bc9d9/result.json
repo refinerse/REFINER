@@ -1,0 +1,35 @@
+{
+  "instance_id": "saleor__saleor-4508@69bc9d9",
+  "repo": "saleor/saleor",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 13710,
+    "completion_tokens": 353,
+    "total_tokens": 14063,
+    "cost_usd": 0.0186529
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n`buttonText` and `textColor` belong to `Record<\"default\" | \"gray\", string>` type.",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "saleor__saleor-4508@69bc9d9/test_review_comment_0.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"theme.ts IThemeColors typing: button/text colors must live under font record\", () => {\n  it(\"should not expose buttonText/textColor as top-level IThemeColors keys; instead, font should include button and textButton\", () => {\n    const src = fs.readFileSync(\n      \"/workspace/saleor/static/dashboard-next/theme.ts\",\n      \"utf8\",\n    );\n\n    expect(src.includes('\"buttonText\"') || src.includes('\"textColor\"')).toBe(\n      false,\n    );\n\n    expect(src).toContain(\n      'font: Record<\"default\" | \"gray\" | \"button\" | \"textButton\", string>',\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "ts-jest[versions] (WARN) Version 24.8.0 of jest installed has not been tested with ts-jest. If you're experiencing issues, consider using a supported version (>=22.0.0 <24.0.0). Please do not report issues in ts-jest if you are using unsupported versions.\nFAIL ./test_review_comment_0.test.ts\n  theme.ts IThemeColors typing: button/text colors must live under font record\n    \u2715 should not expose buttonText/textColor as top-level IThemeColors keys; instead, font should include button and textButton (3ms)\n\n  \u25cf theme.ts IThemeColors typing: button/text colors must live under font record \u203a should not expose buttonText/textColor as top-level IThemeColors keys; instead, font should include button and textButton\n\n    expect(received).toBe(expected) // Object.is equality\n\n    Expected: false\n    Received: true\n\n       8 |     );\n       9 | \n    > 10 |     expect(src.includes('\"buttonText\"') || src.includes('\"textColor\"')).toBe(\n         |                                                                         ^\n      11 |       false,\n      12 |     );\n      13 | \n\n      at Object.<anonymous> (test_review_comment_0.test.ts:10:73)\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\n\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        3.648s\nRan all test suites matching /\\/workspace\\/test_review_comment_0.test.ts/i.",
+      "after_output": "ts-jest[versions] (WARN) Version 24.8.0 of jest installed has not been tested with ts-jest. If you're experiencing issues, consider using a supported version (>=22.0.0 <24.0.0). Please do not report issues in ts-jest if you are using unsupported versions.\nPASS ./test_review_comment_0.test.ts\n  theme.ts IThemeColors typing: button/text colors must live under font record\n    \u2713 should not expose buttonText/textColor as top-level IThemeColors keys; instead, font should include button and textButton (2ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.871s, estimated 4s\nRan all test suites matching /\\/workspace\\/test_review_comment_0.test.ts/i.",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 13710,
+        "completion_tokens": 353,
+        "total_tokens": 14063,
+        "cost_usd": 0.0186529
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

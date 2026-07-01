@@ -1,0 +1,35 @@
+{
+  "instance_id": "tobymao__sqlglot-3945@6a91477",
+  "repo": "tobymao/sqlglot",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 242752,
+    "completion_tokens": 916,
+    "total_tokens": 243668,
+    "cost_usd": 0.18543840000000003
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n        partition = self.sql(expression, \"partition\")\r\n        partition = f\" {partition}\" if partition else \"\"\r\n        return f\"DESCRIBE{style} {self.sql(expression, 'this')}{partition}\"\r\n```",
+      "comment_type": "documentation",
+      "language": "python",
+      "test_file": "tobymao__sqlglot-3945@6a91477/test_review_comment_0.py",
+      "test_code": "from sqlglot import exp\nfrom sqlglot.generator import Generator\n\n\ndef test_describe_sql_partition_uses_keyed_sql_generation_not_self_sql_on_node():\n    \"\"\"\n    The change in the diff is specifically:\n      BEFORE: partition = expression.args.get(\"partition\"); self.sql(partition)\n      AFTER:  partition = self.sql(expression, \"partition\")  (keyed lookup)\n\n    These two are NOT equivalent when the partition node is an exp.Partition, because:\n      - exp.Partition SQL is \"PARTITION(...)\" (via Generator.partition_sql / key dispatch)\n      - calling Generator.sql(exp.Partition) without a key returns its TRANSFORM output,\n        which is exp.PartitionedByProperty (a different \"PARTITIONED BY ...\" construct)\n\n    So: exp.Describe(partition=exp.Partition([...])) must render \"PARTITION(...)\".\n    This FAILS on the before code (it incorrectly renders \"PARTITIONED BY ...\"),\n    and PASSES on the after code.\n    \"\"\"\n    g = Generator(pretty=False)\n\n    describe = exp.Describe(\n        this=exp.to_identifier(\"t\"),\n        partition=exp.Partition(expressions=[exp.Literal.number(1)]),\n    )\n\n    sql = g.generate(describe)\n\n    assert (\n        sql == \"DESCRIBE t PARTITION(1)\"\n    ), (\n        \"Generator.describe_sql must render Describe.partition using Generator.sql(expression, 'partition') \"\n        \"so that exp.Partition is generated as PARTITION(...). \"\n        \"If it instead calls self.sql(partition_node) directly, exp.Partition is incorrectly transformed \"\n        \"as a property (e.g., PARTITIONED BY ...). \"\n        f\"Got: {sql!r}\"\n    )",
+      "before_passed": true,
+      "after_passed": true,
+      "success": false,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_describe_sql_partition_uses_keyed_sql_generation_not_self_sql_on_node PASSED [100%]\n\n============================== 1 passed in 0.21s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_describe_sql_partition_uses_keyed_sql_generation_not_self_sql_on_node PASSED [100%]\n\n============================== 1 passed in 0.20s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 242752,
+        "completion_tokens": 916,
+        "total_tokens": 243668,
+        "cost_usd": 0.18543840000000003
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

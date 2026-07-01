@@ -1,0 +1,35 @@
+{
+  "instance_id": "modin-project__modin-635@2a8e5d1",
+  "repo": "modin-project/modin",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 24570,
+    "completion_tokens": 509,
+    "total_tokens": 25079,
+    "cost_usd": 0.0253267
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nShould we have a try-except block here as well in case it is a list of columns?\n\n@author:\nlist of columns should always work here. if it's not a valid argument it will fail in `__getitem__`.\r\n\r\nIt would be good to add a check for `Series` here, because there should never be a tuple for `Series.loc`. I will add it.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "modin-project__modin-635@2a8e5d1/test_review_comment_0.py",
+      "test_code": "import pytest\n\nimport modin.pandas as mpd\nfrom pandas.core.indexing import IndexingError\n\n\ndef test_loc_too_many_indexers_raises_indexingerror():\n    df = mpd.DataFrame({\"a\": [1, 2], \"b\": [3, 4]})\n\n    with pytest.raises(\n        IndexingError,\n        match=\"Too many indexers\",\n    ):\n        _ = df.loc[:, \"a\", \"extra\"]\n\n    assert True, (\n        \"DataFrame.loc with more indexers than df.ndim should raise \"\n        \"pandas.core.indexing.IndexingError('Too many indexers').\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 24570,
+        "completion_tokens": 509,
+        "total_tokens": 25079,
+        "cost_usd": 0.0253267
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

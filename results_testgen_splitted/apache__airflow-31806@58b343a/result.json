@@ -1,0 +1,75 @@
+{
+  "instance_id": "apache__airflow-31806@58b343a",
+  "repo": "apache/airflow",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 63980,
+    "completion_tokens": 2484,
+    "total_tokens": 66464,
+    "cost_usd": 0.0999698
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWe can remove if unnecessary, tasks are not hovering in the Gantt tab, maybe 'nice to have' but not necessary IMHO\n\n@author:\nRemoved",
+      "comment_type": "structural",
+      "language": "typescript",
+      "test_file": "apache__airflow-31806@58b343a/test_review_comment_0.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"Details Gantt tab: hoveredTaskState prop should be removed when unused\", () => {\n  it(\"does not pass (even commented out) hoveredTaskState into the <Gantt /> component\", () => {\n    const source = fs.readFileSync(\n      \"/workspace/airflow/www/static/js/dag/details/index.tsx\",\n      \"utf8\"\n    );\n\n    expect(source).not.toMatch(\n      /<Gantt[\\s\\S]*hoveredTaskState\\s*=\\s*\\{hoveredTaskState\\}/m\n    );\n    expect(source).not.toMatch(\n      /<Gantt[\\s\\S]*\\/\\/\\s*hoveredTaskState\\s*=\\s*\\{hoveredTaskState\\}/m\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 24290,
+        "completion_tokens": 513,
+        "total_tokens": 24803,
+        "cost_usd": 0.0390047
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nIs `runId` necessary here ? \n\n@author:\nUpdated. There was an existing bug with resetting the tabs.",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "apache__airflow-31806@58b343a/test_review_comment_1.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"Details tab-reset logic (bug fix): only reset when invalid tab for current selection\", () => {\n  it(\"uses tabCount-based reset logic (and removes the old buggy condition)\", () => {\n    const src = fs.readFileSync(\n      \"/workspace/airflow/www/static/js/dag/details/index.tsx\",\n      \"utf8\"\n    );\n\n    const hasOldBuggyCondition =\n      src.includes(\"if ((!taskId || isGroup) && tabIndex > 3)\") &&\n      src.includes(\"onChangeTab(1)\");\n\n    const hasFixedTabCountLogic =\n      src.includes(\"const tabCount\") &&\n      src.includes(\"? 4 : 3\") &&\n      src.includes(\"if (tabCount === 3 && tabIndex > 2)\") &&\n      src.includes(\"onChangeTab(1)\");\n\n    expect(hasFixedTabCountLogic).toBe(\n      true\n    );\n    expect(hasOldBuggyCondition).toBe(\n      false\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 24341,
+        "completion_tokens": 739,
+        "total_tokens": 25080,
+        "cost_usd": 0.03016195
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\nCan we extract a component from this. I find it hard to read to have all this code inlined in the jsx.\n\n@author:\nCleaned up!",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "apache__airflow-31806@58b343a/test_review_comment_2.test.ts",
+      "test_code": "/**\n * Self-contained Jest test file.\n *\n * NOTE: This repo may not ship a Jest config at /workspace, and `npx jest` can fail\n * unless invoked with `--config`. This test creates a minimal Jest config file at the\n * repo root if one is not present, so the test can run cleanly.\n */\n\nimport fs from \"fs\";\nimport path from \"path\";\n\nconst WORKSPACE_ROOT = \"/workspace\";\nconst chartPath = \"/workspace/airflow/www/static/js/dag/details/gantt/Chart.tsx\";\n\nfunction ensureJestConfigExists() {\n  const candidateNames = [\n    \"jest.config.js\",\n    \"jest.config.ts\",\n    \"jest.config.mjs\",\n    \"jest.config.cjs\",\n    \"jest.config.cts\",\n    \"jest.config.json\",\n  ];\n  const hasConfig = candidateNames.some((name) =>\n    fs.existsSync(path.join(WORKSPACE_ROOT, name))\n  );\n  if (hasConfig) return;\n\n  // Minimal config so `npx jest <this_file>` doesn't error with \"Could not find a config file\"\n  const configPath = path.join(WORKSPACE_ROOT, \"jest.config.js\");\n  const configContents = `module.exports = {\n  testEnvironment: 'node',\n  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],\n  transform: {},\n};\\n`;\n\n  fs.writeFileSync(configPath, configContents, \"utf8\");\n}\n\nbeforeAll(() => {\n  ensureJestConfigExists();\n});\n\ndescribe(\"Chart.tsx refactor: extract complex inline JSX into a dedicated component\", () => {\n  test(\"Chart should define at least one additional React component (refactor away from fully inlined JSX)\", () => {\n    expect(fs.existsSync(chartPath)).toBe(\n      true,\n      `Expected source file to exist at absolute path: ${chartPath}`\n    );\n\n    const src = fs.readFileSync(chartPath, \"utf8\");\n\n    // Structural outcome of the refactor: at least one additional component defined\n    // in this file besides Chart (PascalCase component declaration).\n    // Before: only `const Chart = (...) => { ... }`\n    // After: extracted component like `const TaskRow = ...` or `function TaskTooltip(...) { ... }`\n    const componentDeclMatches = src.match(\n      /\\b(?:const|function)\\s+[A-Z][A-Za-z0-9_]*\\s*(?:=\\s*\\(|\\()/g\n    );\n\n    const count = componentDeclMatches?.length ?? 0;\n\n    expect(count).toBeGreaterThan(\n      1,\n      `Expected Chart.tsx to define an extracted React component (e.g. TaskRow/TaskTooltip/TaskBar) in addition to Chart. Found ${count} component declaration(s) matching 'const|function <PascalCase>'.`\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 15349,
+        "completion_tokens": 1232,
+        "total_tokens": 16581,
+        "cost_usd": 0.03080315
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

@@ -1,0 +1,35 @@
+{
+  "instance_id": "python-telegram-bot__python-telegram-bot-3514@d5c0a5c",
+  "repo": "python-telegram-bot/python-telegram-bot",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 2401,
+    "completion_tokens": 219,
+    "total_tokens": 2620,
+    "cost_usd": 0.00726775
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nAt this point we haven't yet established that the rows are sequences as well. `check_keyboard_type([1])` would raise an exception with this addition IISC \u2026",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "python-telegram-bot__python-telegram-bot-3514@d5c0a5c/test_review_comment_0.py",
+      "test_code": "import pytest\n\nfrom telegram._utils.markup import check_keyboard_type\n\n\ndef test_check_keyboard_type_does_not_index_into_rows_before_row_type_check():\n    \"\"\"\n    Regression test for a bug where check_keyboard_type tried to access keyboard[0][0]\n    before validating that rows are sequences.\n\n    For keyboard=[1], the function should *not* raise (e.g. TypeError: 'int' is not subscriptable)\n    and should return False because the row is not a sequence.\n    \"\"\"\n    keyboard = [1]\n\n    try:\n        result = check_keyboard_type(keyboard)\n    except Exception as exc:  # noqa: BLE001 - we want to ensure *no* exception is raised\n        pytest.fail(\n            \"check_keyboard_type([1]) must not raise. It should validate row types before \"\n            f\"attempting nested indexing. Raised: {type(exc).__name__}: {exc}\"\n        )\n\n    assert result is False, \"check_keyboard_type([1]) should return False because rows are not sequences.\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_check_keyboard_type_does_not_index_into_rows_before_row_type_check FAILED [100%]\n\n=================================== FAILURES ===================================\n___ test_check_keyboard_type_does_not_index_into_rows_before_row_type_check ____\ntest_review_comment_0.py:17: in test_check_keyboard_type_does_not_index_into_rows_before_row_type_check\n    result = check_keyboard_type(keyboard)\ntelegram/_utils/markup.py:44: in check_keyboard_type\n    if isinstance(keyboard[0][0], Sequence) and not isinstance(keyboard[0][0], (str, bytes)):\nE   TypeError: 'int' object is not subscriptable\n\nDuring handling of the above exception, another exception occurred:\ntest_review_comment_0.py:19: in test_check_keyboard_type_does_not_index_into_rows_before_row_type_check\n    pytest.fail(\nE   Failed: check_keyboard_type([1]) must not raise. It should validate row types before attempting nested indexing. Raised: TypeError: 'int' object is not subscriptable\n=========================== short test summary info ============================\nFAILED ../dev/::test_check_keyboard_type_does_not_index_into_rows_before_row_type_check\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.33s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_check_keyboard_type_does_not_index_into_rows_before_row_type_check PASSED [100%]\n\n============================== 1 passed in 0.29s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 2401,
+        "completion_tokens": 219,
+        "total_tokens": 2620,
+        "cost_usd": 0.00726775
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}
