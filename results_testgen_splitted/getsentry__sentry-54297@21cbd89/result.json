@@ -1,0 +1,55 @@
+{
+  "instance_id": "getsentry__sentry-54297@21cbd89",
+  "repo": "getsentry/sentry",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 53888,
+    "completion_tokens": 1975,
+    "total_tokens": 55863,
+    "cost_usd": 0.09534279999999999
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWe only want to render `GuideAnchor` when the feature is turned on, so it needs to be inside the `EventNavigationDropdown` component (since it is only rendered when the feature is active)",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-54297@21cbd89/test_review_comment_0.test.ts",
+      "test_code": "import fs from 'fs';\n\ndescribe('groupEventCarousel - GuideAnchor placement', () => {\n  it('places the GuideAnchor inside EventNavigationDropdown (so it is feature-gated) and not in GroupEventCarousel', () => {\n    const source = fs.readFileSync(\n      '/workspace/static/app/views/issueDetails/groupEventCarousel.tsx',\n      'utf8'\n    );\n\n    const dropdownFnStart = source.indexOf('function EventNavigationDropdown');\n    expect(dropdownFnStart).toBeGreaterThan(\n      -1,\n      'Expected to find function EventNavigationDropdown in /workspace/static/app/views/issueDetails/groupEventCarousel.tsx'\n    );\n\n    const carouselFnStart = source.indexOf('export function GroupEventCarousel');\n    expect(carouselFnStart).toBeGreaterThan(\n      -1,\n      'Expected to find export function GroupEventCarousel in /workspace/static/app/views/issueDetails/groupEventCarousel.tsx'\n    );\n\n    const dropdownBody = source.slice(dropdownFnStart, carouselFnStart);\n    const carouselBody = source.slice(carouselFnStart);\n\n    expect(dropdownBody).toContain(\n      '<GuideAnchor target=\"issue_details_default_event\" position=\"bottom\">',\n      'Expected GuideAnchor to be rendered inside EventNavigationDropdown so it only renders when the feature is enabled.'\n    );\n\n    expect(carouselBody).not.toContain(\n      '<GuideAnchor target=\"issue_details_default_event\" position=\"bottom\">',\n      'Did not expect GroupEventCarousel to render this GuideAnchor directly; it should be inside EventNavigationDropdown to ensure feature-gating.'\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 28430,
+        "completion_tokens": 1021,
+        "total_tokens": 29451,
+        "cost_usd": 0.0497329
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nThreshold here should be 2023-08-22",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-54297@21cbd89/test_review_comment_1.test.ts",
+      "test_code": "const fs = require('fs');\n\ndescribe('getGuidesContent: explain_new_default_event_issue_detail threshold', () => {\n  test('dateThreshold is set to 2023-08-22 in getGuidesContent definition', () => {\n    const source = fs.readFileSync(\n      '/workspace/static/app/components/assistant/getGuidesContent.tsx',\n      'utf8'\n    );\n\n    const idx = source.indexOf(\"guide: 'explain_new_default_event_issue_detail'\");\n    expect(idx).toBeGreaterThanOrEqual(\n      0,\n      \"Expected guide 'explain_new_default_event_issue_detail' to exist in /workspace/static/app/components/assistant/getGuidesContent.tsx\"\n    );\n\n    const window = source.slice(idx, idx + 500);\n\n    expect(window).toContain(\n      \"dateThreshold: new Date('2023-08-22')\",\n      \"Expected 'explain_new_default_event_issue_detail' to use dateThreshold new Date('2023-08-22')\"\n    );\n\n    expect(window).not.toContain(\n      \"dateThreshold: new Date('2023-07-05')\",\n      \"Did not expect 'explain_new_default_event_issue_detail' to still use the old dateThreshold new Date('2023-07-05')\"\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 25458,
+        "completion_tokens": 954,
+        "total_tokens": 26412,
+        "cost_usd": 0.045609899999999995
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

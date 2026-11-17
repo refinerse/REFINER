@@ -1,0 +1,36 @@
+import warnings
+
+import pytest
+
+
+def test_get_underlying_uri_uses_local_import_for_mlflowclient():
+    """
+    Verify the implementation uses a local import:
+        from mlflow import MlflowClient
+    and then instantiates the client via:
+        client = MlflowClient(...)
+    (not via mlflow.MlflowClient or mlflow.tracking.MlflowClient).
+
+    Note: We also silence PytestRemovedIn9Warning because, in this repository, it can be raised
+    during conftest/plugin loading under pytest even with `-c /dev/null`, and it's unrelated to
+    the behavior being tested.
+    """
+    warnings.filterwarnings("ignore", category=pytest.PytestRemovedIn9Warning)
+
+    source = open("/workspace/mlflow/store/artifact/models_artifact_repo.py").read()
+
+    assert (
+        "from mlflow import MlflowClient" in source
+    ), "Expected local import 'from mlflow import MlflowClient' in models_artifact_repo.py"
+
+    assert (
+        "client = MlflowClient(" in source
+    ), "Expected client instantiation to use the locally imported name: 'client = MlflowClient(...)'"
+
+    assert (
+        "client = mlflow.MlflowClient(" not in source
+    ), "Did not expect 'client = mlflow.MlflowClient(...)' when using a local MlflowClient import"
+
+    assert (
+        "from mlflow.tracking import MlflowClient" not in source
+    ), "Did not expect import from 'mlflow.tracking' after switching to local MlflowClient import"

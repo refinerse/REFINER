@@ -1,0 +1,55 @@
+{
+  "instance_id": "PostHog__posthog-6447@1e6f4eb",
+  "repo": "PostHog/posthog",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 47531,
+    "completion_tokens": 1485,
+    "total_tokens": 49016,
+    "cost_usd": 0.05840764999999999
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nI think this \"undo\" function requires the full item to do the undoing. \n\n@user1:\nactually no, just the id and the name...\n\n@author:\noops thanks",
+      "comment_type": "style",
+      "language": "typescript",
+      "test_file": "PostHog__posthog-6447@1e6f4eb/test_review_comment_0.test.ts",
+      "test_code": "import fs from 'fs'\n\ntest('DashboardItem deleteWithUndo should include both id and name in object payload', () => {\n    // Ensure module can be loaded (requirement: load module under test)\n    expect(() => require('/workspace/frontend/src/scenes/dashboard/DashboardItem.tsx')).not.toThrow()\n\n    const source = fs.readFileSync('/workspace/frontend/src/scenes/dashboard/DashboardItem.tsx', 'utf8')\n\n    expect(source).toContain(\"data-attr={'dashboard-item-' + index + '-dropdown-delete'}\")\n\n    // Robustly assert that in the delete menu item's onClick handler, deleteWithUndo is called with object containing id and name.\n    // This should FAIL on \"before\" (missing name) and PASS on \"after\".\n    const deleteMenuItemIndex = source.indexOf(\"data-attr={'dashboard-item-' + index + '-dropdown-delete'}\")\n    expect(deleteMenuItemIndex).toBeGreaterThan(\n        -1,\n        'Could not find the delete dropdown menu item in DashboardItem.tsx'\n    )\n\n    const window = source.slice(deleteMenuItemIndex, deleteMenuItemIndex + 1200) // enough to include the handler body\n\n    expect(window).toMatch(/deleteWithUndo\\(\\s*{\\s*/m)\n    expect(window).toMatch(/object:\\s*{\\s*[\\s\\S]*?\\bid:\\s*item\\.id\\b/m)\n    expect(window).toMatch(\n        /\\bname:\\s*item\\.name\\b/m,\n        'Expected deleteWithUndo payload to include `name: item.name` for undo messaging'\n    )\n})",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "No tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspace/frontend/src\n  621 files checked.\n  testMatch: **/__tests__/**/*.[jt]s?(x), **/?(*.)+(spec|test).[tj]s?(x) - 23 matches\n  testPathIgnorePatterns: /node_modules/ - 621 matches\n  testRegex:  - 0 matches\nPattern: /workspace/test_review_comment_0.test.ts - 0 matches",
+      "after_output": "No tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspace/frontend/src\n  621 files checked.\n  testMatch: **/__tests__/**/*.[jt]s?(x), **/?(*.)+(spec|test).[tj]s?(x) - 23 matches\n  testPathIgnorePatterns: /node_modules/ - 621 matches\n  testRegex:  - 0 matches\nPattern: /workspace/test_review_comment_0.test.ts - 0 matches",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 33031,
+        "completion_tokens": 811,
+        "total_tokens": 33842,
+        "cost_usd": 0.03649904999999999
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nI don't think these tests add value. This just checks that calling loadResults calls loadResults, which doesn't check for anything other than its existence... Whether `loadResults` is a function we can call is already checked by typescript, so \ud83e\udd37...\r\n\n\n@author:\nI agree but I wanted to put something in to prevent regression because typescript didn't catch this \n\n@user1:\nWas this something related to deleting dashboard items?\n\n@author:\nyeah, I saw you have a new PR fix for it so I can remove these changes\n\n@user1:\nYup, in addition we shouldn't actually be calling `loadResults` on any of the funnel/trends/paths/retentionTable logics anymore. They all proxy the action up to `insightsLogic` which does the API calls.",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "PostHog__posthog-6447@1e6f4eb/test_review_comment_1.test.ts",
+      "test_code": "import fs from 'fs'\n\ndescribe('funnelLogic review-comment regression: remove no-value \"dashboard item interface\" test', () => {\n    it('does not include the removed \"dashboard item interface\" test block in funnelLogic.test.ts', () => {\n        const testFilePath = '/workspace/frontend/src/scenes/funnels/funnelLogic.test.ts'\n        const contents = fs.readFileSync(testFilePath, 'utf8')\n\n        expect(contents).not.toContain(\"describe('dashboard item interface'\")\n        expect(contents).not.toContain(\"it('can load directly'\")\n        expect(contents).not.toContain(\"toDispatchActions(['loadResults'])\")\n    })\n})",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "No tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspace/frontend/src\n  621 files checked.\n  testMatch: **/__tests__/**/*.[jt]s?(x), **/?(*.)+(spec|test).[tj]s?(x) - 23 matches\n  testPathIgnorePatterns: /node_modules/ - 621 matches\n  testRegex:  - 0 matches\nPattern: /workspace/test_review_comment_1.test.ts - 0 matches",
+      "after_output": "No tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspace/frontend/src\n  621 files checked.\n  testMatch: **/__tests__/**/*.[jt]s?(x), **/?(*.)+(spec|test).[tj]s?(x) - 23 matches\n  testPathIgnorePatterns: /node_modules/ - 621 matches\n  testRegex:  - 0 matches\nPattern: /workspace/test_review_comment_1.test.ts - 0 matches",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 14500,
+        "completion_tokens": 674,
+        "total_tokens": 15174,
+        "cost_usd": 0.0219086
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

@@ -1,0 +1,55 @@
+{
+  "instance_id": "sympy__sympy-27352@b3187d6",
+  "repo": "sympy/sympy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 79253,
+    "completion_tokens": 588,
+    "total_tokens": 79841,
+    "cost_usd": 0.14692475
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nIf the code is the same in both branches then the if check is not needed.\n\n@author:\nOkay, I will update that.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "sympy__sympy-27352@b3187d6/test_review_comment_0.py",
+      "test_code": "import inspect\n\nfrom sympy.polys.matrices.domainmatrix import DomainMatrix\n\n\ndef test_domainmatrix_qr_has_no_redundant_dfm_branch():\n    \"\"\"\n    The qr() implementation should not contain a redundant\n    `if isinstance(self.rep, DFM): ... else: ...` branch when both sides call\n    the same code. This test enforces that by checking the function source.\n    \"\"\"\n    src = inspect.getsource(DomainMatrix.qr)\n\n    assert \"if isinstance(self.rep, DFM)\" not in src, (\n        \"DomainMatrix.qr() still contains a redundant DFM type-check branch. \"\n        \"The review requested removing this unnecessary if/else when both \"\n        \"branches execute the same code.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_domainmatrix_qr_has_no_redundant_dfm_branch FAILED          [100%]\n\n=================================== FAILURES ===================================\n_______________ test_domainmatrix_qr_has_no_redundant_dfm_branch _______________\ntest_review_comment_0.py:14: in test_domainmatrix_qr_has_no_redundant_dfm_branch\n    assert \"if isinstance(self.rep, DFM)\" not in src, (\nE   AssertionError: DomainMatrix.qr() still contains a redundant DFM type-check branch. The review requested removing this unnecessary if/else when both branches execute the same code.\nE   assert 'if isinstan...lf.rep, DFM)' not in '    def qr(...eturn Q, R\\n'\nE     \nE     'if isinstance(self.rep, DFM)' is contained here:\nE           def qr(self):\nE               \"\"\"\nE               QR decomposition for DomainMatrix.\nE       \nE               Returns:...\nE     \nE     ...Full output truncated (11 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev::test_domainmatrix_qr_has_no_redundant_dfm_branch - AssertionEr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.54s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_domainmatrix_qr_has_no_redundant_dfm_branch PASSED          [100%]\n\n============================== 1 passed in 0.50s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 61042,
+        "completion_tokens": 161,
+        "total_tokens": 61203,
+        "cost_usd": 0.10907750000000001
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nUsing `//` here is incorrect. This is not how fraction-free algorithms work: exact division (`exquo`) can be used but floor division should not.\n\n@author:\nOkay, I used `/` at first but after installing `python-flint`, `/` started giving  me  this` \"error:  flint.utils.flint_exceptions.DomainError: fmpz division is not exact \"`\r\n\n\n@author:\nbut i will work around it, thank you for the nuggets. \n\n@user1:\nIf the domain is a field then `/` can be used.\n\n@author:\nwhat are the domains the `qr` method should support?  The current implementation only supports integers (ZZ).\n\n@user1:\nThe QR decomposition should be computable for any field. To learn more about the domains see:\r\nhttps://docs.sympy.org/latest/modules/polys/domainsintro.html",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "sympy__sympy-27352@b3187d6/test_review_comment_1.py",
+      "test_code": "import pytest\n\nfrom sympy import ZZ, QQ\nfrom sympy.polys.matrices.ddm import DDM\nfrom sympy.polys.matrices.exceptions import DMDomainError\n\n\ndef test_ddm_qr_requires_field_and_uses_exact_division():\n    # On the fixed code, qr() should reject non-field domains like ZZ.\n    # On the buggy code, it silently proceeds (and also uses //).\n    Azz = DDM([[ZZ(2), ZZ(1)], [ZZ(1), ZZ(1)]], (2, 2), ZZ)\n\n    with pytest.raises(DMDomainError, match=\"requires a field\"):\n        Azz.qr()\n\n    # On the fixed code, qr() should work over a field (e.g. QQ) and return\n    # Q and R with expected shapes: Q is m x min(m,n), R is min(m,n) x n.\n    Aqq = DDM([[QQ(2), QQ(1)], [QQ(1), QQ(1)]], (2, 2), QQ)\n    Q, R = Aqq.qr()\n\n    assert Q.shape == (2, 2), \"Over a field, qr() should return Q with shape (m, min(m,n)).\"\n    assert R.shape == (2, 2), \"Over a field, qr() should return R with shape (min(m,n), n).\"\n\n    # For a matrix with non-orthogonal columns, Gram-Schmidt should produce\n    # a nonzero off-diagonal entry in R, and it must be exact rational division.\n    # For this A, R[0,1] should be (q0\u00b7a1)/(q0\u00b7q0) = 3/5.\n    assert R[0][1] == QQ(3, 5), (\n        \"qr() over QQ should compute R[0,1] using exact field division, \"\n        \"giving 3/5 for this input (not floor division).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ddm_qr_requires_field_and_uses_exact_division FAILED        [100%]\n\n=================================== FAILURES ===================================\n______________ test_ddm_qr_requires_field_and_uses_exact_division ______________\ntest_review_comment_1.py:13: in test_ddm_qr_requires_field_and_uses_exact_division\n    with pytest.raises(DMDomainError, match=\"requires a field\"):\nE   Failed: DID NOT RAISE <class 'sympy.polys.matrices.exceptions.DMDomainError'>\n=========================== short test summary info ============================\nFAILED ../dev::test_ddm_qr_requires_field_and_uses_exact_division - Failed: D...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.54s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ddm_qr_requires_field_and_uses_exact_division PASSED        [100%]\n\n============================== 1 passed in 0.52s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 18211,
+        "completion_tokens": 427,
+        "total_tokens": 18638,
+        "cost_usd": 0.03784725
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

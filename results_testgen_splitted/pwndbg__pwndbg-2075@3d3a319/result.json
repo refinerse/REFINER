@@ -1,0 +1,55 @@
+{
+  "instance_id": "pwndbg__pwndbg-2075@3d3a319",
+  "repo": "pwndbg/pwndbg",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 6994,
+    "completion_tokens": 1026,
+    "total_tokens": 8020,
+    "cost_usd": 0.026603500000000002
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nThis should be \"error\", which matches the behavior before this change.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pwndbg__pwndbg-2075@3d3a319/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef _extract_step_block(workflow: str, step_name: str) -> str:\n    \"\"\"\n    Extract the YAML text block for a given GitHub Actions step name.\n    This is indentation-based and avoids needing a YAML parser.\n    \"\"\"\n    lines = workflow.splitlines(True)\n\n    # Locate the step header: \"- name: <step_name>\"\n    start = None\n    for i, line in enumerate(lines):\n        if re.match(rf\"^\\s*-\\s*name:\\s*{re.escape(step_name)}\\s*$\", line):\n            start = i\n            break\n    assert start is not None, f\"Expected to find a step named '{step_name}'.\"\n\n    # Determine the indentation of the \"- name:\" line, and capture until next step at same indent.\n    step_indent = len(re.match(r\"^(\\s*)\", lines[start]).group(1))\n    out = [lines[start]]\n\n    for j in range(start + 1, len(lines)):\n        line = lines[j]\n        # A new step begins with \"- \" at the same indentation level.\n        if re.match(rf\"^\\s{{{step_indent}}}-\\s+\", line):\n            break\n        out.append(line)\n\n    return \"\".join(out)\n\n\ndef test_lint_workflow_mypy_reports_errors_not_warnings():\n    path = \"/workspace/.github/workflows/lint.yml\"\n    source = open(path, \"r\", encoding=\"utf-8\").read()\n\n    step_block = _extract_step_block(source, \"Run mypy\")\n\n    assert re.search(r\"(?m)^\\s*level:\\s*error\\s*$\", step_block), (\n        \"Expected the 'Run mypy' GitHub Actions step to set `level: error` so that \"\n        \"mypy findings are treated as errors (not warnings).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_lint_workflow_mypy_reports_errors_not_warnings FAILED       [100%]\n\n=================================== FAILURES ===================================\n_____________ test_lint_workflow_mypy_reports_errors_not_warnings ______________\ntest_review_comment_0.py:39: in test_lint_workflow_mypy_reports_errors_not_warnings\n    assert re.search(r\"(?m)^\\s*level:\\s*error\\s*$\", step_block), (\nE   AssertionError: Expected the 'Run mypy' GitHub Actions step to set `level: error` so that mypy findings are treated as errors (not warnings).\nE   assert None\nE    +  where None = <function search at 0x7f451f972340>('(?m)^\\\\s*level:\\\\s*error\\\\s*$', \"    - name: Run mypy\\n      uses: tsuyoshicho/action-mypy@v4\\n      with:\\n        github_token: ${{ secrets.GITHUB_TOKEN }}\\n        # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].\\n        reporter: github-pr-review\\n        # Change reporter level if you need.\\n        # GitHub Status Check won't become failure with warning.\\n        level: warning\\n        # Change the current directory to run mypy command.\\n        # mypy command reads setup.cfg or other settings file in this path.\\n        execute_command: source ./.venv/bin/activate && mypy pwndbg\\n\\n\")\nE    +    where <function search at 0x7f451f972340> = re.search\n=========================== short test summary info ============================\nFAILED ../dev::test_lint_workflow_mypy_reports_errors_not_warnings - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_lint_workflow_mypy_reports_errors_not_warnings PASSED       [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 4895,
+        "completion_tokens": 706,
+        "total_tokens": 5601,
+        "cost_usd": 0.01845025
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nWhat happens if you use `github-check` instead?\r\n```suggestion\r\n        reporter: github-check\r\n```\r\nor `github-pr-check`\r\n```suggestion\r\n        reporter: github-pr-check\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pwndbg__pwndbg-2075@3d3a319/test_review_comment_1.py",
+      "test_code": "# AUTO-GENERATED by split_acceptance_tests.py\n# Each original test function was split into one function per top-level\n# assertion so pytest reports per-check pass/fail counts.\nimport re\n\ndef test_lint_workflow_mypy_reporter_is_check_not_review__a1():\n    source = open('/workspace/.github/workflows/lint.yml', 'r', encoding='utf-8').read()\n    m = re.search('(?ms)^\\\\s*-\\\\s*name:\\\\s*Run mypy\\\\s*$.*?^\\\\s*reporter:\\\\s*([^\\\\s#]+)\\\\s*$', source)\n    assert m is not None, \"Expected the GitHub Actions workflow /workspace/.github/workflows/lint.yml to contain a step named 'Run mypy' with a 'reporter:' setting.\"\n\ndef test_lint_workflow_mypy_reporter_is_check_not_review__a2():\n    source = open('/workspace/.github/workflows/lint.yml', 'r', encoding='utf-8').read()\n    m = re.search('(?ms)^\\\\s*-\\\\s*name:\\\\s*Run mypy\\\\s*$.*?^\\\\s*reporter:\\\\s*([^\\\\s#]+)\\\\s*$', source)\n    reporter_value = m.group(1).strip()\n    assert reporter_value in {'github-pr-check', 'github-check'}, f\"Review comment requests using a GitHub status check reporter for mypy (e.g. `reporter: github-check` or `reporter: github-pr-check`) instead of PR review comments. Found reporter={reporter_value!r} in the 'Run mypy' step.\"\n\ndef test_lint_workflow_mypy_reporter_is_check_not_review__a3():\n    source = open('/workspace/.github/workflows/lint.yml', 'r', encoding='utf-8').read()\n    m = re.search('(?ms)^\\\\s*-\\\\s*name:\\\\s*Run mypy\\\\s*$.*?^\\\\s*reporter:\\\\s*([^\\\\s#]+)\\\\s*$', source)\n    reporter_value = m.group(1).strip()\n    assert reporter_value != 'github-pr-review', 'The mypy step should not use `reporter: github-pr-review`; it should use a GitHub check reporter (`github-check` or `github-pr-check`) so annotations appear as status checks.'\n",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_lint_workflow_mypy_reporter_is_check_not_review FAILED      [100%]\n\n=================================== FAILURES ===================================\n_____________ test_lint_workflow_mypy_reporter_is_check_not_review _____________\ntest_review_comment_1.py:18: in test_lint_workflow_mypy_reporter_is_check_not_review\n    assert reporter_value in {\"github-pr-check\", \"github-check\"}, (\nE   AssertionError: Review comment requests using a GitHub status check reporter for mypy (e.g. `reporter: github-check` or `reporter: github-pr-check`) instead of PR review comments. Found reporter='github-pr-review' in the 'Run mypy' step.\nE   assert 'github-pr-review' in {'github-check', 'github-pr-check'}\n=========================== short test summary info ============================\nFAILED ../dev::test_lint_workflow_mypy_reporter_is_check_not_review - Asserti...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_lint_workflow_mypy_reporter_is_check_not_review PASSED      [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 2099,
+        "completion_tokens": 320,
+        "total_tokens": 2419,
+        "cost_usd": 0.008153249999999999
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

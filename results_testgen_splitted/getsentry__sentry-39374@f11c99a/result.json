@@ -1,0 +1,95 @@
+{
+  "instance_id": "getsentry__sentry-39374@f11c99a",
+  "repo": "getsentry/sentry",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 194473,
+    "completion_tokens": 2713,
+    "total_tokens": 197186,
+    "cost_usd": 0.20957055
+  },
+  "num_comments": 4,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n  it(\"should show a message when the organization doesn't have access to the replay feature\", () => {\r\n```",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-39374@f11c99a/test_review_comment_0.test.ts",
+      "test_code": "/**\n * This test is intentionally self-contained and does not rely on the repo's Jest config,\n * which is a TypeScript config requiring ts-node in this execution environment.\n *\n * Run with:\n *   npx jest <this_file> --config '{}'\n */\n\nimport fs from 'fs';\n\ndescribe('Code review change: GroupReplays access test name', () => {\n  it('uses the corrected test title \"should show a message when the organization doesn\\'t have access to the replay feature\"', () => {\n    const filePath =\n      '/workspace/static/app/views/organizationGroupDetails/groupReplays/groupReplays.spec.tsx';\n    const source = fs.readFileSync(filePath, 'utf8');\n\n    // After-version uses lowercased \"should show a message...\" (review suggestion).\n    expect(source).toContain(\n      `it(\"should show a message when the organization doesn't have access to the replay feature\"`\n    );\n\n    // Before-version had a typo (\"Should access message ...\").\n    expect(source).not.toContain(\n      `it(\"Should access message when the organization doesn't have access to the replay feature\"`\n    );\n    expect(source).not.toContain(\n      `it('Should access message when the organization doesn't have access to the replay feature\"`\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 52523,
+        "completion_tokens": 672,
+        "total_tokens": 53195,
+        "cost_usd": 0.07451045
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nshouldn't `referrer=` have a value, is this something that needs to be mocked to work properly in the test?",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-39374@f11c99a/test_review_comment_1.test.ts",
+      "test_code": "/**\n * This repo's default Jest config is TypeScript (`/workspace/jest.config.ts`) and\n * requires `ts-node`, which is not available in this execution environment.\n *\n * To keep this test runnable via `npx jest <test_file>`, we provide our own\n * minimal jest config inline and run only plain JS/TS that doesn't require\n * repo Jest setup.\n */\n\nimport fs from 'fs';\n\ndescribe('GroupReplays spec: referrer should not be empty (review regression test)', () => {\n  it('uses a non-empty, URL-encoded referrer value in replay details href expectations', () => {\n    const filePath =\n      '/workspace/static/app/views/organizationGroupDetails/groupReplays/groupReplays.spec.tsx';\n    const src = fs.readFileSync(filePath, 'utf8');\n\n    // The fixed test expects a concrete encoded referrer route (non-empty value),\n    // not an empty `referrer=`.\n    expect(src).toContain(\n      'referrer=%2Forganizations%2F%3AorgId%2Fissues%2F%3AgroupId%2Freplays%2F',\n      'Expected the spec to assert a non-empty, URL-encoded referrer value.'\n    );\n\n    // Ensure the old empty-referrer assertion is not present.\n    expect(src).not.toContain(\n      '/?referrer=',\n      'Expected the spec to no longer assert an empty referrer (`...?referrer=`).'\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 48534,
+        "completion_tokens": 817,
+        "total_tokens": 49351,
+        "cost_usd": 0.04778689999999999
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\nseems like the comment is trying to help describe the test. Instead of using a comment, can we improve the name of the test?\r\n\r\n```suggestion\r\n  it('should query the events endpoint with the passed in replayIds', async () => {\r\n```\r\n\r\nsomething like that imo",
+      "comment_type": "documentation",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-39374@f11c99a/test_review_comment_2.test.ts",
+      "test_code": "/**\n * @jest-environment node\n */\nimport fs from 'fs';\n\ndescribe('Code review: prefer descriptive test name over comment', () => {\n  it('uses the descriptive test name \"should query the events endpoint with the passed in replayIds\" (and not the old generic name)', () => {\n    const filePath =\n      '/workspace/static/app/views/organizationGroupDetails/groupReplays/groupReplays.spec.tsx';\n    const source = fs.readFileSync(filePath, 'utf8');\n\n    expect(source).toContain(\n      \"it('should query the events endpoint with the passed in replayIds'\"\n    );\n\n    expect(source).not.toContain(\"it('Should have correct queries in the events endpoint'\");\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 44336,
+        "completion_tokens": 526,
+        "total_tokens": 44862,
+        "cost_usd": 0.0403984
+      }
+    },
+    {
+      "comment_index": 3,
+      "comment_text": "@user1:\nthis will be hard to fail, because the number 1 could appear in the component in many places for many reasons. Can we be more specific?",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-39374@f11c99a/test_review_comment_3.test.ts",
+      "test_code": "/**\n * @jest-environment node\n */\n\nimport fs from 'fs';\n\ndescribe('groupReplays.spec.tsx review: make error count assertion more specific', () => {\n  it('uses replay-table-count-errors testid assertions instead of generic getByText(\"1\"/\"4\")', () => {\n    const specPath =\n      '/workspace/static/app/views/organizationGroupDetails/groupReplays/groupReplays.spec.tsx';\n    const contents = fs.readFileSync(specPath, 'utf8');\n\n    // Match the \"after\" version: specific assertions using a stable testid\n    expect(contents).toContain(\"getAllByTestId('replay-table-count-errors')[0]\");\n    expect(contents).toContain(\"toHaveTextContent('1')\");\n    expect(contents).toContain(\"getAllByTestId('replay-table-count-errors')[1]\");\n    expect(contents).toContain(\"toHaveTextContent('4')\");\n\n    // Ensure the previous, overly-generic assertions are not present anymore\n    expect(contents).not.toContain(\"getByText('1')\");\n    expect(contents).not.toContain(\"getByText('4')\");\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 49080,
+        "completion_tokens": 698,
+        "total_tokens": 49778,
+        "cost_usd": 0.046874799999999994
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

@@ -1,0 +1,55 @@
+{
+  "instance_id": "getsentry__sentry-71711@d1652c4",
+  "repo": "getsentry/sentry",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 6004,
+    "completion_tokens": 726,
+    "total_tokens": 6730,
+    "cost_usd": 0.020671000000000002
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n`organization`\n\n@user2:\nLet's make sure there is a test in place which would catch this, if there isn't already\n\n@author:\n\ud83e\udd26 \r\nThanks for catching this! Fixing now",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "getsentry__sentry-71711@d1652c4/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_groupsearchview_create_or_update_uses_correct_organization_kwarg_and_position_arg():\n    source = open(\n        \"/workspace/src/sentry/api/endpoints/organization_pinned_searches.py\", \"r\"\n    ).read()\n\n    assert (\n        \"GroupSearchView.objects.create_or_update\" in source\n    ), \"Expected OrganizationPinnedSearchEndpoint.put to call GroupSearchView.objects.create_or_update\"\n\n    # Must not contain the misspelled kwarg that caused the bug.\n    assert (\n        \"organizaiton=\" not in source\n    ), \"GroupSearchView.objects.create_or_update must not use the misspelled kwarg 'organizaiton='; it should be 'organization='\"\n\n    # Must contain the correct kwarg.\n    assert (\n        \"organization=organization\" in source\n    ), \"Expected GroupSearchView.objects.create_or_update to be called with organization=organization\"\n\n    # Style fix also moved `position=0` to a dedicated argument (not inside values).\n    assert re.search(\n        r\"GroupSearchView\\.objects\\.create_or_update\\([\\s\\S]*\\bposition\\s*=\\s*0\\b\",\n        source,\n    ), \"Expected GroupSearchView.objects.create_or_update to pass position=0 as a top-level argument\"\n\n    assert (\n        '\"position\"' not in source and \"'position'\" not in source\n    ), \"Expected 'position' to not be included in the values dict; it should be passed as position=0 argument\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_groupsearchview_create_or_update_uses_correct_organization_kwarg_and_position_arg FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_groupsearchview_create_or_update_uses_correct_organization_kwarg_and_position_arg _\ntest_review_comment_0.py:14: in test_groupsearchview_create_or_update_uses_correct_organization_kwarg_and_position_arg\n    assert (\nE   AssertionError: GroupSearchView.objects.create_or_update must not use the misspelled kwarg 'organizaiton='; it should be 'organization='\nE   assert 'organizaiton=' not in 'from rest_f...tatus=204)\\n'\nE     \nE     'organizaiton=' is contained here:\nE       from rest_framework import serializers\nE       from rest_framework.request import Request\nE       from rest_framework.response import Response\nE       \nE       from sentry.api.api_owners import ApiOwner...\nE     \nE     ...Full output truncated (83 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev::test_groupsearchview_create_or_update_uses_correct_organization_kwarg_and_position_arg\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.05s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_groupsearchview_create_or_update_uses_correct_organization_kwarg_and_position_arg PASSED [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 2982,
+        "completion_tokens": 316,
+        "total_tokens": 3298,
+        "cost_usd": 0.0096425
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nI think the position should be part of the select criteria, since the unique is `org, user, position`",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "getsentry__sentry-71711@d1652c4/test_review_comment_1.py",
+      "test_code": "import re\n\n\ndef test_groupsearchview_create_or_update_includes_position_in_select_criteria():\n    source = open(\n        \"/workspace/src/sentry/api/endpoints/organization_pinned_searches.py\", \"r\", encoding=\"utf-8\"\n    ).read()\n\n    # The review comment requests that `position` be part of the select criteria\n    # for GroupSearchView.objects.create_or_update(...), i.e. passed as a top-level\n    # kwarg (not inside `values={...}`).\n    #\n    # This should look like:\n    #   GroupSearchView.objects.create_or_update(\n    #       organization=organization,\n    #       user_id=request.user.id,\n    #       position=0,\n    #       values={...}\n    #   )\n    #\n    # The \"before\" code incorrectly put \"position\" inside values and also misspelled\n    # organization as \"organizaiton\".\n    m = re.search(\n        r\"GroupSearchView\\.objects\\.create_or_update\\(\\s*(?P<args>.*?)\\)\\s*\",\n        source,\n        flags=re.DOTALL,\n    )\n    assert m, \"Expected a GroupSearchView.objects.create_or_update(...) call in the endpoint.\"\n\n    args = m.group(\"args\")\n\n    assert re.search(r\"^\\s*position\\s*=\\s*0\\s*,\", args, flags=re.MULTILINE), (\n        \"Expected GroupSearchView.objects.create_or_update(...) to include `position=0` \"\n        \"as a top-level select criterion (unique is org, user, position).\"\n    )\n\n    assert not re.search(r'values\\s*=\\s*\\{[^}]*\"position\"\\s*:', args, flags=re.DOTALL), (\n        \"Did not expect `position` to be inside the `values={...}` dict; it should be part of \"\n        \"the select criteria passed directly to create_or_update(...).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_groupsearchview_create_or_update_includes_position_in_select_criteria FAILED [100%]\n\n=================================== FAILURES ===================================\n__ test_groupsearchview_create_or_update_includes_position_in_select_criteria __\ntest_review_comment_1.py:32: in test_groupsearchview_create_or_update_includes_position_in_select_criteria\n    assert re.search(r\"^\\s*position\\s*=\\s*0\\s*,\", args, flags=re.MULTILINE), (\nE   AssertionError: Expected GroupSearchView.objects.create_or_update(...) to include `position=0` as a top-level select criterion (unique is org, user, position).\nE   assert None\nE    +  where None = <function search at 0x7f8c4f972340>('^\\\\s*position\\\\s*=\\\\s*0\\\\s*,', 'organizaiton=organization,\\n            user_id=request.user.id,\\n            values={\\n                \"name\": \"Default Search\",\\n                \"query\": result[\"query\"],\\n                \"query_sort\": result[\"sort\"],\\n                \"position\": 0,  # 0 position indicates default view\\n            },\\n        ', flags=re.MULTILINE)\nE    +    where <function search at 0x7f8c4f972340> = re.search\nE    +    and   re.MULTILINE = re.MULTILINE\n=========================== short test summary info ============================\nFAILED ../dev::test_groupsearchview_create_or_update_includes_position_in_select_criteria\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.05s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_groupsearchview_create_or_update_includes_position_in_select_criteria PASSED [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 3022,
+        "completion_tokens": 410,
+        "total_tokens": 3432,
+        "cost_usd": 0.0110285
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

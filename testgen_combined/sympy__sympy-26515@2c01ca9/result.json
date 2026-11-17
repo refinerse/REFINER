@@ -1,0 +1,55 @@
+{
+  "instance_id": "sympy__sympy-26515@2c01ca9",
+  "repo": "sympy/sympy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 47197,
+    "completion_tokens": 384,
+    "total_tokens": 47581,
+    "cost_usd": 0.08797074999999999
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n``K[x, y]`` and ``k[x, y]``\n\n@author:\nFixed.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "sympy__sympy-26515@2c01ca9/test_review_comment_0.py",
+      "test_code": "import pytest\n\n\ndef test_dmp_sqf_norm_docstring_uses_correct_ring_notation_Kxy_kxy():\n    \"\"\"\n    Functional-ish test via docstring content: the review fixes the example text\n    to use K[x,y] and k[x,y] (multivariate), not K[x] and k[x].\n\n    This has no runtime behavior impact, so we assert on the module docstring\n    text of dmp_sqf_norm.\n    \"\"\"\n    import sympy.polys.sqfreetools as sqf\n\n    doc = sqf.dmp_sqf_norm.__doc__ or \"\"\n    assert \"K[x,y]\" in doc and \"k[x,y]\" in doc, (\n        \"dmp_sqf_norm docstring example should describe the rings as \"\n        \"K[x,y] and k[x,y] (multivariate).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_dmp_sqf_norm_docstring_uses_correct_ring_notation_Kxy_kxy FAILED [100%]\n\n=================================== FAILURES ===================================\n________ test_dmp_sqf_norm_docstring_uses_correct_ring_notation_Kxy_kxy ________\ntest_review_comment_0.py:15: in test_dmp_sqf_norm_docstring_uses_correct_ring_notation_Kxy_kxy\n    assert \"K[x,y]\" in doc and \"k[x,y]\" in doc, (\nE   AssertionError: dmp_sqf_norm docstring example should describe the rings as K[x,y] and k[x,y] (multivariate).\nE   assert ('K[x,y]' in '\\n    Find a shift of ``f`` in ``K[X]`` that has square-free norm.\\n\\n    The domain `K` must be an algebraic number field `k(a)` (see :ref:`QQ(a)`).\\n\\n    Returns `(s,g,r)`, such that `g(x_1,x_2,\\\\cdots)=f(x_1-s_1 a, x_2 - s_2 a,\\n    \\\\cdots)`, `r(x)=\\\\text{Norm}(g(x))` and `r` is a square-free polynomial over\\n    `k`.\\n\\n    Examples\\n    ========\\n\\n    We first create the algebraic number field `K=k(a)=\\\\mathbb{Q}(i)` and rings\\n    `K[x]` and `k[x]`:\\n\\n    >>> from sympy.polys import ring, QQ\\n    >>> from sympy import I\\n\\n    >>> K = QQ.algebraic_field(I)\\n    >>> R, x, y = ring(\"x,y\", K)\\n    >>> _, X, Y = ring(\"x,y\", QQ)\\n\\n    We can now find a square free norm for a shift of `f`:\\n\\n    >>> f = x*y + y**2\\n    >>> s, g, r = R.dmp_sqf_norm(f)\\n\\n    The choice of shifts ``s`` is arbitrary and the particular values returned\\n    for ``g`` and ``r`` are determined by ``s``.\\n\\n    >>> s\\n    [0, 1]\\n    >>> g == x*y - I*x + y**2 - 2*I*y - 1\\n    True\\n    >>> r == X**2*Y**2 + X**2 + 2*X*Y**3 + 2*X*Y + Y**4 + 2*Y**2 + 1\\n    True\\n\\n    The required invariants are:\\n\\n    >>> g == f.shift_list([-si*K.unit for si in s])\\n    True\\n    >>> g.norm() == r\\n    True\\n    >>> r.is_squarefree\\n    True\\n\\n    Explanation\\n    ===========\\n\\n    This is part of Trager\\'s algorithm for factorizing polynomials over\\n    algebraic number fields. In particular this function is a multivariate\\n    generalization of algorithm ``sqfr_norm`` from [Trager76]_.\\n\\n    See Also\\n    ========\\n\\n    dup_sqf_norm:\\n        Analogous function for multivariate polynomials over ``k(a)``.\\n    dmp_norm:\\n        Computes the norm of `f` directly without any shift.\\n    dmp_ext_factor:\\n        Function implementing Trager\\'s algorithm that uses this.\\n    sympy.polys.polytools.sqf_norm:\\n        High-level interface for using this function.\\n    ')\n=========================== short test summary info ============================\nFAILED ../dev::test_dmp_sqf_norm_docstring_uses_correct_ring_notation_Kxy_kxy\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.60s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_dmp_sqf_norm_docstring_uses_correct_ring_notation_Kxy_kxy PASSED [100%]\n\n============================== 1 passed in 0.57s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 23366,
+        "completion_tokens": 183,
+        "total_tokens": 23549,
+        "cost_usd": 0.0434525
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\n\"multivariate\" --> \"univariate\"\n\n@author:\nFixed.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "sympy__sympy-26515@2c01ca9/test_review_comment_1.py",
+      "test_code": "import inspect\n\nimport sympy.polys.sqfreetools as sqfreetools\n\n\ndef test_dmp_sqf_norm_docstring_mentions_univariate_trager_case():\n    \"\"\"\n    Regression test for a documentation fix:\n    dmp_sqf_norm is a *multivariate* generalization of Trager76's sqfr_norm,\n    which is proved in the *univariate* case. The docstring should say\n    \"univariate\", not \"multivariate\", in the \"See Also\" entry for dup_sqf_norm.\n    \"\"\"\n    doc = inspect.getdoc(sqfreetools.dmp_sqf_norm) or \"\"\n\n    assert (\n        \"Analogous function for univariate polynomials\" in doc\n    ), (\n        \"dmp_sqf_norm docstring should describe dup_sqf_norm as 'Analogous \"\n        \"function for univariate polynomials', reflecting that dup_* is the \"\n        \"univariate variant.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_dmp_sqf_norm_docstring_mentions_univariate_trager_case FAILED [100%]\n\n=================================== FAILURES ===================================\n_________ test_dmp_sqf_norm_docstring_mentions_univariate_trager_case __________\ntest_review_comment_1.py:15: in test_dmp_sqf_norm_docstring_mentions_univariate_trager_case\n    assert (\nE   AssertionError: dmp_sqf_norm docstring should describe dup_sqf_norm as 'Analogous function for univariate polynomials', reflecting that dup_* is the univariate variant.\nE   assert 'Analogous function for univariate polynomials' in 'Find a shift of ``f`` in ``K[X]`` that has square-free norm.\\n\\nThe domain `K` must be an algebraic number field `k(a)` (see :ref:`QQ(a)`).\\n\\nReturns `(s,g,r)`, such that `g(x_1,x_2,\\\\cdots)=f(x_1-s_1 a, x_2 - s_2 a,\\n\\\\cdots)`, `r(x)=\\\\text{Norm}(g(x))` and `r` is a square-free polynomial over\\n`k`.\\n\\nExamples\\n========\\n\\nWe first create the algebraic number field `K=k(a)=\\\\mathbb{Q}(i)` and rings\\n`K[x]` and `k[x]`:\\n\\n>>> from sympy.polys import ring, QQ\\n>>> from sympy import I\\n\\n>>> K = QQ.algebraic_field(I)\\n>>> R, x, y = ring(\"x,y\", K)\\n>>> _, X, Y = ring(\"x,y\", QQ)\\n\\nWe can now find a square free norm for a shift of `f`:\\n\\n>>> f = x*y + y**2\\n>>> s, g, r = R.dmp_sqf_norm(f)\\n\\nThe choice of shifts ``s`` is arbitrary and the particular values returned\\nfor ``g`` and ``r`` are determined by ``s``.\\n\\n>>> s\\n[0, 1]\\n>>> g == x*y - I*x + y**2 - 2*I*y - 1\\nTrue\\n>>> r == X**2*Y**2 + X**2 + 2*X*Y**3 + 2*X*Y + Y**4 + 2*Y**2 + 1\\nTrue\\n\\nThe required invariants are:\\n\\n>>> g == f.shift_list([-si*K.unit for si in s])\\nTrue\\n>>> g.norm() == r\\nTrue\\n>>> r.is_squarefree\\nTrue\\n\\nExplanation\\n===========\\n\\nThis is part of Trager\\'s algorithm for factorizing polynomials over\\nalgebraic number fields. In particular this function is a multivariate\\ngeneralization of algorithm ``sqfr_norm`` from [Trager76]_.\\n\\nSee Also\\n========\\n\\ndup_sqf_norm:\\n    Analogous function for multivariate polynomials over ``k(a)``.\\ndmp_norm:\\n    Computes the norm of `f` directly without any shift.\\ndmp_ext_factor:\\n    Function implementing Trager\\'s algorithm that uses this.\\nsympy.polys.polytools.sqf_norm:\\n    High-level interface for using this function.'\n=========================== short test summary info ============================\nFAILED ../dev::test_dmp_sqf_norm_docstring_mentions_univariate_trager_case - ...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.57s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_dmp_sqf_norm_docstring_mentions_univariate_trager_case PASSED [100%]\n\n============================== 1 passed in 0.56s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 23831,
+        "completion_tokens": 201,
+        "total_tokens": 24032,
+        "cost_usd": 0.044518249999999995
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

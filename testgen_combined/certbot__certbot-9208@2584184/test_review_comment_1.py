@@ -1,0 +1,39 @@
+import re
+
+
+def test_debug_challenges_config_created_with_verbose_count_kwarg():
+    """
+    Style regression test: in test_debug_challenges, config should be created with
+    verbose_count passed as a keyword to mock.Mock, not assigned afterward.
+
+    Before (should fail)::
+        config = mock.Mock(debug_challenges=True)
+        config.verbose_count = 0
+
+    After (should pass)::
+        config = mock.Mock(debug_challenges=True, verbose_count=0)
+    """
+    source = open("/workspace/certbot/tests/auth_handler_test.py", "r", encoding="utf-8").read()
+
+    # Locate the specific function body to avoid matching other tests.
+    m = re.search(
+        r"(?ms)^\s*def\s+test_debug_challenges\s*\(self\)\s*:\s*(?P<body>.*?)(?=^\s*def\s|\Z)",
+        source,
+    )
+    assert m is not None, "Expected to find 'def test_debug_challenges(self):' in auth_handler_test.py"
+    body = m.group("body")
+
+    # Assert the updated style is present.
+    assert re.search(
+        r"(?m)^\s*config\s*=\s*mock\.Mock\(\s*debug_challenges\s*=\s*True\s*,\s*verbose_count\s*=\s*0\s*\)\s*$",
+        body,
+    ), (
+        "Expected in test_debug_challenges: config initialized as "
+        "mock.Mock(debug_challenges=True, verbose_count=0) (keyword arg style)."
+    )
+
+    # Assert the old style is not present.
+    assert not re.search(r"(?m)^\s*config\.verbose_count\s*=\s*0\s*$", body), (
+        "Did not expect in test_debug_challenges: a separate assignment "
+        "config.verbose_count = 0; verbose_count should be passed to mock.Mock()."
+    )

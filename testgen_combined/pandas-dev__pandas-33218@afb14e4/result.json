@@ -1,0 +1,75 @@
+{
+  "instance_id": "pandas-dev__pandas-33218@afb14e4",
+  "repo": "pandas-dev/pandas",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 1085597,
+    "completion_tokens": 3297,
+    "total_tokens": 1088894,
+    "cost_usd": 1.61169995
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nFor deprecations, we can only remove this once we release pandas 2.0. `squeeze` must continue to work up until then, so we cannot remove all this code just yet.\n\n@author:\nOh sorry, I did not know that.\r\n\r\nJust to get that right:\r\nSo I can only add a future warning in a Pull Request, which will be merged into the master?\r\n\r\nThis Pull Request could be merged into master before releasing 2.0 but not earlier?\n\n@user1:\n> So I can only add a future warning in a Pull Request, which will be merged into the master?\r\n\r\nCorrect.\r\n\r\n> This Pull Request could be merged into master before releasing 2.0 but not earlier?\r\n\r\nThis pull request with just the futurewarnings can be merged into master before releasing 2.0\r\n\r\nSo another pull request will need to be added in the future where this code is removed when we have decided that 2.0 will be the next release.\n\n@author:\nThanks very much for the clarification. I will modify the PR accordingly tomorrow.\n\n@author:\nI reverted the actual code changes and kept the warning.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-33218@afb14e4/test_review_comment_0.py",
+      "test_code": "def test_groupby_dataframe_wrap_applied_output_retains_squeeze_logic_until_2_0():\n    source = open(\"/workspace/pandas/core/groupby/generic.py\", encoding=\"utf-8\").read()\n\n    # We cannot import pandas in this environment, so we assert on the source.\n    # The review discussion indicates that the `squeeze` deprecation/removal\n    # must NOT happen until pandas 2.0, so the code handling `self.squeeze`\n    # (including computing `applied_index`) must remain present.\n    expected = \"applied_index = self._selected_obj._get_axis(self.axis)\"\n\n    assert expected in source, (\n        \"Expected DataFrameGroupBy._wrap_applied_output to retain the squeeze \"\n        \"compatibility logic until pandas 2.0.\\n\"\n        \"Missing source line:\\n\"\n        f\"    {expected}\\n\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "/usr/local/bin/python: No module named pytest",
+      "after_output": "/usr/local/bin/python: No module named pytest",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 91865,
+        "completion_tokens": 976,
+        "total_tokens": 92841,
+        "cost_usd": 0.12826135
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nCould you revert this assignment?\n\n@author:\nDone",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-33218@afb14e4/test_review_comment_1.py",
+      "test_code": "# Self-contained source-inspection test.\n# NOTE: This file is intentionally runnable without pytest installed.\n# It uses plain asserts and does not import pandas or pytest.\n\nimport re\n\n\ndef test_groupby_squeeze_no_default_branch_resets_to_false():\n    source = open(\"/workspace/pandas/core/frame.py\", encoding=\"utf-8\").read()\n\n    # After change: when squeeze is left as no_default, it must be set to False\n    # to preserve prior behavior.\n    #\n    # Before version: has \"if squeeze is not no_default: warnings.warn(...)\" but\n    # does NOT have an \"else: squeeze = False\" branch.\n    pattern = re.compile(\n        r\"def\\s+groupby\\([\\s\\S]*?\\):[\\s\\S]*?\"\n        r\"if\\s+squeeze\\s+is\\s+not\\s+no_default:\\s*[\\s\\S]*?warnings\\.warn\\([\\s\\S]*?\\)\\s*\"\n        r\"[\\s\\S]*?else:\\s*\\n\\s*squeeze\\s*=\\s*False\",\n        re.MULTILINE,\n    )\n    assert pattern.search(source), (\n        \"DataFrame.groupby should set `squeeze = False` when `squeeze` is left as no_default. \"\n        \"Expected to find an `else: squeeze = False` branch paired with the \"\n        \"`if squeeze is not no_default:` deprecation-warning check.\"\n    )\n\n    # After change: the resolved squeeze value should also be forwarded.\n    assert \"squeeze=squeeze\" in source, (\n        \"DataFrame.groupby should pass the resolved `squeeze` value through to DataFrameGroupBy \"\n        \"(expected `squeeze=squeeze` in the constructor call).\"\n    )\n\n\nif __name__ == \"__main__\":\n    # Allow running as a script: `python test_file.py`\n    test_groupby_squeeze_no_default_branch_resets_to_false()\n    print(\"OK\")",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "/usr/local/bin/python: No module named pytest",
+      "after_output": "/usr/local/bin/python: No module named pytest",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 443318,
+        "completion_tokens": 1094,
+        "total_tokens": 444412,
+        "cost_usd": 0.7911225000000001
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\n```suggestion\r\n            .. deprecated:: 1.1.0\r\n```\r\n\r\nShould put a newline before as well\n\n@author:\nThanks, I did that in the newest commit\n\n@user1:\nDid you push the latest changes? Doesn\u2019t appear to be updated here on GitHub\n\n@author:\nIf I view the changes over all commits, there is an empty line after the description and before deprecated: 1.1.0\n\n@user2:\nLooks like this change still needs to be made",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-33218@afb14e4/test_review_comment_2.py",
+      "test_code": "# test_groupby_docstring_deprecated_newline.py\nimport re\n\n\ndef test_groupby_docstring_deprecated_directive_has_blank_line_and_correct_syntax():\n    source = open(\"/workspace/pandas/core/generic.py\", encoding=\"utf-8\").read()\n\n    m = re.search(\n        r\"_shared_docs\\[\\s*[\\\"']groupby[\\\"']\\s*\\]\\s*=\\s*([\\\"']{3})(?P<doc>.*?)(\\1)\",\n        source,\n        flags=re.DOTALL,\n    )\n    assert (\n        m is not None\n    ), \"Could not find the _shared_docs['groupby'] docstring block in /workspace/pandas/core/generic.py\"\n\n    doc = m.group(\"doc\")\n\n    assert (\n        \"otherwise return a consistent type.\\n\\n            .. deprecated:: 1.1.0\\n\\n\"\n        in doc\n    ), (\n        \"Expected groupby docstring to have a blank line before and after the \"\n        \"reST deprecation directive for the 'squeeze' parameter, i.e.\\n\\n\"\n        \"    otherwise return a consistent type.\\n\"\n        \"    <blank line>\\n\"\n        \"            .. deprecated:: 1.1.0\\n\"\n        \"    <blank line>\\n\"\n        \"but this exact pattern was not found.\"\n    )\n\n    assert (\n        \"otherwise return a consistent type.\\n            deprecated:: 1.1.0\" not in doc\n    ), (\n        \"Found 'deprecated:: 1.1.0' without the leading '.. ' and without a blank \"\n        \"line before it in the groupby docstring. It should be written as a proper \"\n        \"reST directive and separated by blank lines.\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "/usr/local/bin/python: No module named pytest",
+      "after_output": "/usr/local/bin/python: No module named pytest",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 550414,
+        "completion_tokens": 1227,
+        "total_tokens": 551641,
+        "cost_usd": 0.6923161
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

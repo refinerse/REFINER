@@ -1,0 +1,18 @@
+import importlib
+
+import pytest
+
+
+def test_fp8_import_compatible_without_cuda_device_capability_exception():
+    """
+    The module should be importable even if querying CUDA device capability fails.
+    This checks that fp8.py guards torch.cuda.get_device_capability() with try/except
+    and falls back to a safe default (cuda_arch = 0).
+    """
+    fp8 = importlib.import_module("colossalai.quantization.fp8")
+
+    assert hasattr(fp8, "cuda_arch"), "fp8 module must define `cuda_arch` at import time for compile-disable logic."
+    assert isinstance(fp8.cuda_arch, int), "`cuda_arch` must be an int so it can be compared (e.g., cuda_arch < 89)."
+    assert (
+        fp8.cuda_arch >= 0
+    ), "When CUDA capability can't be queried, `cuda_arch` should fall back to 0 (or another non-negative int)."

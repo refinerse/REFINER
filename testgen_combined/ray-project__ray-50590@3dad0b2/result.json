@@ -1,0 +1,55 @@
+{
+  "instance_id": "ray-project__ray-50590@3dad0b2",
+  "repo": "ray-project/ray",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 14248,
+    "completion_tokens": 744,
+    "total_tokens": 14992,
+    "cost_usd": 0.03535
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nPlease add type annotations",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ray-project__ray-50590@3dad0b2/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_iceberg_datasink_has_type_annotations_for_write_and_internal_fields():\n    source = open(\n        \"/workspace/python/ray/data/_internal/datasource/iceberg_datasink.py\",\n        \"r\",\n        encoding=\"utf-8\",\n    ).read()\n\n    # Review asked: \"Please add type annotations\".\n    # This change is reflected by adding an explicit return type annotation on `write`.\n    assert (\n        \"-> WriteResult[List[\\\"DataFile\\\"]]:\" in source\n    ), (\n        \"Expected IcebergDatasink.write to have an explicit return type annotation \"\n        \"'-> WriteResult[List[\\\"DataFile\\\"]]'. This should be present after adding type \"\n        \"annotations, and absent in the before version.\"\n    )\n\n    # Also ensure the init-time internal attributes have explicit annotations (added in after).\n    # We check for these exact annotated assignments to keep the test focused and deterministic.\n    for expected in [\n        \"_uuid: str = None\",\n        \"_io: FileIO = None\",\n        \"_txn: Transaction = None\",\n        \"_table_metadata: TableMetadata = None\",\n    ]:\n        assert expected in source, (\n            f\"Expected IcebergDatasink.__init__ to annotate internal attribute as \"\n            f\"'{expected}'. This should be present after adding type annotations.\"\n        )\n\n    # Sanity check: ensure the typing-only imports corresponding to those annotations exist.\n    # (This is part of the behavioral change in source: introducing these types for annotations.)\n    for expected_import in [\n        \"from pyiceberg.io import FileIO\",\n        \"from pyiceberg.table import Transaction\",\n        \"from pyiceberg.table.metadata import TableMetadata\",\n    ]:\n        assert expected_import in source, (\n            f\"Expected to import '{expected_import}' to support the added type annotations.\"\n        )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_iceberg_datasink_has_type_annotations_for_write_and_internal_fields FAILED [100%]\n\n=================================== FAILURES ===================================\n___ test_iceberg_datasink_has_type_annotations_for_write_and_internal_fields ___\ntest_review_comment_0.py:13: in test_iceberg_datasink_has_type_annotations_for_write_and_internal_fields\n    assert (\nE   AssertionError: Expected IcebergDatasink.write to have an explicit return type annotation '-> WriteResult[List[\"DataFile\"]]'. This should be present after adding type annotations, and absent in the before version.\nE   assert '-> WriteResult[List[\"DataFile\"]]:' in '\"\"\"\\nModule to write a Ray Dataset into an iceberg table, by using the Ray Datasink API.\\n\"\"\"\\nimport logging\\n\\nfrom typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional\\n\\nfrom ray.data.datasource.datasink import Datasink\\nfrom ray.util.annotations import DeveloperAPI\\nfrom ray.data.block import BlockAccessor, Block\\nfrom ray.data._internal.execution.interfaces import TaskContext\\nfrom ray.data.datasource.datasink import WriteResult\\nimport uuid\\n\\nif TYPE_CHECKING:\\n    from pyiceberg.catalog import Catalog\\n    from pyiceberg.manifest import DataFile\\n\\n\\nlogger = logging.getLogger(__name__)\\n\\n\\n@DeveloperAPI\\nclass IcebergDatasink(Datasink[List[\"DataFile\"]]):\\n    \"\"\"\\n    Iceberg datasink to write a Ray Dataset into an existing Iceberg table. This module\\n    heavily uses PyIceberg to write to iceberg table. All the routines in this class override\\n    `ray.data.Datasink`.\\n\\n    \"\"\"\\n\\n    def __init__(\\n        self,\\n        table_identifier: str,\\n        catalog_kwargs: Optional[Dict[str, Any]] = None,\\n        snapshot_properties: Optional[Dict[str, str]] = None,\\n    ):\\n        \"\"\"\\n        Initialize the IcebergDatasink\\n\\n        Args:\\n            t...  _check_pyarrow_schema_compatible(\\n                self._table_metadata.schema(),\\n                provided_schema=pa_table.schema,\\n                downcast_ns_timestamp_to_us=downcast_ns_timestamp_to_us,\\n            )\\n\\n            if pa_table.shape[0] <= 0:\\n                continue\\n\\n            data_files = _dataframe_to_data_files(\\n                self._table_metadata, pa_table, self._io, self._uuid\\n            )\\n            data_files_list.extend(data_files)\\n\\n        return data_files_list\\n\\n    def on_write_complete(self, write_result: WriteResult[List[\"DataFile\"]]):\\n        update_snapshot = self._txn.update_snapshot(\\n            snapshot_properties=self._snapshot_properties\\n        )\\n        append_method = (\\n            update_snapshot.merge_append\\n            if self._manifest_merge_enabled\\n            else update_snapshot.fast_append\\n        )\\n\\n        with append_method() as append_files:\\n            append_files.commit_uuid = self._uuid\\n            for data_files in write_result.write_returns:\\n                for data_file in data_files:\\n                    append_files.append_data_file(data_file)\\n\\n        self._txn.commit_transaction()\\n'\n=========================== short test summary info ============================\nFAILED ../dev/::test_iceberg_datasink_has_type_annotations_for_write_and_internal_fields\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_iceberg_datasink_has_type_annotations_for_write_and_internal_fields PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 6766,
+        "completion_tokens": 388,
+        "total_tokens": 7154,
+        "cost_usd": 0.0172725
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nThis is not necessary anymore, right?",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ray-project__ray-50590@3dad0b2/test_review_comment_1.py",
+      "test_code": "import re\n\n\ndef test_iceberg_tests_no_redundant_pyarrow_version_guard_in_test_write_basic():\n    \"\"\"\n    The review comment \"This is not necessary anymore, right?\" refers to removing\n    the redundant runtime guard that returned early for pyarrow < 9.0.0 inside\n    test_write_basic (the test already has a skipif for pyarrow < 14.0.0).\n    \"\"\"\n    path = \"/workspace/python/ray/data/tests/test_iceberg.py\"\n    source = open(path, \"r\", encoding=\"utf-8\").read()\n\n    # Extract the body of test_write_basic (from its def line up to the next top-level def/if).\n    m = re.search(\n        r\"^def test_write_basic\\(\\):(?P<body>.*?)(?=^\\S|\\Z)\",\n        source,\n        flags=re.MULTILINE | re.DOTALL,\n    )\n    assert m, f\"Expected to find a top-level function 'test_write_basic' in {path}\"\n    body = m.group(\"body\")\n\n    assert (\n        \"_get_pyarrow_version\" not in body\n    ), (\n        \"test_write_basic should not contain the redundant pyarrow version guard \"\n        \"(calls to _get_pyarrow_version / parse_version with early return). \"\n        \"It should rely on the pytest.mark.skipif condition instead.\"\n    )\n    assert (\n        \"Iceberg only works with PyArrow 9 or above\" not in body\n    ), (\n        \"test_write_basic should not include the obsolete comment/guard \"\n        \"about PyArrow 9+, since the test is already skip-gated by PyArrow>=14.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_iceberg_tests_no_redundant_pyarrow_version_guard_in_test_write_basic FAILED [100%]\n\n=================================== FAILURES ===================================\n__ test_iceberg_tests_no_redundant_pyarrow_version_guard_in_test_write_basic ___\ntest_review_comment_1.py:22: in test_iceberg_tests_no_redundant_pyarrow_version_guard_in_test_write_basic\n    assert (\nE   AssertionError: test_write_basic should not contain the redundant pyarrow version guard (calls to _get_pyarrow_version / parse_version with early return). It should rely on the pytest.mark.skipif condition instead.\nE   assert '_get_pyarrow_version' not in '\\n    # NOT...ble_p)\\n\\n\\n'\nE     '_get_pyarrow_version' is contained here:\nE       \nE           # NOTE: Iceberg only works with PyArrow 9 or above.\nE           pyarrow_version = _get_pyarrow_version()\nE           if pyarrow_version is not None:\nE               pyarrow_version = parse_version(pyarrow_version)\nE           if pyarrow_version is not None and pyarrow_version < parse_version(\"9.0.0\"):...\nE     \nE     ...Full output truncated (27 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev/::test_iceberg_tests_no_redundant_pyarrow_version_guard_in_test_write_basic\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_iceberg_tests_no_redundant_pyarrow_version_guard_in_test_write_basic PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 7482,
+        "completion_tokens": 356,
+        "total_tokens": 7838,
+        "cost_usd": 0.0180775
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

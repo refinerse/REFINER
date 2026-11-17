@@ -1,0 +1,23 @@
+import numpy as np
+
+from sklearn.utils.class_weight import compute_class_weight
+
+
+def test_compute_class_weight_always_returns_float64_even_for_float32_y():
+    """compute_class_weight should always return float64 weights.
+
+    This guards against dtype-coupling to y (e.g. special-casing float32),
+    ensuring weights are consistently float64.
+    """
+    y = np.array([0.0, 0.0, 1.0, 1.0, 1.0], dtype=np.float32)
+    classes = np.array([0.0, 1.0], dtype=np.float32)
+
+    w_none = compute_class_weight(None, classes=classes, y=y)
+    assert (
+        w_none.dtype == np.float64
+    ), f"Expected float64 weights for class_weight=None even when y is float32, got {w_none.dtype}"
+
+    w_balanced = compute_class_weight("balanced", classes=classes, y=y)
+    assert (
+        w_balanced.dtype == np.float64
+    ), f"Expected float64 weights for class_weight='balanced' even when y is float32, got {w_balanced.dtype}"

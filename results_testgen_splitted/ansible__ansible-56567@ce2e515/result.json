@@ -1,0 +1,35 @@
+{
+  "instance_id": "ansible__ansible-56567@ce2e515",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 1318,
+    "completion_tokens": 208,
+    "total_tokens": 1526,
+    "cost_usd": 0.0052185
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nUnless you quote the entire line, `#` will comment out the rest of the line, this will result in the following data structure:\r\n\r\n```\r\n{\r\n    \"bugfixes\": [\r\n        \"win_iis_website - \\\"Fixed \"\r\n    ]\r\n}\r\n```\r\n\r\nI would include the full URL to the issue/pr in the changelog fragment.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ansible__ansible-56567@ce2e515/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_changelog_fragment_quotes_issue_url_and_avoids_yaml_comment_truncation():\n    path = \"/workspace/changelogs/fragments/56567-Fix-win_iis_website-id assignment-for-first-new-site.yml\"\n    source = open(path, \"r\", encoding=\"utf-8\").read()\n\n    # Ensure the bullet item is a single fully-quoted YAML string and includes a full GitHub URL.\n    # This prevents `#47057` from being treated as a YAML comment and truncating the entry.\n    assert re.search(r'^\\s*-\\s*\".*https://github\\.com/ansible/ansible/issues/47057.*\"\\s*$',\n                     source, flags=re.MULTILINE), (\n        \"Changelog fragment entry must be a fully quoted YAML string containing the full issue URL \"\n        \"(https://github.com/ansible/ansible/issues/47057) to avoid `#...` being parsed as a YAML comment.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_changelog_fragment_quotes_issue_url_and_avoids_yaml_comment_truncation FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_changelog_fragment_quotes_issue_url_and_avoids_yaml_comment_truncation __\ntest_review_comment_0.py:10: in test_changelog_fragment_quotes_issue_url_and_avoids_yaml_comment_truncation\n    assert re.search(r'^\\s*-\\s*\".*https://github\\.com/ansible/ansible/issues/47057.*\"\\s*$',\nE   AssertionError: Changelog fragment entry must be a fully quoted YAML string containing the full issue URL (https://github.com/ansible/ansible/issues/47057) to avoid `#...` being parsed as a YAML comment.\nE   assert None\nE    +  where None = <function search at 0x7fce3a722340>('^\\\\s*-\\\\s*\".*https://github\\\\.com/ansible/ansible/issues/47057.*\"\\\\s*$', 'bugfixes:\\n  - win_iis_website - \"Fixed #47057 , site_id not used if no sites exist already and creating a new site\"', flags=re.MULTILINE)\nE    +    where <function search at 0x7fce3a722340> = re.search\nE    +    and   re.MULTILINE = re.MULTILINE\n=========================== short test summary info ============================\nFAILED ../dev::test_changelog_fragment_quotes_issue_url_and_avoids_yaml_comment_truncation\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_changelog_fragment_quotes_issue_url_and_avoids_yaml_comment_truncation PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 1318,
+        "completion_tokens": 208,
+        "total_tokens": 1526,
+        "cost_usd": 0.0052185
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

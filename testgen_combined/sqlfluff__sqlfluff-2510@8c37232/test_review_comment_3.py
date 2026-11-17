@@ -1,0 +1,28 @@
+import pytest
+
+import src.sqlfluff.dialects.dialect_ansi as dialect_ansi
+
+
+def test_date_part_function_comment_spelling_fixed():
+    """Verify the review-requested comment spelling change is present.
+
+    This change has no runtime behavior impact, so we assert at the source level
+    that the comment reads 'Treat functions...' (not the misspelled 'fucnctions').
+    """
+    source = open("/workspace/src/sqlfluff/dialects/dialect_ansi.py", encoding="utf-8").read()
+
+    assert (
+        "# Treat functions which take date parts separately" in source
+    ), (
+        "Expected the comment to be corrected to "
+        "'# Treat functions which take date parts separately' in "
+        "/workspace/src/sqlfluff/dialects/dialect_ansi.py"
+    )
+
+    assert (
+        "# Treat fucnctions which take date parts separately" not in source
+    ), (
+        "Did not expect the old misspelled comment "
+        "'# Treat fucnctions which take date parts separately' to remain in "
+        "/workspace/src/sqlfluff/dialects/dialect_ansi.py"
+    )

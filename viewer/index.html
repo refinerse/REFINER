@@ -1,0 +1,438 @@
+<title>REFINER Comment Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+/* Layout: a review-tool split pane, comment index on the left, one comment's evidence stacked on the right */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --fg: #1b2230; --muted: #5c6678; --line: #dde1e8;
+  --accent: #2f5bd3; --accent-soft: #e6ecfb;
+  --pass: #1f7a4d; --pass-soft: #e3f3ea; --fail: #b4322c; --fail-soft: #fbe8e6;
+  --add-bg: #e6f4ea; --del-bg: #fbeaea; --hit-bg: #fff4c2; --hit-edge: #d9a400;
+  --code-bg: #f3f5f8;
+  --k: #8a3ab9; --s: #1f7a4d; --c: #7b8494; --n: #b35c00; --f: #2f5bd3;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12151b; --panel: #181c24; --fg: #e3e7ee; --muted: #949db0; --line: #2a303c;
+  --accent: #7d9bff; --accent-soft: #222c47;
+  --pass: #5cc98f; --pass-soft: #17301f; --fail: #f07a73; --fail-soft: #3a1c1b;
+  --add-bg: #15301f; --del-bg: #3a1a1a; --hit-bg: #3d3412; --hit-edge: #e0b02a;
+  --code-bg: #1d222c;
+  --k: #c792ea; --s: #8fd6a8; --c: #7c8597; --n: #f2a65a; --f: #8fb0ff;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #181c24; --fg: #e3e7ee; --muted: #949db0; --line: #2a303c;
+  --accent: #7d9bff; --accent-soft: #222c47;
+  --pass: #5cc98f; --pass-soft: #17301f; --fail: #f07a73; --fail-soft: #3a1c1b;
+  --add-bg: #15301f; --del-bg: #3a1a1a; --hit-bg: #3d3412; --hit-edge: #e0b02a;
+  --code-bg: #1d222c;
+  --k: #c792ea; --s: #8fd6a8; --c: #7c8597; --n: #f2a65a; --f: #8fb0ff;
+  color-scheme: dark }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+.app { height: 100%; display: grid; grid-template-columns: minmax(280px, 360px) 1fr; }
+.app.collapsed { grid-template-columns: 1fr; }
+.app.collapsed .side { display: none; }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tog[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+.tests { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 16px; }
+.tcard { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tcard-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tcard h3 { font-size: 14px; font-weight: 600; margin: 0; }
+.tcard .code { max-height: 60vh; }
+.tcard .runs { grid-template-columns: 1fr 1fr; }
+.chip.kind.structural { color: var(--n); border-color: currentColor; }
+.chip.kind.behavioural { color: var(--accent); border-color: currentColor; }
+.chip.kind.revised { color: var(--k); border-color: currentColor; }
+.patch { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); }
+.patch-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.patch h4 { margin: 0; font-size: 12.5px; font-weight: 600; }
+.patch details { background: var(--panel); }
+.why { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.minis { display: inline-flex; gap: 3px; align-items: center; }
+.mini { width: 7px; height: 7px; border-radius: 2px; background: var(--pass); }
+.mini.round { border-radius: 50%; }
+.mini.bad { background: var(--fail); } .mini.none { background: var(--line); }
+
+/* sidebar */
+.side { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--panel); }
+.side-head { display: flex; flex-direction: column; gap: 10px; padding-block: 16px 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.brand h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: .01em; }
+.count { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+input, select { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible, .item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.filters select { width: 100%; }
+.list { overflow-y: auto; flex: 1; min-height: 0; }
+.item { display: grid; grid-template-columns: 1fr; gap: 10px; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.item:hover { background: var(--bg); }
+.item[aria-current="true"] { background: var(--accent-soft); }
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; background: var(--pass); }
+.dot.bad { background: var(--fail); }
+.item-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.item-top { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.item-top b { color: var(--fg); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-path { font-family: var(--mono); font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
+.item-text { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.empty { padding: 24px 16px; color: var(--muted); }
+
+/* detail */
+/* wide screens: header on top, then two independently scrolling columns (comment + hunk | tests) */
+.detail { overflow: hidden; min-width: 0; height: 100%; }
+.cols { display: grid; grid-template-columns: minmax(420px, 1fr) minmax(0, 2.6fr); gap: 20px; flex: 1; min-height: 0; }
+.col { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; min-width: 0; min-height: 0; padding-bottom: 32px; padding-right: 4px; }
+.col-left .code { max-height: none; }
+.wrap { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px; padding-block: 16px 0; padding-left: 24px; padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12.5px; color: var(--muted); }
+.crumbs a { color: var(--accent); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.title { font-size: 20px; font-weight: 600; margin: 0; text-wrap: balance; line-height: 1.3; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 11.5px; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.chip.ok { color: var(--pass); background: var(--pass-soft); border-color: transparent; font-weight: 500; }
+.chip.bad { color: var(--fail); background: var(--fail-soft); border-color: transparent; font-weight: 500; }
+.nav { display: flex; gap: 6px; margin-left: auto; }
+button { font: inherit; font-size: 12.5px; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: .4; cursor: default; }
+kbd { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+section { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+h2 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin: 0; }
+.loc { font-family: var(--mono); font-size: 12.5px; color: var(--fg); overflow-wrap: anywhere; }
+
+.thread { display: flex; flex-direction: column; gap: 10px; }
+.msg { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; min-width: 0; }
+.msg .who { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+.msg.author .who { color: var(--muted); }
+.msg .body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg code { font-family: var(--mono); font-size: 12.5px; background: var(--code-bg); padding: 0 4px; border-radius: 4px; }
+
+.code { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: auto; max-height: 70vh; }
+.code pre { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; }
+table.diff { border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; width: 100%; }
+table.diff td { padding: 0 10px; white-space: pre; vertical-align: top; }
+table.diff td.n { color: var(--muted); text-align: right; user-select: none; width: 1%; padding: 0 6px; font-variant-numeric: tabular-nums; opacity: .8; }
+tr.add td.t { background: var(--add-bg); }
+tr.del td.t { background: var(--del-bg); }
+tr.hdr td { color: var(--muted); background: var(--code-bg); }
+tr.hit td { background: var(--hit-bg) !important; }
+tr.hit td.n:first-child { box-shadow: inset 3px 0 0 var(--hit-edge); }
+.testpre { padding: 12px 14px; }
+
+.runs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.run { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
+.run .lbl { font-size: 12px; color: var(--muted); }
+.run .val { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.run .val.ok { color: var(--pass); } .run .val.bad { color: var(--fail); }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+details > summary { cursor: pointer; padding: 8px 14px; font-size: 12.5px; color: var(--muted); }
+details pre { margin: 0; padding: 0 14px 12px; font-family: var(--mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 50vh; overflow: auto; }
+details .code { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; }
+.copy { font-size: 11.5px; padding: 2px 8px; }
+
+.hljs-keyword, .hljs-built_in, .hljs-literal { color: var(--k); }
+.hljs-string, .hljs-regexp { color: var(--s); }
+.hljs-comment, .hljs-meta { color: var(--c); font-style: italic; }
+.hljs-number { color: var(--n); }
+.hljs-title, .hljs-title.function_, .hljs-title.class_ { color: var(--f); }
+.hljs-params, .hljs-attr, .hljs-variable { color: var(--fg); }
+
+@media (max-width: 800px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; min-height: 100%; }
+  .side { border-right: 0; border-bottom: 1px solid var(--line); }
+  .side-head { padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .item { padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .list { max-height: 38vh; }
+  .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .detail { overflow: visible; }
+}
+@media (max-width: 1100px) {
+  .detail { overflow-y: auto; }
+  .wrap { height: auto; padding-block: 16px 48px; }
+  .cols { grid-template-columns: 1fr; }
+  .col { overflow: visible; padding-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-head">
+      <div class="brand"><h1>REFINER comments</h1><span class="count" id="count">loading…</span></div>
+      <input id="q" type="search" placeholder="Search comment, path, instance…" aria-label="Search">
+      <div class="filters">
+        <select id="f-status" aria-label="Model test status">
+          <option value="">All model results</option>
+          <option value="all-ok">All 3 models valid</option>
+          <option value="any-bad">Any model invalid</option>
+          <option value="all-bad">All 3 models invalid</option>
+          <option value="bad-sonnet">Sonnet invalid</option>
+          <option value="bad-plus">Qwen Plus invalid</option>
+          <option value="bad-flash">Qwen Flash invalid</option>
+          <option value="res-all">REFINER resolved by all 3</option>
+          <option value="unres-any">REFINER unresolved by any</option>
+          <option value="unres-all">REFINER unresolved by all 3</option>
+        </select>
+        <select id="f-lang" aria-label="Language"><option value="">All languages</option></select>
+        <select id="f-kind" aria-label="Test type" style="grid-column: 1 / -1">
+          <option value="">All test types</option>
+          <option value="gt-structural">GT structural</option>
+          <option value="gt-behavioural">GT behavioural</option>
+          <option value="differs">A model's type differs from GT</option>
+          <option value="all-structural">All 4 structural</option>
+          <option value="all-behavioural">All 4 behavioural</option>
+        </select>
+        <select id="f-repo" aria-label="Repository" style="grid-column: 1 / -1"><option value="">All repositories</option></select>
+      </div>
+    </div>
+    <div class="list" id="list" role="listbox" aria-label="Review comments"></div>
+  </aside>
+  <main class="detail" id="detail"><div class="wrap"><p class="empty">Loading 483 review comments…</p></div></main>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let DATA = [], view = [], cur = -1;
+
+function lsGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch {} }
+
+fetch('data.json').then(r => r.json()).then(d => {
+  DATA = d.map((x, i) => ({ ...x, idx: i, hay: (x.text + ' ' + x.path + ' ' + x.id + ' ' + x.title).toLowerCase() }));
+  const opts = (sel, vals) => [...new Set(vals)].sort().forEach(v => sel.insertAdjacentHTML('beforeend', `<option>${esc(v)}</option>`));
+  opts($('#f-lang'), DATA.map(x => x.lang));
+  opts($('#f-repo'), DATA.map(x => x.repo));
+  applyFilters();
+  const m = location.hash.match(/^#c-(\d+)$/);
+  const start = m ? +m[1] : +(lsGet('refiner-cur') ?? 0);
+  select(DATA[start] ? start : 0);
+}).catch(() => { $('#detail').innerHTML = '<div class="wrap"><p class="empty">Could not load data.json. Reload the page to try again.</p></div>'; });
+
+const SETS = [['gt', 'Ground truth'], ['sonnet', 'Claude Sonnet 4.6'], ['plus', 'Qwen 3.6 Plus'], ['flash', 'Qwen 3.6 Flash']];
+const MODELS = ['sonnet', 'plus', 'flash'];
+let shown;
+try { shown = new Set(JSON.parse(lsGet('refiner-shown')) || SETS.map(s => s[0])); } catch { shown = new Set(SETS.map(s => s[0])); }
+const ok = (x, k) => !!x.tests[k]?.ok;
+const res = (x, k) => !!x.refiner[k]?.resolved;
+const STATUS = {
+  'all-ok': x => MODELS.every(k => ok(x, k)),
+  'any-bad': x => MODELS.some(k => !ok(x, k)),
+  'all-bad': x => MODELS.every(k => !ok(x, k)),
+  'bad-sonnet': x => !ok(x, 'sonnet'), 'bad-plus': x => !ok(x, 'plus'), 'bad-flash': x => !ok(x, 'flash'),
+  'res-all': x => MODELS.every(k => res(x, k)),
+  'unres-any': x => MODELS.some(k => !res(x, k)),
+  'unres-all': x => MODELS.every(k => !res(x, k)),
+};
+const minis = x => `<span class="minis" title="Tests (Sonnet / Qwen Plus / Qwen Flash): green = fails before and passes after merge">${MODELS.map(k =>
+  `<span class="mini ${!x.tests[k] ? 'none' : ok(x, k) ? '' : 'bad'}"></span>`).join('')}</span>
+  <span class="minis" title="REFINER patch (Sonnet / Qwen Plus / Qwen Flash): green = resolved by the GT test">${MODELS.map(k =>
+  `<span class="mini round ${!x.refiner[k] ? 'none' : res(x, k) ? '' : 'bad'}"></span>`).join('')}</span>`;
+
+const kindOf = (x, k) => x.tests[k]?.kind;
+const KIND = {
+  'gt-structural': x => kindOf(x, 'gt') === 'structural',
+  'gt-behavioural': x => kindOf(x, 'gt') === 'behavioural',
+  'differs': x => MODELS.some(k => kindOf(x, k) && kindOf(x, k) !== kindOf(x, 'gt')),
+  'all-structural': x => SETS.every(([k]) => kindOf(x, k) === 'structural'),
+  'all-behavioural': x => SETS.every(([k]) => kindOf(x, k) === 'behavioural'),
+};
+
+function setSidebar(hidden) {
+  $('.app').classList.toggle('collapsed', hidden); lsSet('refiner-side', hidden ? '1' : '');
+  const b = $('#side-btn'); if (b) { b.textContent = hidden ? 'Show list' : 'Hide list'; b.setAttribute('aria-expanded', !hidden); }
+}
+
+function applyFilters() {
+  const q = $('#q').value.trim().toLowerCase(), st = $('#f-status').value, lang = $('#f-lang').value, repo = $('#f-repo').value;
+  const kd = $('#f-kind').value;
+  view = DATA.filter(x => (!q || x.hay.includes(q)) && (!st || STATUS[st](x)) && (!kd || KIND[kd](x)) && (!lang || x.lang === lang) && (!repo || x.repo === repo));
+  $('#count').textContent = view.length === DATA.length ? `${DATA.length} comments` : `${view.length} / ${DATA.length}`;
+  const list = $('#list');
+  list.innerHTML = view.length ? view.map(x => `
+    <div class="item" role="option" tabindex="-1" data-i="${x.idx}" aria-current="${x.idx === cur}">
+      <div class="item-main">
+        <div class="item-top"><b>${esc(x.repo)}#${x.pr}</b><span>c${x.ci} ${minis(x)}</span></div>
+        <div class="item-path">${esc(x.path)}:${x.oline ?? x.line ?? '?'}</div>
+        <div class="item-text">${esc(stripSpeakers(x.text))}</div>
+      </div>
+    </div>`).join('') : '<p class="empty">No comments match these filters.</p>';
+}
+const stripSpeakers = t => t.replace(/^@[\w-]+:\s*$/gm, '').trim().slice(0, 220);
+
+['#q', '#f-status', '#f-kind', '#f-lang', '#f-repo'].forEach(s => $(s).addEventListener('input', applyFilters));
+$('#list').addEventListener('click', e => { const it = e.target.closest('.item'); if (it) select(+it.dataset.i); });
+
+function select(i) {
+  cur = i; lsSet('refiner-cur', i);
+  if (location.hash !== `#c-${i}`) history.replaceState(null, '', `#c-${i}`);
+  document.querySelectorAll('.item').forEach(el => el.setAttribute('aria-current', +el.dataset.i === i));
+  const el = document.querySelector(`.item[data-i="${i}"]`); el?.scrollIntoView({ block: 'nearest' });
+  render(DATA[i]);
+}
+function step(d) {
+  const pos = view.findIndex(x => x.idx === cur);
+  const nxt = view[pos === -1 ? 0 : pos + d];
+  if (nxt) select(nxt.idx);
+}
+addEventListener('hashchange', () => { const m = location.hash.match(/^#c-(\d+)$/); if (m && DATA[+m[1]] && +m[1] !== cur) select(+m[1]); });
+addEventListener('keydown', e => {
+  if (e.target.matches('input, select')) { if (e.key === 'Escape') e.target.blur(); return; }
+  if (e.key === 'j' || e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+  else if (e.key === 'k' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  else if (e.key === '/') { e.preventDefault(); $('#q').focus(); }
+  else if (e.key === 'b') setSidebar(!$('.app').classList.contains('collapsed'));
+});
+setSidebar(lsGet('refiner-side') === '1');
+
+$('#detail').addEventListener('click', e => {
+  const tog = e.target.closest('.tog');
+  if (tog) {
+    shown.has(tog.dataset.k) ? shown.delete(tog.dataset.k) : shown.add(tog.dataset.k);
+    lsSet('refiner-shown', JSON.stringify([...shown]));
+    const y = [$('#detail').scrollTop, $('#col-left').scrollTop, $('#col-right').scrollTop];
+    render(DATA[cur]);
+    [$('#detail').scrollTop, $('#col-left').scrollTop, $('#col-right').scrollTop] = y;
+    return;
+  }
+  const cp = e.target.closest('.copy');
+  if (cp) {
+    const code = DATA[cur].tests[cp.dataset.k].test;
+    navigator.clipboard.writeText(code).then(() => { cp.textContent = 'Copied'; },
+      () => { getSelection().selectAllChildren($(`#code-${cp.dataset.k}`)); cp.textContent = 'Press Ctrl+C'; });
+    return;
+  }
+  if (e.target.id === 'side-btn') setSidebar(!$('.app').classList.contains('collapsed'));
+});
+
+const verdict = v => v == null ? 'not run' : v ? 'passed' : 'failed';
+function patchBlock(r) {
+  if (!r) return `<div class="patch"><div class="patch-head"><h4>REFINER patch</h4><span class="chip">not run</span></div></div>`;
+  const facts = [
+    r.own_test != null && `own test ${r.own_test ? 'passes' : 'fails'} after the edit`,
+    r.revised != null && (r.revised ? 'test was revised' : 'test not revised'),
+    r.intent && `task: ${esc(r.intent)}`,
+  ].filter(Boolean).join(' · ');
+  return `<div class="patch">
+    <div class="patch-head"><h4>REFINER patch</h4>
+      ${r.resolved == null ? '<span class="chip">no GT result</span>' : r.resolved ? '<span class="chip ok">resolved</span>' : '<span class="chip bad">unresolved</span>'}</div>
+    ${facts ? `<div class="why">${facts}</div>` : ''}
+    ${r.error ? `<div class="why" style="color:var(--fail)">${esc(r.error)}</div>` : ''}
+    <details><summary>${r.diff ? 'Show agent diff' : 'Agent made no change'}</summary>${r.diff ? `<div class="code">${diffTable(r.diff)}</div>` : ''}</details>
+  </div>`;
+}
+
+function testCard(k, label, t, x) {
+  const patch = k === 'gt' ? '' : patchBlock(x.refiner[k]);
+  if (!t || !t.test) return `<div class="tcard"><div class="tcard-head"><h3>${label}</h3></div>
+    <p class="empty" style="padding:0">This model did not produce a test for this comment.</p>${patch}</div>`;
+  const ext = (t.file || '').split('.').pop();
+  return `<div class="tcard">
+    <div class="tcard-head"><h3>${label}</h3>
+      <span class="loc">${t.ok ? '<span class="chip ok">valid</span>' : '<span class="chip bad">invalid</span>'}
+        ${t.kind ? `<span class="chip kind ${t.kind}" title="${esc(t.kind_why)}">${t.kind}</span>` : ''}
+        ${t.revised ? '<span class="chip kind revised" title="The REFINER agent edited this test; the final version is shown">final · revised by agent</span>' : ''}
+        ${esc(t.file)}${t.attempts ? ` · ${t.attempts} attempt${t.attempts > 1 ? 's' : ''}` : ''}
+        <button class="copy" data-k="${k}">Copy</button></span></div>
+    ${t.kind_why ? `<div class="why">${t.kind === 'structural' ? 'Structural' : 'Behavioural'}: ${esc(t.kind_why)}</div>` : ''}
+    <div class="runs">
+      <div class="run"><span class="lbl">Before merge (should fail)</span><span class="val ${t.before === false ? 'ok' : 'bad'}">${verdict(t.before)}</span></div>
+      <div class="run"><span class="lbl">After merge (should pass)</span><span class="val ${t.after === true ? 'ok' : 'bad'}">${verdict(t.after)}</span></div>
+    </div>
+    ${t.revised ? '<div class="why">Before/after merge results above are for the test as generated, before the agent revised it.</div>' : ''}
+    ${t.revise_failed ? `<div class="why" style="color:var(--fail)">The agent revised this test, but its diff does not apply to the generated test. Showing the generated test.</div>
+      <details><summary>Agent's test diff</summary><div class="code">${diffTable(t.revise_diff)}</div></details>` : ''}
+    ${patch}
+    <div class="code"><pre class="testpre"><code id="code-${k}">${hl(t.test, { js: 'javascript', ts: 'typescript' }[ext] || 'python')}</code></pre></div>
+    <details><summary>Output before merge</summary><pre>${esc(t.before_out || 'No output recorded.')}</pre></details>
+    <details><summary>Output after merge</summary><pre>${esc(t.after_out || 'No output recorded.')}</pre></details>
+  </div>`;
+}
+
+function thread(text) {
+  const parts = text.split(/^(@[\w-]+):\s*$/m);
+  const out = [];
+  if (parts[0].trim()) out.push(['', parts[0]]);
+  for (let i = 1; i < parts.length; i += 2) out.push([parts[i], parts[i + 1] || '']);
+  return out.map(([who, body]) => `<div class="msg ${who === '@author' ? 'author' : ''}">
+    ${who ? `<div class="who">${esc(who)}</div>` : ''}
+    <div class="body">${esc(body.trim()).replace(/`([^`\n]+)`/g, '<code>$1</code>')}</div></div>`).join('');
+}
+
+// Render a unified diff with old/new line numbers. `hitFrom..hitTo` (new-side line numbers) get highlighted.
+function diffTable(diff, hitFrom, hitTo) {
+  let o = 0, n = 0;
+  const rows = diff.replace(/\n$/, '').split('\n').map(l => {
+    const h = l.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)/);
+    if (h) { o = +h[1]; n = +h[2]; return `<tr class="hdr"><td class="n"></td><td class="n"></td><td class="t">${esc(l)}</td></tr>`; }
+    if (/^(diff --git|index |--- |\+\+\+ |new file|deleted file|similarity|rename |\\ No newline)/.test(l)) return `<tr class="hdr"><td class="n"></td><td class="n"></td><td class="t">${esc(l)}</td></tr>`;
+    let cls = '', on = '', nn = '';
+    if (l[0] === '+') { cls = 'add'; nn = n++; }
+    else if (l[0] === '-') { cls = 'del'; on = o++; }
+    else { on = o++; nn = n++; }
+    const hit = hitTo != null && nn !== '' && nn >= hitFrom && nn <= hitTo;
+    return `<tr class="${cls}${hit ? ' hit' : ''}"><td class="n">${on}</td><td class="n">${nn}</td><td class="t">${esc(l)}</td></tr>`;
+  });
+  return `<table class="diff">${rows.join('')}</table>`;
+}
+
+function hl(code, lang) {
+  const l = { python: 'python', javascript: 'javascript', typescript: 'typescript', js: 'javascript', ts: 'typescript' }[lang] || 'python';
+  try { return window.hljs ? hljs.highlight(code, { language: l }).value : esc(code); } catch { return esc(code); }
+}
+
+function render(x) {
+  const hitTo = x.oline ?? x.line, hitFrom = x.osline ?? x.sline ?? hitTo;
+  const range = hitFrom !== hitTo ? `${hitFrom}–${hitTo}` : `${hitTo ?? '?'}`;
+  const pos = view.findIndex(v => v.idx === x.idx);
+  const prUrl = `https://github.com/${x.repo}/pull/${x.pr}`;
+  $('#detail').innerHTML = `<div class="wrap">
+    <div class="crumbs">
+      <button id="side-btn" aria-expanded="${!$('.app').classList.contains('collapsed')}" title="Toggle list (b)">${$('.app').classList.contains('collapsed') ? 'Show list' : 'Hide list'}</button>
+      <a href="${esc(prUrl)}" target="_blank" rel="noopener">${esc(x.repo)} #${x.pr} ↗</a>
+      <span>${esc(x.id)}</span><span>comment ${x.ci}</span>
+      <div class="nav">
+        <button id="prev" ${pos <= 0 ? 'disabled' : ''} aria-label="Previous comment">← <kbd>k / ←</kbd></button>
+        <button id="next" ${pos === -1 || pos >= view.length - 1 ? 'disabled' : ''} aria-label="Next comment"><kbd>j / →</kbd> →</button>
+      </div>
+    </div>
+    <h1 class="title">${esc(x.title)}</h1>
+    <div class="chips">
+      ${[x.lang, x.type, x.difficulty, x.domain].filter(Boolean).map(c => `<span class="chip">${esc(c)}</span>`).join('')}
+    </div>
+
+    <div class="cols">
+    <div class="col col-left" id="col-left">
+    <section><div class="sec-head"><h2>Review comment</h2></div><div class="thread">${thread(x.text)}</div></section>
+    <section>
+      <div class="sec-head"><h2>Where it commented</h2><span class="loc">${esc(x.path)} · line ${range}${x.line == null ? ' <span style="color:var(--muted)">(outdated)</span>' : ''}</span></div>
+      <div class="code">${x.hunk ? diffTable(x.hunk, hitFrom, hitTo) : '<p class="empty">No diff hunk recorded for this comment.</p>'}</div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Human fix in merged PR</h2><span class="loc">${esc(x.path)}</span></div>
+      <details ${x.fix ? '' : 'open'}><summary>${x.fix ? 'Show merged diff for this file' : 'The merged patch does not touch this file'}</summary>
+        ${x.fix ? `<div class="code">${diffTable(x.fix)}</div>` : ''}</details>
+    </section>
+    </div>
+    <div class="col col-right" id="col-right">
+    <section>
+      <div class="sec-head"><h2>Tests</h2>
+        <div class="toggles">${SETS.map(([k, label]) => `<button class="tog" data-k="${k}" aria-pressed="${shown.has(k)}">${label}${k === 'gt' ? '' : ` · test ${ok(x, k) ? '✓' : '✗'} · patch ${res(x, k) ? '✓' : '✗'}`}</button>`).join('')}</div></div>
+      ${shown.size ? `<div class="tests">${SETS.filter(([k]) => shown.has(k)).map(([k, label]) => testCard(k, label, x.tests[k], x)).join('')}</div>`
+        : '<p class="empty" style="padding:0">Turn on a test set above to see its test.</p>'}
+    </section>
+    </div>
+    </div>
+  </div>`;
+  $('#detail').scrollTop = 0;
+  $('#prev').onclick = () => step(-1);
+  $('#next').onclick = () => step(1);
+}
+</script>

@@ -1,0 +1,35 @@
+{
+  "instance_id": "PrefectHQ__prefect-14392@aac04aa",
+  "repo": "PrefectHQ/prefect",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 35839,
+    "completion_tokens": 556,
+    "total_tokens": 36395,
+    "cost_usd": 0.04247985
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nmaybe we can we `assert` or `raise` here in case we don't have `data` in the response?\n\n@author:\nended up removing this due to refactor",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "PrefectHQ__prefect-14392@aac04aa/test_review_comment_0.py",
+      "test_code": "import pytest\n\nimport scripts.surface_high_engagement_issues as mod\n\n\ndef test_get_issue_id_no_keyerror_when_graphql_response_missing_data(monkeypatch):\n    \"\"\"\n    Before: get_issue_id() raises KeyError when GraphQL JSON lacks \"data\".\n    After: get_issue_id() no longer raises KeyError in this scenario (it may still\n    raise a different exception due to current implementation details).\n    \"\"\"\n\n    class DummyResponse:\n        def raise_for_status(self):\n            return None\n\n        def json(self):\n            # Simulate an unexpected GraphQL response shape (no \"data\" key)\n            return {\"message\": \"something went wrong\"}\n\n    def fake_post(url, headers=None, json=None):\n        return DummyResponse()\n\n    monkeypatch.setattr(mod.httpx, \"post\", fake_post)\n\n    # The key behavior change: do not crash with KeyError on missing \"data\"\n    with pytest.raises(Exception) as excinfo:\n        mod.get_issue_id(123, headers={\"Authorization\": \"Bearer x\"})\n\n    assert not isinstance(excinfo.value, KeyError), (\n        \"get_issue_id() should not raise KeyError when the GraphQL response is missing \"\n        \"the 'data' key; it should handle/report the unexpected response instead.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_get_issue_id_no_keyerror_when_graphql_response_missing_data FAILED [100%]\n\n=================================== FAILURES ===================================\n_______ test_get_issue_id_no_keyerror_when_graphql_response_missing_data _______\ntest_review_comment_0.py:30: in test_get_issue_id_no_keyerror_when_graphql_response_missing_data\n    assert not isinstance(excinfo.value, KeyError), (\nE   AssertionError: get_issue_id() should not raise KeyError when the GraphQL response is missing the 'data' key; it should handle/report the unexpected response instead.\nE   assert not True\nE    +  where True = isinstance(KeyError('data'), KeyError)\nE    +    where KeyError('data') = <ExceptionInfo KeyError('data') tblen=2>.value\n=========================== short test summary info ============================\nFAILED ../dev/::test_get_issue_id_no_keyerror_when_graphql_response_missing_data\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.06s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_get_issue_id_no_keyerror_when_graphql_response_missing_data PASSED [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 35839,
+        "completion_tokens": 556,
+        "total_tokens": 36395,
+        "cost_usd": 0.04247985
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

@@ -1,0 +1,35 @@
+import re
+
+
+def test_empty_reg_pol_user_uses_hkcu_not_hklm():
+    """
+    Verify that the `empty_reg_pol_user` fixture cleans up the User hive (HKCU),
+    not the Machine hive (HKLM).
+
+    This is a source-inspection test because importing/running these tests isn't
+    reliable in this execution environment.
+    """
+    source = open(
+        "/workspace/tests/pytests/unit/modules/test_win_lgpo_reg.py", encoding="utf-8"
+    ).read()
+
+    # Extract the body of the empty_reg_pol_user fixture.
+    m = re.search(
+        r"@pytest\.fixture\s*\n"
+        r"def\s+empty_reg_pol_user\s*\(\s*\)\s*:\s*\n"
+        r"(?P<body>(?:[ \t].*\n)*)",
+        source,
+        flags=re.MULTILINE,
+    )
+    assert (
+        m is not None
+    ), "Could not find the `empty_reg_pol_user` pytest fixture in /workspace/tests/pytests/unit/modules/test_win_lgpo_reg.py"
+
+    body = m.group("body")
+
+    assert (
+        'delete_key_recursive(hive="HKCU"' in body
+    ), 'Expected `empty_reg_pol_user` to delete registry keys from HKCU (user hive), i.e. `delete_key_recursive(hive="HKCU", ...)`.'
+    assert (
+        'delete_key_recursive(hive="HKLM"' not in body
+    ), 'Did not expect `empty_reg_pol_user` to delete registry keys from HKLM (machine hive); fixture should operate on HKCU.'

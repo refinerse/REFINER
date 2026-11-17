@@ -1,0 +1,23 @@
+import inspect
+
+import src.accelerate.accelerator as accelerator_mod
+
+
+def test_save_state_delegates_to_checkpointing_helpers():
+    """
+    Style review requested adding a clarifying comment (# Random number generator states) in the old manual RNG saving
+    block. In the merged version, the implementation was refactored to delegate to checkpointing helpers instead of
+    manually handling RNG state.
+
+    This test asserts that Accelerator.save_state/load_state delegate to the public checkpointing helpers
+    (save_accelerator_state/load_accelerator_state), which is observable at runtime via the function source.
+    """
+    save_state_src = inspect.getsource(accelerator_mod.Accelerator.save_state)
+    load_state_src = inspect.getsource(accelerator_mod.Accelerator.load_state)
+
+    assert (
+        "save_accelerator_state" in save_state_src
+    ), "Expected Accelerator.save_state to delegate to save_accelerator_state (refactored checkpointing path)."
+    assert (
+        "load_accelerator_state" in load_state_src
+    ), "Expected Accelerator.load_state to delegate to load_accelerator_state (refactored checkpointing path)."

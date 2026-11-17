@@ -1,0 +1,35 @@
+{
+  "instance_id": "python__mypy-14517@78b0f55",
+  "repo": "python/mypy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 43662,
+    "completion_tokens": 1215,
+    "total_tokens": 44877,
+    "cost_usd": 0.0486633
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nI wonder if this might degrade performance, since builtins have over 200 definitions, and it looks like we are iterating over all of them for every module. Can you measure the time spent in this loop when performing a self check, for example? \n\n@author:\nI have found a way to deal with this that doesn't involve calling `record_definition` every time! So performance should be unchanged.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "python__mypy-14517@78b0f55/test_review_comment_0.py",
+      "test_code": "import inspect\n\nfrom mypy.nodes import MypyFile, SymbolTable, SymbolTableNode\nfrom mypy.options import Options\nfrom mypy.partially_defined import PossiblyUndefinedVariableVisitor\n\n\ndef _make_symtab_node(*, kind: int, node: object) -> SymbolTableNode:\n    \"\"\"Create SymbolTableNode in a way that works across mypy versions.\"\"\"\n    sig = inspect.signature(SymbolTableNode)\n    kwargs = {\"kind\": kind, \"node\": node}\n    if \"type_override\" in sig.parameters:\n        kwargs[\"type_override\"] = None\n    if \"module_public\" in sig.parameters:\n        kwargs[\"module_public\"] = True\n    if \"module_hidden\" in sig.parameters:\n        kwargs[\"module_hidden\"] = False\n    if \"cross_ref\" in sig.parameters:\n        kwargs[\"cross_ref\"] = None\n    return SymbolTableNode(**kwargs)  # type: ignore[arg-type]\n\n\ndef test_builtins_are_not_bulk_recorded_into_tracker_definitions() -> None:\n    \"\"\"\n    Verifies the behavioral/perf change: PossiblyUndefinedVariableVisitor.__init__\n    should NOT bulk-record all builtins as tracker definitions.\n\n    This is observable by checking that, right after initialization, a builtin name\n    (e.g. 'len') is still considered undefined by the tracker's global scope.\n\n    Before version: builtins were recorded => is_undefined('len') == False.\n    After version: builtins are not recorded => is_undefined('len') == True.\n    \"\"\"\n    builtins_file = MypyFile([], [], False, \"__builtins__\")\n    builtins_file.names = SymbolTable()\n    builtins_file.names[\"len\"] = _make_symtab_node(kind=0, node=None)\n\n    names = SymbolTable()\n    names[\"__builtins__\"] = _make_symtab_node(kind=0, node=builtins_file)\n\n    v = PossiblyUndefinedVariableVisitor(\n        msg=None,  # type: ignore[arg-type]\n        type_map={},\n        options=Options(),\n        names=names,\n    )\n\n    assert v.tracker.is_undefined(\n        \"len\"\n    ), \"Builtins like 'len' should not be pre-recorded as defined in the tracker during visitor initialization.\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_builtins_are_not_bulk_recorded_into_tracker_definitions FAILED [100%]\n\n=================================== FAILURES ===================================\n_________ test_builtins_are_not_bulk_recorded_into_tracker_definitions _________\ntest_review_comment_0.py:48: in test_builtins_are_not_bulk_recorded_into_tracker_definitions\n    assert v.tracker.is_undefined(\nE   AssertionError: Builtins like 'len' should not be pre-recorded as defined in the tracker during visitor initialization.\nE   assert False\nE    +  where False = is_undefined('len')\nE    +    where is_undefined = <mypy.partially_defined.DefinedVariableTracker object at 0x7fa2c757f550>.is_undefined\nE    +      where <mypy.partially_defined.DefinedVariableTracker object at 0x7fa2c757f550> = <mypy.partially_defined.PossiblyUndefinedVariableVisitor object at 0x7fa2c81a8b10>.tracker\n=========================== short test summary info ============================\nFAILED ../dev::test_builtins_are_not_bulk_recorded_into_tracker_definitions\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.28s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_builtins_are_not_bulk_recorded_into_tracker_definitions PASSED [100%]\n\n============================== 1 passed in 0.26s ===============================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 43662,
+        "completion_tokens": 1215,
+        "total_tokens": 44877,
+        "cost_usd": 0.0486633
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

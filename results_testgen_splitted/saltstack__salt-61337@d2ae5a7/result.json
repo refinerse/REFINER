@@ -1,0 +1,35 @@
+{
+  "instance_id": "saltstack__salt-61337@d2ae5a7",
+  "repo": "saltstack/salt",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 3593,
+    "completion_tokens": 509,
+    "total_tokens": 4102,
+    "cost_usd": 0.01341375
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nchangelog files are not required for doc changes.\n\n@author:\n:fire: gone now :+1:",
+      "comment_type": "documentation",
+      "language": "python",
+      "test_file": "saltstack__salt-61337@d2ae5a7/test_review_comment_0.py",
+      "test_code": "import os\n\n\ndef test_changelog_entry_removed_for_doc_only_change():\n    \"\"\"\n    Doc-only change: no changelog entry should be present.\n    We assert the changelog entry file was removed (preferred) or is empty (acceptable).\n    \"\"\"\n    path = \"/workspace/changelog/60880.fixed\"\n\n    if not os.path.exists(path):\n        assert True, \"Changelog entry file was removed as expected for a doc-only change.\"\n        return\n\n    contents = open(path, encoding=\"utf-8\").read()\n    assert contents.strip() == \"\", (\n        \"Expected the changelog entry file to be removed or empty for a doc-only change. \"\n        f\"File exists and contains non-whitespace content: {contents!r}\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: Only salt>=3005 is supported(Installed version 3003rc1+1281.gd2ae5a7cfa",
+      "after_output": "ERROR: Only salt>=3005 is supported(Installed version 3003rc1+1282.g2156d57a70",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 3593,
+        "completion_tokens": 509,
+        "total_tokens": 4102,
+        "cost_usd": 0.01341375
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

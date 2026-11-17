@@ -1,0 +1,24 @@
+import re
+
+
+def test_script_base_template_uses_job_count_badge_variable():
+    """
+    Enforce the reviewed template style/behavior change for the Jobs tab badge.
+
+    The template should render the badge using the precomputed `job_count` context
+    variable (not `jobs.count`), and should not include double spaces inside the
+    `{% ... %}` tag.
+    """
+    path = "/workspace/netbox/templates/extras/script/base.html"
+    source = open(path, "r", encoding="utf-8").read()
+
+    assert "{% trans \"Jobs\" %} {% badge job_count %}" in source, (
+        "Expected Jobs tab badge to use the `job_count` context variable exactly as:\n"
+        '  {% trans "Jobs" %} {% badge job_count %}\n'
+        "This should replace any usage of `jobs.count` and avoid extra spaces in the tag."
+    )
+
+    assert not re.search(r"{%\s+badge\s+jobs\.count\s+%}", source), (
+        "Found usage of `{% badge jobs.count %}` (possibly with extra spaces). "
+        "The Jobs tab should use `{% badge job_count %}` instead."
+    )

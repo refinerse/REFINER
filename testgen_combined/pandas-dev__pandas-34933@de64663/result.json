@@ -1,0 +1,35 @@
+{
+  "instance_id": "pandas-dev__pandas-34933@de64663",
+  "repo": "pandas-dev/pandas",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 153107,
+    "completion_tokens": 253,
+    "total_tokens": 153360,
+    "cost_usd": 0.27147925
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\ninclude the type for ignore_index.\n\n@author:\nGot it, done.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-34933@de64663/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_dataframe_explode_ignore_index_has_bool_type_annotation():\n    source = open(\"/workspace/pandas/core/frame.py\", encoding=\"utf-8\").read()\n\n    # We want to ensure `ignore_index` is typed as bool in the explode signature.\n    # Before: def explode(self, column: Union[str, Tuple], ignore_index=False) -> \"DataFrame\":\n    # After:  def explode(self, column: Union[str, Tuple], ignore_index: bool = False) -> \"DataFrame\":\n    pattern = re.compile(\n        r\"def\\s+explode\\s*\\(\\s*self\\s*,\\s*column\\s*:\\s*Union\\[\\s*str\\s*,\\s*Tuple\\s*\\]\\s*,\"\n        r\"\\s*ignore_index\\s*:\\s*bool\\s*=\\s*False\\s*\\)\\s*->\\s*['\\\"]DataFrame['\\\"]\\s*:\",\n        flags=re.MULTILINE,\n    )\n\n    assert pattern.search(source), (\n        \"DataFrame.explode should type-annotate ignore_index as `bool` with default \"\n        \"`False` in the function signature (i.e., `ignore_index: bool = False`).\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_dataframe_explode_ignore_index_has_bool_type_annotation FAILED [100%]\n\n=================================== FAILURES ===================================\n_________ test_dataframe_explode_ignore_index_has_bool_type_annotation _________\ntest_review_comment_0.py:16: in test_dataframe_explode_ignore_index_has_bool_type_annotation\n    assert pattern.search(source), (\nE   AssertionError: DataFrame.explode should type-annotate ignore_index as `bool` with default `False` in the function signature (i.e., `ignore_index: bool = False`).\nE   assert None\nE    +  where None = <built-in method search of re.Pattern object at 0x564f2a9097d0>('\"\"\"\\nDataFrame\\n---------\\nAn efficient 2D container for potentially mixed-type time series or other\\nlabeled data series.\\n\\nSimilar to its R counterpart, data.frame, except providing automatic data\\nalignment and a host of useful data manipulation methods having to do with the\\nlabeling information\\n\"\"\"\\n\\nimport collections\\nfrom collections import abc\\nimport datetime\\nfrom io import StringIO\\nimport itertools\\nfrom textwrap import dedent\\nfrom typing import (\\n    IO,\\n    TYPE_CHECKING,\\n    Any,\\n    Dict,\\n    FrozenSet,\\n    Hashable,\\n    Iterable,\\n    Iterator,\\n    List,\\n    Mapping,\\n    Optional,\\n    Sequence,\\n    Set,\\n    Tuple,\\n    Type,\\n    Union,\\n    cast,\\n)\\nimport warnings\\n\\nimport numpy as np\\nimport numpy.ma as ma\\n\\nfrom pandas._config import get_option\\n\\nfrom pandas._libs import algos as libalgos, lib, properties\\nfrom pandas._libs.lib import no_default\\nfrom pandas._typing import (\\n    ArrayLike,\\n    Axes,\\n    Axis,\\n    Dtype,\\n    FilePathOrBuffer,\\n    FrameOrSeriesUnion,\\n    IndexKeyFunc,\\n    Label,\\n    Level,\\n    Renamer,\\n    ValueKeyFunc,\\n)\\nfrom pandas.compat import PY37\\nfrom pandas.compat._optional import import_optional_depe...ame.\"\\n    )\\n    columns: \"Index\" = properties.AxisProperty(\\n        axis=0, doc=\"The column labels of the DataFrame.\"\\n    )\\n\\n    @property\\n    def _AXIS_NUMBERS(self) -> Dict[str, int]:\\n        \"\"\".. deprecated:: 1.1.0\"\"\"\\n        super()._AXIS_NUMBERS\\n        return {\"index\": 0, \"columns\": 1}\\n\\n    @property\\n    def _AXIS_NAMES(self) -> Dict[int, str]:\\n        \"\"\".. deprecated:: 1.1.0\"\"\"\\n        super()._AXIS_NAMES\\n        return {0: \"index\", 1: \"columns\"}\\n\\n    # ----------------------------------------------------------------------\\n    # Add plotting methods to DataFrame\\n    plot = CachedAccessor(\"plot\", pandas.plotting.PlotAccessor)\\n    hist = pandas.plotting.hist_frame\\n    boxplot = pandas.plotting.boxplot_frame\\n    sparse = CachedAccessor(\"sparse\", SparseFrameAccessor)\\n\\n\\nDataFrame._add_numeric_operations()\\nDataFrame._add_series_or_dataframe_operations()\\n\\nops.add_flex_arithmetic_methods(DataFrame)\\nops.add_special_arithmetic_methods(DataFrame)\\n\\n\\ndef _from_nested_dict(data):\\n    new_data = collections.defaultdict(dict)\\n    for index, s in data.items():\\n        for col, v in s.items():\\n            new_data[col][index] = v\\n    return new_data\\n')\nE    +    where <built-in method search of re.Pattern object at 0x564f2a9097d0> = re.compile('def\\\\s+explode\\\\s*\\\\(\\\\s*self\\\\s*,\\\\s*column\\\\s*:\\\\s*Union\\\\[\\\\s*str\\\\s*,\\\\s*Tuple\\\\s*\\\\]\\\\s*,\\\\s*ignore_index\\\\s*:\\\\s*bool\\\\s*=\\\\s*False\\\\s*\\\\)\\\\s*->\\\\s*[\\'\\\\\"]DataFrame[\\'\\\\\"]\\\\s*:', re.MULTILINE).search\n=========================== short test summary info ============================\nFAILED ../dev::test_dataframe_explode_ignore_index_has_bool_type_annotation\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_dataframe_explode_ignore_index_has_bool_type_annotation PASSED [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 153107,
+        "completion_tokens": 253,
+        "total_tokens": 153360,
+        "cost_usd": 0.27147925
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

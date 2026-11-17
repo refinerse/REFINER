@@ -1,0 +1,40 @@
+import re
+
+
+def test_dtype_match_casts_X_Y1_to_float64_for_reference_fit():
+    source = open("/workspace/sklearn/linear_model/tests/test_logistic.py").read()
+
+    # Ensure the new test_dtype_match creates explicit float64 copies
+    # (review comment: ensure X, Y1 are float64 before the reference fit).
+    assert "X_64 = np.array(X).astype(np.float64)" in source, (
+        "Expected test_dtype_match to explicitly create X_64 as float64 via "
+        "`X_64 = np.array(X).astype(np.float64)`."
+    )
+    assert "y_64 = np.array(Y1).astype(np.float64)" in source, (
+        "Expected test_dtype_match to explicitly create y_64 as float64 via "
+        "`y_64 = np.array(Y1).astype(np.float64)`."
+    )
+
+    # Ensure the reference fit uses X_64, y_64 (not X, Y1 directly).
+    assert "lr_64.fit(X_64, y_64)" in source, (
+        "Expected test_dtype_match to fit the float64 reference model with "
+        "`lr_64.fit(X_64, y_64)` to make the test robust to future changes in "
+        "the dtype of global X/Y1."
+    )
+
+    # And ensure the old (fragile) pattern is not present in that test.
+    # This is what should fail on the 'before' code.
+    assert "lr_64.fit(X, Y1)" not in source, (
+        "Found `lr_64.fit(X, Y1)` in test_logistic.py; the review requested "
+        "casting X and Y1 to float64 explicitly before the reference fit."
+    )
+
+    # Additional robustness: check that within the `test_dtype_match` function
+    # body, we don't reference `lr_64.fit(X, Y1)` even if it appears elsewhere.
+    m = re.search(r"def\s+test_dtype_match\(\):([\s\S]*?)(\n\ndef\s+|\Z)", source)
+    assert m, "Could not locate `def test_dtype_match():` in test_logistic.py"
+    body = m.group(1)
+    assert "lr_64.fit(X, Y1)" not in body, (
+        "Within `test_dtype_match`, reference fit still uses `X, Y1` instead of "
+        "explicit float64 copies (`X_64, y_64`)."
+    )

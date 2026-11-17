@@ -1,0 +1,35 @@
+{
+  "instance_id": "Lightning-AI__pytorch-lightning-866@5a0ccf4",
+  "repo": "Lightning-AI/pytorch-lightning",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 8590,
+    "completion_tokens": 414,
+    "total_tokens": 9004,
+    "cost_usd": 0.0208285
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@author:\nIs this known?\n\n@user1:\nthe `abs` looks suspicious...\n\n@author:\nThe check should be `!=0` if the global step matched for odd vs even number of training steps, so if that's worked out then we shouldn't need it. Unless it's intended, in which case I think just ``(self.global_step + 1) % self.num_training_batches`` is sufficient since global step matches num_training_batches in the even case. \r\n\r\nThinking about it, I should probably just remove the abs, it is fine without. \n\n@author:\nI've removed the `abs` and made sure it handled accumulated batches properly. Can you think of anything else that might change the global step? \r\n\r\nCurrently the only test that throws this warning now is ``test_restore_models/test_dp_resume`` since this changes the percentage of train data used when resuming in a new trainer. Not much we can about that.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "Lightning-AI__pytorch-lightning-866@5a0ccf4/test_review_comment_0.py",
+      "test_code": "import warnings\n\nimport pytest\n\nfrom pytorch_lightning.trainer.training_io import TrainerIOMixin\n\n\nclass _DummyTrainer(TrainerIOMixin):\n    \"\"\"Concrete class to test TrainerIOMixin.restore_training_state in isolation.\"\"\"\n\n    def __init__(self):\n        super().__init__()\n        self.checkpoint_callback = None\n        self.early_stop_callback = None\n        self.root_gpu = None  # avoid optimizer state CUDA move path\n        self.optimizers = []\n        self.lr_schedulers = []\n\n\ndef test_restore_training_state_mid_epoch_warning_respects_grad_accumulation():\n    \"\"\"\n    Regression test for mid-epoch resume warning logic.\n\n    When accumulate_grad_batches > 1, global_step advances once per accumulated batch.\n    Resuming at global_step==expected_steps (end of epoch) should NOT warn.\n\n    Before fix: used abs((global_step + 1) % num_training_batches) which warns incorrectly.\n    After fix: uses expected_steps = num_training_batches / accumulate_grad_batches.\n    \"\"\"\n    t = _DummyTrainer()\n    t.num_training_batches = 10\n    # attribute exists only in \"after\"; set defensively so this test runs on both versions\n    t.accumulate_grad_batches = 2\n\n    checkpoint = {\n        \"global_step\": 5,  # end-of-epoch when expected_steps = 10/2 = 5\n        \"epoch\": 0,\n        \"optimizer_states\": [],\n        \"lr_schedulers\": [],\n    }\n\n    with warnings.catch_warnings(record=True) as caught:\n        warnings.simplefilter(\"always\")\n        t.restore_training_state(checkpoint)\n\n    assert not any(\"ended mid-epoch\" in str(w.message) for w in caught), (\n        \"restore_training_state should not warn about resuming mid-epoch when global_step \"\n        \"corresponds to an epoch boundary after accounting for accumulate_grad_batches. \"\n        f\"Got warnings: {[str(w.message) for w in caught]}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_restore_training_state_mid_epoch_warning_respects_grad_accumulation FAILED [100%]\n\n=================================== FAILURES ===================================\n___ test_restore_training_state_mid_epoch_warning_respects_grad_accumulation ___\ntest_review_comment_0.py:46: in test_restore_training_state_mid_epoch_warning_respects_grad_accumulation\n    assert not any(\"ended mid-epoch\" in str(w.message) for w in caught), (\nE   AssertionError: restore_training_state should not warn about resuming mid-epoch when global_step corresponds to an epoch boundary after accounting for accumulate_grad_batches. Got warnings: [\"You're resuming from a checkpoint that ended mid-epoch. This can cause unreliable results if further training is done, consider using an end of epoch checkpoint. \"]\nE   assert not True\nE    +  where True = any(<generator object test_restore_training_state_mid_epoch_warning_respects_grad_accumulation.<locals>.<genexpr> at 0x7f6dec9fc120>)\n=========================== short test summary info ============================\nFAILED ../dev::test_restore_training_state_mid_epoch_warning_respects_grad_accumulation\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 2.41s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_restore_training_state_mid_epoch_warning_respects_grad_accumulation PASSED [100%]\n\n============================== 1 passed in 2.40s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 8590,
+        "completion_tokens": 414,
+        "total_tokens": 9004,
+        "cost_usd": 0.0208285
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

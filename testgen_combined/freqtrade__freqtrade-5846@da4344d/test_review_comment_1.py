@@ -1,0 +1,32 @@
+import re
+
+import pytest
+
+
+def _pinned_requirement_present(requirements_text: str, package: str) -> bool:
+    """
+    Return True if a pinned requirement like `package==...` exists as a standalone line.
+    Ignores comments and whitespace.
+    """
+    pattern = rf"(?m)^\s*{re.escape(package)}==[^\s#]+(?:\s+#.*)?\s*$"
+    return re.search(pattern, requirements_text) is not None
+
+
+def test_requirements_txt_does_not_include_types_stubs_dependency():
+    """
+    Review expectation: typing stub packages (types-*) should not be in runtime requirements.txt,
+    since they're only needed for mypy / type checking (dev dependency).
+    """
+    req_path = "/workspace/requirements.txt"
+    requirements_text = open(req_path, "r", encoding="utf-8").read()
+
+    assert _pinned_requirement_present(
+        requirements_text, "python-dateutil"
+    ), "Sanity check: requirements.txt should include the runtime dependency 'python-dateutil==...'."
+
+    assert not _pinned_requirement_present(
+        requirements_text, "types-python-dateutil"
+    ), (
+        "requirements.txt must not include 'types-python-dateutil==...'; "
+        "typing stub packages should be in requirements-dev.txt (or equivalent), not runtime deps."
+    )

@@ -1,0 +1,28 @@
+import inspect
+
+import sky.clouds.aws as aws_mod
+
+
+def test_sso_comment_style_has_grammatical_fix():
+    """Verify the reviewed style fix is present in aws.py.
+
+    The review requested changing:
+      "the credential file can be from a different account, and will make"
+    (missing "be") to:
+      "the credential file can be from a different account, and will make ..."
+
+    The merged fix contains:
+      "the credential file can be from a different account, and will make ..."
+    AND crucially includes the word "be" ("can be from...").
+    """
+    source = inspect.getsource(aws_mod.AWS.get_credential_file_mounts)
+
+    assert "can be from a different account" in source, (
+        "Expected get_credential_file_mounts() to include the clarified comment "
+        "about credentials possibly being from a different account."
+    )
+
+    assert "can from a different account" not in source, (
+        "Expected the style fix to be applied: the comment should not contain "
+        "the ungrammatical phrase 'can from a different account' (missing 'be')."
+    )

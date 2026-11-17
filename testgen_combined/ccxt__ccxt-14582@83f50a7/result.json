@@ -1,0 +1,35 @@
+{
+  "instance_id": "ccxt__ccxt-14582@83f50a7",
+  "repo": "ccxt/ccxt",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 50627,
+    "completion_tokens": 112,
+    "total_tokens": 50739,
+    "cost_usd": 0.09016525
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n!== null is not transpilable \n\n@author:\nfixed it",
+      "comment_type": "functional",
+      "language": "javascript",
+      "test_file": "ccxt__ccxt-14582@83f50a7/test_review_comment_0.test.js",
+      "test_code": "const Exchange = require('/workspace/js/base/Exchange.js');\n\ndescribe('Exchange.findBroadlyMatchedKey transpilation-safe null check', () => {\n    test('should throw TypeError when string is null (only undefined is guarded)', () => {\n        const exchange = new Exchange();\n        const broad = { 'err': Error };\n\n        expect(() => exchange.findBroadlyMatchedKey(broad, null)).toThrow(\n            new TypeError(\"Cannot read properties of null (reading 'indexOf')\")\n        );\n    });\n});",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "jest-haste-map: Haste module naming collision: ccxt\n  The following files share their name; please adjust your hasteImpl:\n    * <rootDir>/package.json\n    * <rootDir>/python/package.json\n\n\nnpm WARN exec The following package was not found and will be installed: jest@30.3.0\nnpm WARN deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm WARN deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nFAIL ./test_review_comment_0.test.js\n  Exchange.findBroadlyMatchedKey transpilation-safe null check\n    \u2715 should throw TypeError when string is null (only undefined is guarded) (5 ms)\n\n  \u25cf Exchange.findBroadlyMatchedKey transpilation-safe null check \u203a should throw TypeError when string is null (only undefined is guarded)\n\n    expect(received).toThrow(expected)\n\n    Expected message: \"Cannot read properties of null (reading 'indexOf')\"\n\n    Received function did not throw\n\n       6 |         const broad = { 'err': Error };\n       7 |\n    >  8 |         expect(() => exchange.findBroadlyMatchedKey(broad, null)).toThrow(\n         |                                                                   ^\n       9 |             new TypeError(\"Cannot read properties of null (reading 'indexOf')\")\n      10 |         );\n      11 |     });\n\n      at Object.toThrow (test_review_comment_0.test.js:8:67)\n\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        1.257 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "after_output": "PASS ./test_review_comment_0.test.js\n  Exchange.findBroadlyMatchedKey transpilation-safe null check\n    \u2713 should throw TypeError when string is null (only undefined is guarded) (49 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.64 s, estimated 2 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 50627,
+        "completion_tokens": 112,
+        "total_tokens": 50739,
+        "cost_usd": 0.09016525
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

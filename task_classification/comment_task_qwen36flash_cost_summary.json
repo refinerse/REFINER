@@ -1,0 +1,10 @@
+{
+  "total_comments": 485,
+  "classified": 485,
+  "newly_classified": 42,
+  "model": "qwen3.6-flash",
+  "prompt_tokens": 54072,
+  "completion_tokens": 64814,
+  "total_tokens": 118886,
+  "cost_usd": 0.0
+}

@@ -1,0 +1,26 @@
+import inspect
+
+import dask.base
+
+
+def test_visualize_docstring_does_not_document_cmap_kwarg_on_color():
+    """
+    Regression test for docstring clarity:
+
+    The review requested that we should not mention ``cmap=`` in the
+    ``color`` parameter description (either document cmap separately or remove it).
+
+    The fixed version removes "Provide ``cmap=`` keyword for additional" from the
+    docstring; the old version contains it.
+    """
+    doc = inspect.getdoc(dask.base.visualize)
+    assert doc is not None and "Parameters" in doc, "Expected dask.base.visualize to have a docstring with a Parameters section"
+
+    forbidden = "Provide ``cmap=`` keyword for additional"
+    assert (
+        forbidden not in doc
+    ), (
+        "The dask.base.visualize docstring for `color` should not mention `cmap=` as an "
+        "undocumented/unclear extra kwarg. Either document `cmap` separately or remove "
+        "the mention; expected the phrase to be absent, but it was found."
+    )

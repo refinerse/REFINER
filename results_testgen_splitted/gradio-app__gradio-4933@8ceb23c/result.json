@@ -1,0 +1,55 @@
+{
+  "instance_id": "gradio-app__gradio-4933@8ceb23c",
+  "repo": "gradio-app/gradio",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 8843,
+    "completion_tokens": 423,
+    "total_tokens": 9266,
+    "cost_usd": 0.02139725
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nnit: i think we can just remove the args param if not in use, it's not required",
+      "comment_type": "style",
+      "language": "javascript",
+      "test_file": "gradio-app__gradio-4933@8ceb23c/test_review_comment_0.test.js",
+      "test_code": "const fs = require(\"fs\");\n\ndescribe(\"Markdown Storybook stories style: remove unused args param\", () => {\n\ttest(\"Markdown.stories.svelte should not define an empty args object (args={{ }}), since args is optional when unused\", () => {\n\t\tconst filePath =\n\t\t\t\"/workspace/js/app/src/components/Markdown/Markdown.stories.svelte\";\n\n\t\t// Load the module under test (required by instructions). This may not be executable JS in Jest,\n\t\t// so we swallow any error and assert on the source text instead.\n\t\ttry {\n\t\t\trequire(filePath);\n\t\t} catch (e) {\n\t\t\t// Intentionally ignored: Storybook .svelte files are not generally runnable in Jest.\n\t\t}\n\n\t\tconst src = fs.readFileSync(filePath, \"utf8\");\n\n\t\texpect(src).not.toMatch(/args=\\{\\{\\s*\\}\\}/m, {\n\t\t\tmessage:\n\t\t\t\t\"Expected Markdown.stories.svelte to remove the unused empty args prop (args={{ }}). When args is not used, it should be omitted to match the style nit in the review comment.\"\n\t\t});\n\t});\n});",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "npm WARN exec The following package was not found and will be installed: jest@30.3.0\nnpm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm WARN deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm WARN deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nFAIL ./test_review_comment_0.test.js\n  Markdown Storybook stories style: remove unused args param\n    \u2715 Markdown.stories.svelte should not define an empty args object (args={{ }}), since args is optional when unused (8 ms)\n\n  \u25cf Markdown Storybook stories style: remove unused args param \u203a Markdown.stories.svelte should not define an empty args object (args={{ }}), since args is optional when unused\n\n    expect(received).not.toMatch(expected)\n\n    Expected pattern: not /args=\\{\\{\\s*\\}\\}/m\n    Received string:      \"<script>\n    \timport {Meta, Template, Story } from \\\"@storybook/addon-svelte-csf\\\";\n    \timport Markdown from \\\"./Markdown.svelte\\\";\n    </script>\n\n    <Meta\n    \ttitle=\\\"Components/Markdown\\\"\n    \tcomponent={Markdown}\n    \targTypes={{\n    \t\ttext_align: {\n    \t\t\toptions: [\\\"left\\\", \\\"center\\\", \\\"right\\\"],\n    \t\t\tdescription: \\\"Whether to align the text left or right\\\",\n    \t\t\tcontrol: { type: \\\"select\\\" },\n    \t\t\tdefaultValue: \\\"left\\\"\n    \t\t}\n    \t}}\n    />\n\n\n    <Template let:args>\n    \t<Markdown\n    \t\t{...args}\n    \t\tvalue=\\\"Here's some <strong>bold</strong> text. And some <em>italics</em> and some <code>code</code>\\\"\n    \t/>\n    </Template>\n\n    <Story\n    \tname=\\\"Simple inline Markdown\\\"\n    \targs={{  }}\n    />\n    <Story\n    \tname=\\\"Right aligned Markdown\\\"\n    \targs={{ text_align: \\\"right\\\" }}\n    />\n\n    \"\n\n      16 | \t\tconst src = fs.readFileSync(filePath, \"utf8\");\n      17 |\n    > 18 | \t\texpect(src).not.toMatch(/args=\\{\\{\\s*\\}\\}/m, {\n         | \t\t                ^\n      19 | \t\t\tmessage:\n      20 | \t\t\t\t\"Expected Markdown.stories.svelte to remove the unused empty args prop (args={{ }}). When args is not used, it should be omitted to match the style nit in the review comment.\"\n      21 | \t\t});\n\n      at Object.toMatch (test_review_comment_0.test.js:18:19)\n\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        0.325 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "after_output": "PASS ./test_review_comment_0.test.js\n  Markdown Storybook stories style: remove unused args param\n    \u2713 Markdown.stories.svelte should not define an empty args object (args={{ }}), since args is optional when unused (11 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.179 s, estimated 1 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 1751,
+        "completion_tokens": 242,
+        "total_tokens": 1993,
+        "cost_usd": 0.00645225
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\ntypo precedence",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "gradio-app__gradio-4933@8ceb23c/test_review_comment_1.py",
+      "test_code": "# AUTO-GENERATED by split_acceptance_tests.py\n# Each original test function was split into one function per top-level\n# assertion so pytest reports per-check pass/fail counts.\nimport inspect\nfrom gradio.components.textbox import Textbox\n\ndef test_textbox_text_align_default_is_none_for_rtl_precedence__a1():\n    \"\"\"\n    Style/API expectation: `rtl` should take precedence over `text_align`, which is\n    reflected by making `text_align` default to None (so it can be derived from rtl).\n    This test checks that the public constructor signature has text_align default None.\n    \"\"\"\n    sig = inspect.signature(Textbox.__init__)\n    assert 'text_align' in sig.parameters, 'Textbox.__init__ must accept a `text_align` parameter.'\n\ndef test_textbox_text_align_default_is_none_for_rtl_precedence__a2():\n    \"\"\"\n    Style/API expectation: `rtl` should take precedence over `text_align`, which is\n    reflected by making `text_align` default to None (so it can be derived from rtl).\n    This test checks that the public constructor signature has text_align default None.\n    \"\"\"\n    sig = inspect.signature(Textbox.__init__)\n    text_align_param = sig.parameters['text_align']\n    assert text_align_param.default is None, 'Expected Textbox.__init__ `text_align` default to be None so `rtl` can take precedence; got a non-None default.'\n",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_textbox_text_align_default_is_none_for_rtl_precedence FAILED [100%]\n\n=================================== FAILURES ===================================\n__________ test_textbox_text_align_default_is_none_for_rtl_precedence __________\ntest_review_comment_1.py:16: in test_textbox_text_align_default_is_none_for_rtl_precedence\n    assert (\nE   AssertionError: Expected Textbox.__init__ `text_align` default to be None so `rtl` can take precedence; got a non-None default.\nE   assert 'left' is None\nE    +  where 'left' = <Parameter \"text_align: \"Literal['left', 'right']\" = 'left'\">.default\n=============================== warnings summary ===============================\ngradio/routes.py:26\n  /workspace/gradio/routes.py:26: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_textbox_text_align_default_is_none_for_rtl_precedence - A...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 1.46s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_textbox_text_align_default_is_none_for_rtl_precedence PASSED [100%]\n\n=============================== warnings summary ===============================\ngradio/routes.py:26\n  /workspace/gradio/routes.py:26: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 1.27s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 7092,
+        "completion_tokens": 181,
+        "total_tokens": 7273,
+        "cost_usd": 0.014945
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

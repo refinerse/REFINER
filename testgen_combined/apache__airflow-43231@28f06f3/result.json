@@ -1,0 +1,75 @@
+{
+  "instance_id": "apache__airflow-43231@28f06f3",
+  "repo": "apache/airflow",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 54005,
+    "completion_tokens": 1798,
+    "total_tokens": 55803,
+    "cost_usd": 0.07089355
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nLet's keep the select only for the card list. But let's drop \"sort by last run state\", I think last run start_date is fine.\n\n@user1:\nWe can pass a custom `sortingFn` [docs](https://tanstack.com/table/latest/docs/guide/sorting#sorting-fns) to sort the table view by start_date to the latest_dag_runs column definition.\n\n@author:\nGot it.",
+      "comment_type": "documentation",
+      "language": "typescript",
+      "test_file": "apache__airflow-43231@28f06f3/test_review_comment_0.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"DagsList sort UI placement and options (review comment)\", () => {\n  it('keeps the \"sort-by-select\" only for card view and removes last_run_state sorting', () => {\n    const srcPath = \"/workspace/airflow/ui/src/pages/DagsList/DagsList.tsx\";\n\n    const src = fs.readFileSync(srcPath, \"utf8\");\n\n    expect(src).toContain(\n      'data-testid=\"sort-by-select\"',\n    );\n\n    // Select must be conditionally rendered only for card display (not always visible).\n    expect(src).toContain(\n      '{display === \"card\" ? (',\n    );\n\n    // \"Sort by last run state\" must be removed in favor of start_date sorting.\n    expect(src).not.toContain(\n      \"last_run_state\",\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 17523,
+        "completion_tokens": 701,
+        "total_tokens": 18224,
+        "cost_usd": 0.02435125
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nI definitely want to move the new UI to only use `dag_display_name`. dag_id is only a detail the user needs for debugging. But yes, we need to update our sorting in FastAPI to fallback to dag_id just like we do for search query.\n\n@user2:\nOk got it. Yes normally default sorting id `dag_id` so we should be able to just remove it.",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "apache__airflow-43231@28f06f3/test_review_comment_1.test.ts",
+      "test_code": "import fs from \"node:fs\";\n\ndescribe(\"DagsList sorting options should be centralized and include dag_id fallback\", () => {\n  test(\"DagsList imports DagSortOptions as sortOptions from src/constants/sortParams\", () => {\n    const dagsListPath = \"/workspace/airflow/ui/src/pages/DagsList/DagsList.tsx\";\n    const contents = fs.readFileSync(dagsListPath, \"utf8\");\n\n    expect(\n      contents.includes(\n        'import { DagSortOptions as sortOptions } from \"src/constants/sortParams\";',\n      ),\n    ).toBe(\n      true,\n      \"Expected /workspace/airflow/ui/src/pages/DagsList/DagsList.tsx to import DagSortOptions as sortOptions from src/constants/sortParams (centralized sort options with dag_id fallback).\",\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 17804,
+        "completion_tokens": 498,
+        "total_tokens": 18302,
+        "cost_usd": 0.022001000000000003
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\nA lot of these aren't actually alphabetical searches. Two options:\r\n\r\n1. Just put a +/- indicator, even better if we used the same up and down arrow icons as the table sort function\r\n2. Only have one option per select and each time you click it it cycles through asc, desc or removing that sort. With the symbols to match\n\n@user1:\nLet's just change the start_date from (A-Z) to (latest-earliest) and we can do the rest later.\n\n@author:\nThe problem with 2 option is that it would not be user friendly in case of multi selection.\n\n@user1:\nYeah, we can optimize later.",
+      "comment_type": "style",
+      "language": "typescript",
+      "test_file": "apache__airflow-43231@28f06f3/test_review_comment_2.test.ts",
+      "test_code": "import fs from \"fs\";\n\ndescribe(\"DagsList sort option labels style\", () => {\n  it('does not label start date sorting as \"(A-Z)\" and instead uses \"latest-earliest\"', () => {\n    const filePath = \"/workspace/airflow/ui/src/pages/DagsList/DagsList.tsx\";\n\n    expect(fs.existsSync(filePath)).toBe(\n      true,\n    );\n\n    const src = fs.readFileSync(filePath, \"utf8\");\n\n    expect(\n      src.includes(\"Last Run Start Date (A-Z)\") ||\n        src.includes(\"Start Date (A-Z)\") ||\n        src.includes(\"start_date (A-Z)\"),\n    ).toBe(\n      false,\n    );\n\n    expect(src.toLowerCase()).toContain(\"latest-earliest\");\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 18678,
+        "completion_tokens": 599,
+        "total_tokens": 19277,
+        "cost_usd": 0.024541300000000002
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

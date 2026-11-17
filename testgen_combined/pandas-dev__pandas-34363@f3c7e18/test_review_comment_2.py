@@ -1,0 +1,28 @@
+import inspect
+
+import pandas.tests.frame.methods.test_isin as mod
+
+
+def test_isin_category_test_is_parametrized_and_old_name_removed():
+    """
+    The review requested parametrization over the category values cases.
+    Enforce that the old non-parametrized test name is gone and the new
+    parametrized test exists (as evidenced by the presence of the injected
+    'values' argument in the function signature).
+    """
+    members = dict(inspect.getmembers(mod.TestDataFrameIsIn, predicate=callable))
+
+    assert (
+        "test_isin_against_categoryDataframe" not in members
+    ), "Expected old non-parametrized test 'test_isin_against_categoryDataframe' to be removed."
+
+    assert (
+        "test_isin_category_frame" in members
+    ), "Expected new parametrized test 'test_isin_category_frame' to exist."
+
+    fn = members["test_isin_category_frame"]
+    params = list(inspect.signature(fn).parameters)
+    assert params == [
+        "self",
+        "values",
+    ], f"Expected 'test_isin_category_frame' to accept (self, values) for parametrization; got {params}."

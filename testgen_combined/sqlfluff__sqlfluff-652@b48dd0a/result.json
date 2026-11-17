@@ -1,0 +1,35 @@
+{
+  "instance_id": "sqlfluff__sqlfluff-652@b48dd0a",
+  "repo": "sqlfluff/sqlfluff",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 152336,
+    "completion_tokens": 1076,
+    "total_tokens": 153412,
+    "cost_usd": 0.2018184
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@author:\nThis is the real fix. By ignoring whitespace prior to the first newline, we avoid being fooled by trailing whitespace after the `SELECT`.\r\n\r\nQuestion: Does this potentially cause other issues?",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "sqlfluff__sqlfluff-652@b48dd0a/test_review_comment_0.py",
+      "test_code": "import pytest\n\nfrom sqlfluff.core import Linter\n\n\ndef test_rule_l036_ignores_trailing_whitespace_after_select_before_first_newline():\n    \"\"\"Rule L036 should ignore whitespace *before* the first newline after SELECT.\n\n    Regression for a false-positive where trailing whitespace after SELECT on the\n    same line could be mistaken for the indentation whitespace before the first\n    select target line.\n\n    This should lint cleanly (no L036 violation) for multi-target SELECT where:\n    - the SELECT line ends with trailing spaces\n    - then newline\n    - then indentation + targets on separate lines\n    \"\"\"\n    sql = \"SELECT   \\n    a,\\n    b\\nFROM t\\n\"\n    linter = Linter(dialect=\"ansi\", rules=[\"L036\"])\n    linted = linter.lint_string(sql)\n\n    l036_violations = [\n        v for v in linted.get_violations() if getattr(v, \"rule_code\", None) == \"L036\"\n    ]\n\n    assert (\n        l036_violations == []\n    ), \"Expected no L036 violations: trailing whitespace after SELECT (before first newline) must be ignored when locating indentation before select targets.\"",
+      "before_passed": true,
+      "after_passed": true,
+      "success": false,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_rule_l036_ignores_trailing_whitespace_after_select_before_first_newline PASSED [100%]\n\n=============================== warnings summary ===============================\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:74\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:74: DeprecationWarning: invalid escape sequence '\\['\n    _re = re.compile(\"\\033\\[[0-9;]*m\")\n\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:800\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:800: DeprecationWarning: invalid escape sequence '\\{'\n    self.vertical_char = random.choice(\"~!@#$%^&*()_+|-=\\{}[];':\\\",./;<>?\")\n\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:801\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:801: DeprecationWarning: invalid escape sequence '\\{'\n    self.horizontal_char = random.choice(\"~!@#$%^&*()_+|-=\\{}[];':\\\",./;<>?\")\n\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:802\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:802: DeprecationWarning: invalid escape sequence '\\{'\n    self.junction_char = random.choice(\"~!@#$%^&*()_+|-=\\{}[];':\\\",./;<>?\")\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 4 warnings in 0.29s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_rule_l036_ignores_trailing_whitespace_after_select_before_first_newline PASSED [100%]\n\n=============================== warnings summary ===============================\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:74\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:74: DeprecationWarning: invalid escape sequence '\\['\n    _re = re.compile(\"\\033\\[[0-9;]*m\")\n\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:800\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:800: DeprecationWarning: invalid escape sequence '\\{'\n    self.vertical_char = random.choice(\"~!@#$%^&*()_+|-=\\{}[];':\\\",./;<>?\")\n\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:801\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:801: DeprecationWarning: invalid escape sequence '\\{'\n    self.horizontal_char = random.choice(\"~!@#$%^&*()_+|-=\\{}[];':\\\",./;<>?\")\n\n../usr/local/lib/python3.11/site-packages/benchit/prettytable.py:802\n  /usr/local/lib/python3.11/site-packages/benchit/prettytable.py:802: DeprecationWarning: invalid escape sequence '\\{'\n    self.junction_char = random.choice(\"~!@#$%^&*()_+|-=\\{}[];':\\\",./;<>?\")\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 4 warnings in 0.29s =========================",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 152336,
+        "completion_tokens": 1076,
+        "total_tokens": 153412,
+        "cost_usd": 0.2018184
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

@@ -1,0 +1,35 @@
+{
+  "instance_id": "scikit-learn__scikit-learn-12486@15a4397",
+  "repo": "scikit-learn/scikit-learn",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 10885,
+    "completion_tokens": 637,
+    "total_tokens": 11522,
+    "cost_usd": 0.02796675
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nshould we say \"got predict_proba of shape\"?\n\n@author:\nThat seems like a good idea, because that is what is actually happening.  \r\n\r\n*But*, will the *user* understand that?  Is there some place in the documentation where we can write:\r\n>When obtaining predictions from a classifier, if it is only one class, the returned ValueError will be \"got predict_proba of shape\".  That means it returns one column all with same probabilities (equal to 1). \r\n**Q:** How to fix this?\r\n**A:** Must use a classifier with 2 classes.\r\n\r\nOr will they be able to see it from the test below:  \r\n`with pytest.raises(ValueError, match=\"use classifier with two classes\")`\r\nI would feel better if the user had explicit feedback on how to solve the error.\r\n\r\ncc:  @user2\r\n\r\n\n\n@user1:\nAre you saying the current error message is not informative enough? The test is just to make sure that the error that is raised is actually informative.\r\nI suggested adding the predict_proba shape to the error message, not replace the message that's there now.\n\n@author:\nThat works.\r\nI tried making the update myself but ran into multiple problems:  [errors list](https://gist.github.com/reshamas/93af459fd61aed10ff3c162ca62a8a98)\n\n@author:\nok, making progress.  Please let me know next steps. \r\n\r\ncc:  @user2",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "scikit-learn__scikit-learn-12486@15a4397/test_review_comment_0.py",
+      "test_code": "import numpy as np\nimport pytest\n\nfrom sklearn.metrics import log_loss, make_scorer\n\n\nclass OneClassProbaClassifier:\n    \"\"\"Classifier whose predict_proba returns only one column (one class).\"\"\"\n\n    def predict_proba(self, X):\n        # shape (n_samples, 1) mimics a classifier trained on a single class\n        return np.ones((len(X), 1), dtype=float)\n\n\nclass OneClassDecisionFunctionClassifier:\n    \"\"\"Classifier without decision_function, forcing ThresholdScorer to use predict_proba.\"\"\"\n\n    def predict_proba(self, X):\n        return np.ones((len(X), 1), dtype=float)\n\n\ndef test_proba_scorer_error_message_includes_predict_proba_shape_and_fix_hint():\n    scorer = make_scorer(log_loss, needs_proba=True)\n    clf = OneClassProbaClassifier()\n    X = np.zeros((3, 2))\n    y = np.array([0, 1, 0])  # binary target => scorer expects 2 prob columns\n\n    with pytest.raises(ValueError) as err:\n        scorer(clf, X, y)\n\n    msg = str(err.value)\n    assert \"got predict_proba of shape\" in msg, (\n        \"Error message should mention the actual predict_proba shape to help \"\n        \"debug single-class classifiers. Got: {!r}\".format(msg)\n    )\n    assert \"(3, 1)\" in msg, (\n        \"Error message should include the concrete predict_proba shape. \"\n        \"Got: {!r}\".format(msg)\n    )\n    assert \"need classifier with two classes\" in msg, (\n        \"Error message should explain how to fix the issue (use a 2-class classifier). \"\n        \"Got: {!r}\".format(msg)\n    )\n\n\ndef test_threshold_scorer_error_message_includes_predict_proba_shape_and_fix_hint():\n    # roc_auc uses needs_threshold=True and will fall back to predict_proba when\n    # decision_function is missing.\n    from sklearn.metrics import roc_auc_score\n\n    scorer = make_scorer(roc_auc_score, needs_threshold=True)\n    clf = OneClassDecisionFunctionClassifier()\n    X = np.zeros((4, 2))\n    y = np.array([0, 1, 0, 1])\n\n    with pytest.raises(ValueError) as err:\n        scorer(clf, X, y)\n\n    msg = str(err.value)\n    assert \"got predict_proba of shape\" in msg, (\n        \"Threshold-based scorer should also mention predict_proba shape when it \"\n        \"falls back to predict_proba. Got: {!r}\".format(msg)\n    )\n    assert \"(4, 1)\" in msg, (\n        \"Error message should include the concrete predict_proba shape. \"\n        \"Got: {!r}\".format(msg)\n    )\n    assert \"need classifier with two classes\" in msg, (\n        \"Error message should explain how to fix the issue (use a 2-class classifier). \"\n        \"Got: {!r}\".format(msg)\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 2 items\n\n../dev/::test_proba_scorer_error_message_includes_predict_proba_shape_and_fix_hint FAILED [ 50%]\n\n=================================== FAILURES ===================================\n__ test_proba_scorer_error_message_includes_predict_proba_shape_and_fix_hint ___\ntest_review_comment_0.py:32: in test_proba_scorer_error_message_includes_predict_proba_shape_and_fix_hint\n    assert \"got predict_proba of shape\" in msg, (\nE   AssertionError: Error message should mention the actual predict_proba shape to help debug single-class classifiers. Got: 'Must use classifier with two classes for log_loss scoring'\nE   assert 'got predict_proba of shape' in 'Must use classifier with two classes for log_loss scoring'\n=============================== warnings summary ===============================\nsklearn/externals/joblib/externals/cloudpickle/cloudpickle.py:47\n  /workspace/sklearn/externals/joblib/externals/cloudpickle/cloudpickle.py:47: DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses\n    import imp\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev/::test_proba_scorer_error_message_includes_predict_proba_shape_and_fix_hint\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 0.20s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 2 items\n\n../dev/::test_proba_scorer_error_message_includes_predict_proba_shape_and_fix_hint PASSED [ 50%]\n../dev/::test_threshold_scorer_error_message_includes_predict_proba_shape_and_fix_hint PASSED [100%]\n\n============================== 2 passed in 0.16s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 10885,
+        "completion_tokens": 637,
+        "total_tokens": 11522,
+        "cost_usd": 0.02796675
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

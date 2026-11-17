@@ -1,0 +1,21 @@
+import pytest
+
+from sqlglot.dialects.hive import Hive
+
+
+def test_hive_identifiers_can_start_with_digit_is_dialect_level_flag():
+    """
+    The review change moves the "identifiers can start with digit" behavior to the Dialect
+    level so it can be shared by both tokenizer and generator.
+
+    This test asserts that Hive exposes the new dialect-level flag.
+    """
+    assert hasattr(
+        Hive, "identifiers_can_start_with_digit"
+    ), (
+        "Hive dialect should define `identifiers_can_start_with_digit` at the Dialect level "
+        "(so it can be passed into both tokenizer and generator)."
+    )
+    assert (
+        Hive.identifiers_can_start_with_digit is True
+    ), "Hive.identifiers_can_start_with_digit should be True to allow identifiers starting with digits."

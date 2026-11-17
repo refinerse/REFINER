@@ -1,0 +1,25 @@
+import re
+
+
+def test_check_subtype_notes_list_is_explicitly_typed() -> None:
+    """
+    Regression test for a self-check / typing issue: in TypeChecker.check_subtype,
+    the local variable `notes` must have an explicit `List[str]` type comment.
+
+    This test intentionally uses source inspection (not AST) because the change
+    affects static typing/self-checking, not runtime behavior.
+    """
+    source = open("/workspace/mypy/checker.py", "r", encoding="utf-8").read()
+
+    # Narrow to the check_subtype method body to avoid matching unrelated "notes" variables.
+    m = re.search(r"\n\s+def check_subtype\([\s\S]*?\n\s+def ", source)
+    assert m, "Could not locate TypeChecker.check_subtype() in /workspace/mypy/checker.py"
+    check_subtype_block = m.group(0)
+
+    assert (
+        "notes = []  # type: List[str]" in check_subtype_block
+    ), (
+        "TypeChecker.check_subtype() must declare `notes` with an explicit type comment "
+        "`notes = []  # type: List[str]` so mypy self-check doesn't infer an incompatible "
+        "type for `notes`."
+    )

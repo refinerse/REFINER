@@ -1,0 +1,35 @@
+{
+  "instance_id": "sympy__sympy-22369@6eb7e6a",
+  "repo": "sympy/sympy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 11971,
+    "completion_tokens": 144,
+    "total_tokens": 12115,
+    "cost_usd": 0.02296525
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nI recommend against changing `find` in this way. One might have the equation `2*y + 1` which is another way of saying `y = 1/2`.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "sympy__sympy-22369@6eb7e6a/test_review_comment_0.py",
+      "test_code": "import pytest\nfrom sympy import Symbol\nfrom sympy.geometry.util import find\n\n\ndef test_find_raises_valueerror_when_symbol_not_present_in_equation():\n    \"\"\"\n    Regression/style test: find() must not \"guess\" a value (e.g. return 1)\n    when the requested symbol is not a free symbol of the expression.\n    \"\"\"\n    y = Symbol(\"y\")\n    x = Symbol(\"x\")\n    expr = 2*y + 1\n\n    with pytest.raises(ValueError, match=r\"could not find\"):\n        find(x, expr)\n\n    with pytest.raises(ValueError, match=r\"could not find\"):\n        find(\"x\", expr)",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_find_raises_valueerror_when_symbol_not_present_in_equation FAILED [100%]\n\n=================================== FAILURES ===================================\n_______ test_find_raises_valueerror_when_symbol_not_present_in_equation ________\ntest_review_comment_0.py:15: in test_find_raises_valueerror_when_symbol_not_present_in_equation\n    with pytest.raises(ValueError, match=r\"could not find\"):\nE   Failed: DID NOT RAISE <class 'ValueError'>\n=============================== warnings summary ===============================\n../usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35\n  /usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35: DeprecationWarning: mpnumeric is deprecated\n    warnings.warn(f\"{name} is deprecated\", DeprecationWarning)\n\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n  /usr/local/lib/python3.11/site-packages/mpmath/rational.py:4: DeprecationWarning: the rational private module is deprecated\n    warnings.warn(\"the rational private module is deprecated\",\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_find_raises_valueerror_when_symbol_not_present_in_equation\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 4 warnings in 0.11s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_find_raises_valueerror_when_symbol_not_present_in_equation PASSED [100%]\n\n=============================== warnings summary ===============================\n../usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35\n  /usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35: DeprecationWarning: mpnumeric is deprecated\n    warnings.warn(f\"{name} is deprecated\", DeprecationWarning)\n\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n  /usr/local/lib/python3.11/site-packages/mpmath/rational.py:4: DeprecationWarning: the rational private module is deprecated\n    warnings.warn(\"the rational private module is deprecated\",\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 4 warnings in 0.08s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 11971,
+        "completion_tokens": 144,
+        "total_tokens": 12115,
+        "cost_usd": 0.02296525
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

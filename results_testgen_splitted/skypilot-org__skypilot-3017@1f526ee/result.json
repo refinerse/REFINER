@@ -1,0 +1,35 @@
+{
+  "instance_id": "skypilot-org__skypilot-3017@1f526ee",
+  "repo": "skypilot-org/skypilot",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 2122,
+    "completion_tokens": 265,
+    "total_tokens": 2387,
+    "cost_usd": 0.0074234999999999995
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWhat is this file for? Will this have any side-effects?\n\n@user1:\nAlso is it a common issue for other workloads? Should we add it in `azure-ray.yml.j2` instead?\n\n@author:\nThis is a good point! This file is wrongly configured on Azure with multiple GPUs, causing the issue with the distributed workload using nccl. We should include this in the `azure-ray.yml.j2`.\n\n@author:\nFixed. PTAL.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "skypilot-org__skypilot-3017@1f526ee/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_mixtral_serve_yaml_does_not_remove_system_nccl_conf():\n    source = open(\"/workspace/llm/mixtral/serve.yaml\", \"r\", encoding=\"utf-8\").read()\n\n    # The review resolution moved the Azure-specific workaround elsewhere (azure-ray.yml.j2),\n    # so the Mixtral serve.yaml should NOT mutate /etc/nccl.conf.\n    forbidden_patterns = [\n        r\"sudo\\s+mv\\s+/etc/nccl\\.conf\\s+/etc/nccl\\.conf\\.bak\",\n        r\"mv\\s+/etc/nccl\\.conf\\s+/etc/nccl\\.conf\\.bak\",\n        r\"/etc/nccl\\.conf\\.bak\",\n        r\"Remove the default nccl\\.conf\",\n    ]\n\n    for pat in forbidden_patterns:\n        assert re.search(pat, source) is None, (\n            \"Mixtral serve.yaml should not include an Azure-specific side-effect that \"\n            \"moves/removes the system-wide /etc/nccl.conf. This workaround should live \"\n            \"in Azure templates (e.g., azure-ray.yml.j2), not in llm/mixtral/serve.yaml. \"\n            f\"Found forbidden pattern: {pat!r}\"\n        )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_mixtral_serve_yaml_does_not_remove_system_nccl_conf FAILED  [100%]\n\n=================================== FAILURES ===================================\n___________ test_mixtral_serve_yaml_does_not_remove_system_nccl_conf ___________\ntest_review_comment_0.py:17: in test_mixtral_serve_yaml_does_not_remove_system_nccl_conf\n    assert re.search(pat, source) is None, (\nE   AssertionError: Mixtral serve.yaml should not include an Azure-specific side-effect that moves/removes the system-wide /etc/nccl.conf. This workaround should live in Azure templates (e.g., azure-ray.yml.j2), not in llm/mixtral/serve.yaml. Found forbidden pattern: 'sudo\\\\s+mv\\\\s+/etc/nccl\\\\.conf\\\\s+/etc/nccl\\\\.conf\\\\.bak'\nE   assert <re.Match object; span=(1217, 1258), match='sudo mv /etc/nccl.conf /etc/nccl.conf.bak'> is None\nE    +  where <re.Match object; span=(1217, 1258), match='sudo mv /etc/nccl.conf /etc/nccl.conf.bak'> = <function search at 0x7f14806f2d40>('sudo\\\\s+mv\\\\s+/etc/nccl\\\\.conf\\\\s+/etc/nccl\\\\.conf\\\\.bak', '# A example yaml for serving Mixtral model from Mistral.ai with an OpenAI API.\\n# Usage:\\n#  1. Launch on a single instance: `sky launch mixtral ./serve.yaml`\\n#  2. Scale up to multiple instances with a single endpoint:\\n#     `sky serve up -n mixtral ./serve.yaml`\\nservice:\\n  readiness_probe:\\n    path: /v1/chat/completions\\n    post_data:\\n      model: mistralai/Mixtral-8x7B-Instruct-v0.1\\n      messages:\\n        - role: user\\n          content: Hello! What is your name?\\n    initial_delay_seconds: 1200\\n  replica_policy:\\n    min_replicas: 2\\n\\nresources: \\n  accelerators: {L4:8, A10g:8, A10:8, A100:4, A100:8, A100-80GB:2, A100-80GB:4, A100-80GB:8}\\n  ports: 8000\\n  disk_tier: high\\n\\nsetup: |\\n  conda activate mixtral\\n  if [ $? -ne 0 ]; then\\n    conda create -n mixtral -y python=3.10\\n    conda activate mixtral\\n  fi\\n  # We have to manually install Torch otherwise apex & xformers won\\'t build\\n  pip list | grep torch || pip install \"torch>=2.0.0\"\\n\\n  pip list | grep vllm || pip install \"git+https://github.com/vllm-project/vllm.git\"\\n  pip install git+https://github.com/huggingface/transformers\\n  pip list | grep megablocks || pip install megablocks\\n\\nrun: |\\n  # Remove the default nccl.conf which causes failure on Azure\\n  sudo mv /etc/nccl.conf /etc/nccl.conf.bak || true\\n\\n  conda activate mixtral\\n  export PATH=$PATH:/sbin\\n  python -u -m vllm.entrypoints.openai.api_server \\\\\\n                --host 0.0.0.0 \\\\\\n                --model mistralai/Mixtral-8x7B-Instruct-v0.1 \\\\\\n                --tensor-parallel-size $SKYPILOT_NUM_GPUS_PER_NODE | tee ~/openai_api_server.log\\n\\n')\nE    +    where <function search at 0x7f14806f2d40> = re.search\n=========================== short test summary info ============================\nFAILED ../dev::test_mixtral_serve_yaml_does_not_remove_system_nccl_conf - Ass...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_mixtral_serve_yaml_does_not_remove_system_nccl_conf PASSED  [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 2122,
+        "completion_tokens": 265,
+        "total_tokens": 2387,
+        "cost_usd": 0.0074234999999999995
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

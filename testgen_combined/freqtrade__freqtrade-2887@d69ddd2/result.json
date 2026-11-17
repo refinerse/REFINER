@@ -1,0 +1,75 @@
+{
+  "instance_id": "freqtrade__freqtrade-2887@d69ddd2",
+  "repo": "freqtrade/freqtrade",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 207809,
+    "completion_tokens": 3331,
+    "total_tokens": 211140,
+    "cost_usd": 0.26232535
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nmaybe \"Cancelling open sell order for {pair}\" ?\n\n@author:\nFixed",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "freqtrade__freqtrade-2887@d69ddd2/test_review_comment_0.py",
+      "test_code": "import os\n\n# Some harnesses may invoke pytest with args that are unsupported by the installed pytest version\n# (e.g. \"--no-header\"). We can't change the invocation, but we can ensure that a compatible\n# pytest is used by disabling auto-loaded third-party plugins that may add such options.\n#\n# This must be set before importing pytest.\nos.environ.setdefault(\"PYTEST_DISABLE_PLUGIN_AUTOLOAD\", \"1\")\n\nimport pytest  # noqa: E402\n\nfrom freqtrade.rpc.telegram import Telegram  # noqa: E402\nfrom freqtrade.rpc import RPCMessageType  # noqa: E402\n\n\ndef test_telegram_cancel_messages_include_open_order_for_pair():\n    \"\"\"\n    Style regression test:\n    Cancel notifications should say \"Cancelling Open <Buy/Sell> Order for {pair}\".\n    This must fail on older wording (\"Cancelling Buy {pair}\" / \"Cancelling Sell {pair}\").\n    \"\"\"\n\n    class DummyFreqtrade:\n        config = {\n            \"telegram\": {\"chat_id\": \"123\", \"token\": \"dummy\"},\n            # Keep fiat display disabled to avoid initializing converter.\n            \"fiat_display_currency\": None,\n        }\n\n    class TelegramNoInit(Telegram):\n        def _init(self) -> None:\n            # Avoid starting the real telegram updater polling thread.\n            self._updater = None\n\n    t = TelegramNoInit(DummyFreqtrade())\n    sent = []\n\n    def capture(msg: str, *args, **kwargs) -> None:\n        sent.append(msg)\n\n    # Replace sending with a local capture function.\n    t._send_msg = capture  # type: ignore[method-assign]\n\n    pair = \"BTC/USDT\"\n    exchange = \"binance\"\n\n    # BUY cancel message\n    t.send_msg({\"type\": RPCMessageType.BUY_CANCEL_NOTIFICATION, \"exchange\": exchange, \"pair\": pair})\n    assert sent[-1] == f\"*{exchange}:* Cancelling Open Buy Order for {pair}\", (\n        \"BUY_CANCEL_NOTIFICATION telegram message should be exactly \"\n        \"'*{exchange}:* Cancelling Open Buy Order for {pair}'.\"\n    )\n\n    # SELL cancel message\n    t.send_msg({\"type\": RPCMessageType.SELL_CANCEL_NOTIFICATION, \"exchange\": exchange, \"pair\": pair})\n    assert sent[-1] == f\"*{exchange}:* Cancelling Open Sell Order for {pair}\", (\n        \"SELL_CANCEL_NOTIFICATION telegram message should be exactly \"\n        \"'*{exchange}:* Cancelling Open Sell Order for {pair}'.\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 43278,
+        "completion_tokens": 1441,
+        "total_tokens": 44719,
+        "cost_usd": 0.0741377
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nI'm not a fan of having defaults where they're not needed ... and defaulting to \"not refresh\" is a dangerous approach to me (see also the comment on `get_buy_rate()`)\n\n@author:\nFixed to default to TRUE.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "freqtrade__freqtrade-2887@d69ddd2/test_review_comment_1.py",
+      "test_code": "import inspect\n\n\ndef test_get_sell_rate_requires_explicit_refresh_param_no_default():\n    \"\"\"\n    Verify `FreqtradeBot.get_sell_rate` requires an explicit `refresh` argument (no default).\n\n    BEFORE: def get_sell_rate(self, pair: str, refresh: bool = False) -> float  (FAIL)\n    AFTER:  def get_sell_rate(self, pair: str, refresh: bool) -> float          (PASS)\n    \"\"\"\n    from freqtrade.freqtradebot import FreqtradeBot\n\n    sig = inspect.signature(FreqtradeBot.get_sell_rate)\n    refresh_param = sig.parameters.get(\"refresh\")\n    assert refresh_param is not None, \"Expected 'refresh' parameter to exist on get_sell_rate().\"\n\n    assert refresh_param.default is inspect._empty, (\n        \"get_sell_rate(refresh=...) must not have a default. \"\n        \"Callers must explicitly pass refresh=True/False to avoid unsafe implicit behavior.\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 81751,
+        "completion_tokens": 731,
+        "total_tokens": 82482,
+        "cost_usd": 0.06842465
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\nI would prefer to use `open_rate` here.\r\n\r\nAssuming the order did fill partially, you'd want to see the  the  avg price in the message, not what you asked for (that's NOT necessarily what you paid for).\n\n@author:\nFixed.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "freqtrade__freqtrade-2887@d69ddd2/test_review_comment_2.py",
+      "test_code": "import types\n\n\ndef test_notify_buy_uses_open_rate_not_requested_for_limit_field():\n    \"\"\"\n    BUY notifications should show the actually paid avg fill price (trade.open_rate),\n    not the requested price (trade.open_rate_requested), since partial fills can differ.\n    \"\"\"\n    from freqtrade.freqtradebot import FreqtradeBot\n    from freqtrade.rpc import RPCMessageType\n\n    class _DummyRPC:\n        def __init__(self) -> None:\n            self.last_msg = None\n\n        def send_msg(self, msg):\n            self.last_msg = msg\n\n    bot = object.__new__(FreqtradeBot)\n    bot.config = {\"stake_currency\": \"USDT\"}\n    bot.exchange = types.SimpleNamespace(name=\"binance\")\n    bot.rpc = _DummyRPC()\n\n    trade = types.SimpleNamespace(\n        pair=\"BTC/USDT\",\n        open_rate=101.0,\n        open_rate_requested=100.0,\n        stake_amount=10.0,\n        amount=0.1,\n        open_date=None,\n    )\n\n    FreqtradeBot._notify_buy(bot, trade, order_type=\"limit\")\n\n    msg = bot.rpc.last_msg\n    assert msg is not None, \"Expected _notify_buy to send an RPC message via self.rpc.send_msg.\"\n    assert msg[\"type\"] == RPCMessageType.BUY_NOTIFICATION, (\n        \"Expected BUY notification message type.\"\n    )\n\n    assert msg[\"limit\"] == trade.open_rate, (\n        \"BUY notification 'limit' must use trade.open_rate (actual avg fill price), \"\n        \"not trade.open_rate_requested (requested limit).\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 82780,
+        "completion_tokens": 1159,
+        "total_tokens": 83939,
+        "cost_usd": 0.119763
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

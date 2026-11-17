@@ -1,0 +1,35 @@
+{
+  "instance_id": "pandas-dev__pandas-35284@644bdf7",
+  "repo": "pandas-dev/pandas",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 17561,
+    "completion_tokens": 468,
+    "total_tokens": 18029,
+    "cost_usd": 0.037283750000000004
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nDuplicated lines?\n\n@author:\nRight thanks !",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-35284@644bdf7/test_review_comment_0.py",
+      "test_code": "def test_latex_longtable_begin_does_not_duplicate_position_assignment_block():\n    # This is a pure style regression test: the \"before\" version accidentally\n    # duplicated the `if self.position is None: ... else: ...` block in\n    # `_write_longtable_begin`. That duplication has no runtime effect, so we\n    # must assert on the source.\n    source = open(\"/workspace/pandas/io/formats/latex.py\", encoding=\"utf-8\").read()\n\n    # Count the number of occurrences of the exact conditional line in the file.\n    # In the buggy \"before\" version, the duplicated block results in 2 occurrences\n    # (within _write_longtable_begin). In the fixed \"after\" version, it is 1.\n    needle = \"if self.position is None:\\n            position_ = \\\"\\\"\"\n    count = source.count(needle)\n\n    assert (\n        count == 1\n    ), (\n        \"Expected exactly one `if self.position is None:` block assigning `position_` \"\n        \"in pandas/io/formats/latex.py (duplicate lines were present before the fix). \"\n        f\"Found {count} occurrences of the position-assignment block.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_latex_longtable_begin_does_not_duplicate_position_assignment_block FAILED [100%]\n\n=================================== FAILURES ===================================\n___ test_latex_longtable_begin_does_not_duplicate_position_assignment_block ____\ntest_review_comment_0.py:14: in test_latex_longtable_begin_does_not_duplicate_position_assignment_block\n    assert (\nE   AssertionError: Expected exactly one `if self.position is None:` block assigning `position_` in pandas/io/formats/latex.py (duplicate lines were present before the fix). Found 2 occurrences of the position-assignment block.\nE   assert 2 == 1\n=========================== short test summary info ============================\nFAILED ../dev/::test_latex_longtable_begin_does_not_duplicate_position_assignment_block\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_latex_longtable_begin_does_not_duplicate_position_assignment_block PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 17561,
+        "completion_tokens": 468,
+        "total_tokens": 18029,
+        "cost_usd": 0.037283750000000004
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

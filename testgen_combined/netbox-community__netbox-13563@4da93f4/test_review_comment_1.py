@@ -1,0 +1,30 @@
+import re
+
+
+def test_bulk_import_allows_user_override_of_csv_delimiter():
+    """
+    The reviewed change adds a user-selectable csv_delimiter field and threads it into _clean_csv,
+    while keeping automatic detection as the default.
+
+    This test inspects the source (module import is not possible in this environment) to verify:
+    1) BulkImportForm defines a `csv_delimiter = forms.ChoiceField(...)`
+    2) `_clean_csv` accepts a `delimiter` argument (override mechanism)
+    3) `clean()` passes the selected delimiter into `_clean_csv(...)`
+    """
+    source = open("/workspace/netbox/utilities/forms/bulk_import.py", "r", encoding="utf-8").read()
+
+    assert "csv_delimiter = forms.ChoiceField" in source, (
+        "BulkImportForm should define a `csv_delimiter` ChoiceField to let the user override CSV delimiter "
+        "detection (automatic detection should remain the default)."
+    )
+
+    assert re.search(r"def\s+_clean_csv\s*\(\s*self\s*,\s*data\s*,\s*delimiter\s*=", source), (
+        "_clean_csv() should accept a `delimiter` parameter (defaulting to AUTO) so users can override "
+        "automatic CSV dialect detection."
+    )
+
+    # Ensure the selected delimiter is actually wired through when CSV is processed
+    assert re.search(r"_clean_csv\s*\(\s*data\s*,\s*delimiter\s*=\s*delimiter\s*\)", source), (
+        "clean() should pass the user-selected delimiter into _clean_csv(data, delimiter=...) so the override "
+        "is honored at runtime."
+    )

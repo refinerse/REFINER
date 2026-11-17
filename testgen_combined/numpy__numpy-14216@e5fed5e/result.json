@@ -1,0 +1,36 @@
+{
+  "instance_id": "numpy__numpy-14216@e5fed5e",
+  "repo": "numpy/numpy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+    "cost_usd": 0.0
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWhy not just define MADV_HUGEPAGES and let it go through a more similar code path\n\n@author:\nYes, thanks for the good idea, let me fix that.\n\n@author:\nDone in the latest commits, let me know if that's ok with you.\n\n@user1:\nok with me means nothing, just a suggestion ;)\n\n@author:\nWell, if it's ok with you, it means that you probably don't disagree nor have an idea to make it even cleaner. :)",
+      "comment_type": "unknown",
+      "language": "c",
+      "test_file": null,
+      "test_code": null,
+      "error": "Language 'c' not supported for test execution",
+      "before_passed": null,
+      "after_passed": null,
+      "success": false,
+      "before_output": "",
+      "after_output": "",
+      "attempts_used": 0,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cost_usd": 0.0
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

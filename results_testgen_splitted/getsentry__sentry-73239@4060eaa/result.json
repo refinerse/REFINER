@@ -1,0 +1,95 @@
+{
+  "instance_id": "getsentry__sentry-73239@4060eaa",
+  "repo": "getsentry/sentry",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 90434,
+    "completion_tokens": 3605,
+    "total_tokens": 94039,
+    "cost_usd": 0.1417983
+  },
+  "num_comments": 4,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nyou'll need to pull Draggable out of this component since things like calling hooks inside here will violate rules of hooks",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-73239@4060eaa/test_review_comment_0.test.ts",
+      "test_code": "import fs from 'fs';\nimport path from 'path';\n\nconst FILE_PATH = '/workspace/static/app/components/draggableTabs/draggableTab.tsx';\n\n/**\n * This repo's default jest.config.ts requires ts-node to parse, which is not\n * available in the execution environment for these tests.\n *\n * Running Jest with an explicit config avoids loading /workspace/jest.config.ts.\n */\nexport default {\n  testEnvironment: 'node',\n  testMatch: ['**/*.test.ts'],\n  transform: {},\n};\n\ndescribe('draggableTab rules-of-hooks fix: Draggable extracted out of component', () => {\n  it('does not define a nested Draggable component inside BaseDraggableTab/DraggableTab', () => {\n    const src = fs.readFileSync(FILE_PATH, 'utf8');\n\n    const hasNestedDraggableInsideBaseDraggableTab =\n      /function\\s+BaseDraggableTab[\\s\\S]*?\\n\\s*function\\s+Draggable\\s*\\(/m.test(src);\n\n    expect(hasNestedDraggableInsideBaseDraggableTab).toBe(false);\n  });\n\n  it('defines Draggable at module scope (top-level), not inside another function', () => {\n    const src = fs.readFileSync(FILE_PATH, 'utf8');\n\n    // After fix: `function Draggable(...) { ... useDrag(...) ... }` exists at top-level.\n    // Before: Draggable exists but is nested, so this assertion still passes;\n    // the previous test is what forces failure on the before version.\n    const hasTopLevelDraggableFunction = /(^|\\n)\\s*function\\s+Draggable\\s*\\(/m.test(src);\n\n    expect(hasTopLevelDraggableFunction).toBe(true);\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 20396,
+        "completion_tokens": 902,
+        "total_tokens": 21298,
+        "cost_usd": 0.039249000000000006
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nis there a plan for these classnames?\n\n@author:\nNope, this was copy pasted over from the react-aria guides. I'll delete them if/until they become useful",
+      "comment_type": "style",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-73239@4060eaa/test_review_comment_1.test.ts",
+      "test_code": "/**\n * Use a plain .ts Jest test (no TS config) that only reads the source file.\n * This avoids Jest trying to load /workspace/jest.config.ts (which requires ts-node).\n */\n\nimport fs from 'fs';\n\ndescribe('draggableTab style cleanup: remove unused guide classnames', () => {\n  test('draggableTab.tsx no longer contains the react-aria guide classname strings', () => {\n    const filePath = '/workspace/static/app/components/draggableTabs/draggableTab.tsx';\n    const src = fs.readFileSync(filePath, 'utf8');\n\n    // These classname tokens existed in the \"before\" version and should be absent in the \"after\" version.\n    const forbiddenTokens = [\n      'drop-indicator',\n      'drop-target',\n      'focus-visible',\n      'draggable',\n      'dragging',\n    ];\n\n    for (const token of forbiddenTokens) {\n      expect(src).not.toContain(\n        token\n      );\n    }\n\n    // \"option\" is too generic to ban as a raw substring; ban it only when used as a classname token.\n    expect(src).not.toMatch(/\\bclassName\\s*=\\s*{[^}]*\\boption\\b[^}]*}/m);\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 21660,
+        "completion_tokens": 896,
+        "total_tokens": 22556,
+        "cost_usd": 0.0397642
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\nlets add some types here since we know what object is expected",
+      "comment_type": "style",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-73239@4060eaa/test_review_comment_2.test.ts",
+      "test_code": "/**\n * @jest-environment node\n */\n\nimport fs from 'fs';\n\ndescribe('draggableTabList typing for parsed drag/drop payload', () => {\n  it('adds an explicit type annotation for the JSON-parsed drag payload (eventTab) in onInsert', () => {\n    const source = fs.readFileSync(\n      '/workspace/static/app/components/draggableTabs/draggableTabList.tsx',\n      'utf8'\n    );\n\n    // After change, eventTab is typed as:\n    // `const eventTab: {key: string; value: string} = JSON.parse(await dropItem.getText('tab'));`\n    // Before change, it was untyped:\n    // `const eventTab = JSON.parse(await dropItem.getText('tab'));`\n    expect(source).toMatch(\n      /const\\s+eventTab\\s*:\\s*\\{\\s*key\\s*:\\s*string\\s*;\\s*value\\s*:\\s*string\\s*;?\\s*\\}\\s*=\\s*JSON\\.parse\\s*\\(/m\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 27965,
+        "completion_tokens": 737,
+        "total_tokens": 28702,
+        "cost_usd": 0.03123435
+      }
+    },
+    {
+      "comment_index": 3,
+      "comment_text": "@user1:\ndefine prop types here to avoid implicit any",
+      "comment_type": "functional",
+      "language": "typescript",
+      "test_file": "getsentry__sentry-73239@4060eaa/test_review_comment_3.test.ts",
+      "test_code": "/**\n * Jest in this environment fails to start because the repo's jest.config.ts\n * requires ts-node (not installed). To keep this runnable, this file is a\n * self-contained test script (TypeScript) that can be executed directly.\n *\n * It still validates the review comment outcome: Draggable props must be typed\n * (no implicit any).\n */\n\nimport fs from 'fs';\n\nfunction assert(condition: unknown, message: string): void {\n  if (!condition) {\n    throw new Error(message);\n  }\n}\n\nconst FILE = '/workspace/static/app/components/draggableTabs/draggableTab.tsx';\nconst src = fs.readFileSync(FILE, 'utf8');\n\n// AFTER version defines `interface DraggableProps` and uses it in the Draggable function signature.\n// BEFORE version defines `function Draggable({children}) { ... }` with implicit any and no DraggableProps.\nconst hasDraggablePropsInterface = /\\binterface\\s+DraggableProps\\b/.test(src);\nconst hasTypedDraggableSignature =\n  /\\bfunction\\s+Draggable\\s*\\(\\s*\\{[^)]*\\}\\s*:\\s*DraggableProps\\s*\\)/m.test(src);\n\nassert(\n  hasDraggablePropsInterface,\n  [\n    'Expected draggableTab.tsx to define explicit prop types for Draggable (avoid implicit any).',\n    'Missing `interface DraggableProps`.',\n  ].join('\\n')\n);\n\nassert(\n  hasTypedDraggableSignature,\n  [\n    'Expected draggableTab.tsx Draggable component to type its destructured props using DraggableProps.',\n    'Missing `function Draggable(...: DraggableProps)` signature.',\n  ].join('\\n')\n);\n\n// If we got here, the test passes.\nprocess.stdout.write('PASS: Draggable props are explicitly typed (no implicit any)\\n');",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 20413,
+        "completion_tokens": 1070,
+        "total_tokens": 21483,
+        "cost_usd": 0.03155075
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

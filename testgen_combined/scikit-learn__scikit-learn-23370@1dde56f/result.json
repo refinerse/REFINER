@@ -1,0 +1,75 @@
+{
+  "instance_id": "scikit-learn__scikit-learn-23370@1dde56f",
+  "repo": "scikit-learn/scikit-learn",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 76973,
+    "completion_tokens": 887,
+    "total_tokens": 77860,
+    "cost_usd": 0.11728395
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n            elif self.degree == 0 and not self.include_bias:\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "scikit-learn__scikit-learn-23370@1dde56f/test_review_comment_0.py",
+      "test_code": "import numpy as np\nimport pytest\n\nfrom sklearn.preprocessing import PolynomialFeatures\n\n\ndef test_polynomial_features_degree0_include_bias_false_error_message():\n    \"\"\"degree=0 with include_bias=False should raise a clear ValueError.\n\n    This checks that the error message matches the updated wording (\"would result in\n    an empty output array.\") rather than the older wording (\"will result to an empty\n    dataframe.\").\n    \"\"\"\n    X = np.array([[1.0, 2.0], [3.0, 4.0]])\n\n    with pytest.raises(ValueError) as excinfo:\n        PolynomialFeatures(degree=0, include_bias=False).fit(X)\n\n    msg = str(excinfo.value)\n    expected = \"Setting degree to zero and include_bias to False would result in an empty output array.\"\n    assert expected in msg, (\n        \"Expected PolynomialFeatures(degree=0, include_bias=False).fit(X) to raise \"\n        \"ValueError with the updated message about an 'empty output array'. \"\n        f\"Got: {msg!r}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_polynomial_features_degree0_include_bias_false_error_message FAILED [100%]\n\n=================================== FAILURES ===================================\n______ test_polynomial_features_degree0_include_bias_false_error_message _______\ntest_review_comment_0.py:21: in test_polynomial_features_degree0_include_bias_false_error_message\n    assert expected in msg, (\nE   AssertionError: Expected PolynomialFeatures(degree=0, include_bias=False).fit(X) to raise ValueError with the updated message about an 'empty output array'. Got: 'Setting degree to zero and include_bias to False will result to an empty dataframe.'\nE   assert 'Setting degree to zero and include_bias to False would result in an empty output array.' in 'Setting degree to zero and include_bias to False will result to an empty dataframe.'\n=========================== short test summary info ============================\nFAILED ../dev::test_polynomial_features_degree0_include_bias_false_error_message\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.38s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_polynomial_features_degree0_include_bias_false_error_message PASSED [100%]\n\n============================== 1 passed in 0.34s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 19416,
+        "completion_tokens": 226,
+        "total_tokens": 19642,
+        "cost_usd": 0.037142
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\n```suggestion\r\n                    \"Setting degree to zero and include_bias to False would result in an\"\r\n                    \" empty output array.\"\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "scikit-learn__scikit-learn-23370@1dde56f/test_review_comment_1.py",
+      "test_code": "import numpy as np\nimport pytest\n\nfrom sklearn.preprocessing import PolynomialFeatures\n\n\ndef test_polynomial_features_degree0_include_bias_false_error_message_is_output_array():\n    \"\"\"degree=0 with include_bias=False should raise a ValueError with the new wording.\"\"\"\n    X = np.array([[1.0, 2.0], [3.0, 4.0]])\n\n    with pytest.raises(ValueError) as excinfo:\n        PolynomialFeatures(degree=0, include_bias=False).fit(X)\n\n    msg = str(excinfo.value)\n    assert (\n        \"would result in an empty output array\" in msg\n    ), f\"Expected updated error message mentioning 'empty output array', got: {msg!r}\"\n    assert (\n        \"empty dataframe\" not in msg\n    ), f\"Old error message ('empty dataframe') should not be used anymore, got: {msg!r}\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_polynomial_features_degree0_include_bias_false_error_message_is_output_array FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_polynomial_features_degree0_include_bias_false_error_message_is_output_array _\ntest_review_comment_1.py:15: in test_polynomial_features_degree0_include_bias_false_error_message_is_output_array\n    assert (\nE   AssertionError: Expected updated error message mentioning 'empty output array', got: 'Setting degree to zero and include_bias to False will result to an empty dataframe.'\nE   assert 'would result in an empty output array' in 'Setting degree to zero and include_bias to False will result to an empty dataframe.'\n=========================== short test summary info ============================\nFAILED ../dev::test_polynomial_features_degree0_include_bias_false_error_message_is_output_array\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.38s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_polynomial_features_degree0_include_bias_false_error_message_is_output_array PASSED [100%]\n\n============================== 1 passed in 0.35s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 19454,
+        "completion_tokens": 189,
+        "total_tokens": 19643,
+        "cost_usd": 0.0366905
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\nThis should be a stronger assert statement, something like `assert_array_equal(_X, np.ones(...))`.\n\n@author:\nUpdated as suggested :)",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "scikit-learn__scikit-learn-23370@1dde56f/test_review_comment_2.py",
+      "test_code": "import pytest\nimport numpy as np\n\nfrom sklearn.preprocessing import PolynomialFeatures\n\n\ndef test_degree_tuple_zero_zero_include_bias_false_raises_with_specific_message():\n    \"\"\"Regression test for degree=(0, 0) with include_bias=False.\n\n    The reviewed change added a dedicated ValueError (and message) for the tuple\n    form degree=(0, 0). This test asserts that this exact error message is raised.\n\n    This fails on the \"before\" version because it does *not* raise (it returns an\n    empty array instead), and it passes on the \"after\" version.\n    \"\"\"\n    X = np.ones((10, 2))\n\n    poly = PolynomialFeatures(degree=(0, 0), include_bias=False)\n    expected_msg = (\n        r\"Setting both min_deree and max_degree to zero and include_bias to\"\n        r\" False would result in an empty output array\\.\"\n    )\n\n    with pytest.raises(ValueError, match=expected_msg):\n        poly.fit_transform(X)",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_degree_tuple_zero_zero_include_bias_false_raises_with_specific_message FAILED [100%]\n\n=================================== FAILURES ===================================\n_ test_degree_tuple_zero_zero_include_bias_false_raises_with_specific_message __\ntest_review_comment_2.py:25: in test_degree_tuple_zero_zero_include_bias_false_raises_with_specific_message\n    poly.fit_transform(X)\nE   Failed: DID NOT RAISE <class 'ValueError'>\n=========================== short test summary info ============================\nFAILED ../dev::test_degree_tuple_zero_zero_include_bias_false_raises_with_specific_message\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.40s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_degree_tuple_zero_zero_include_bias_false_raises_with_specific_message PASSED [100%]\n\n============================== 1 passed in 0.34s ===============================",
+      "attempts_used": 2,
+      "usage": {
+        "prompt_tokens": 38103,
+        "completion_tokens": 472,
+        "total_tokens": 38575,
+        "cost_usd": 0.043451449999999996
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

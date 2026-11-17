@@ -1,0 +1,35 @@
+{
+  "instance_id": "skypilot-org__skypilot-614@ac824f0",
+  "repo": "skypilot-org/skypilot",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 6685,
+    "completion_tokens": 218,
+    "total_tokens": 6903,
+    "cost_usd": 0.01475075
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nis this `ubuntu 20.04`?\n\n@author:\nAh my bad. Just updated to the correct image name.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "skypilot-org__skypilot-614@ac824f0/test_review_comment_0.py",
+      "test_code": "import types\n\nfrom sky.clouds.gcp import GCP\n\n\ndef test_gcp_default_cpu_image_is_ubuntu_2004():\n    \"\"\"Default (CPU) image should explicitly specify ubuntu-2004.\n\n    This ensures image naming is unambiguous (e.g., not just 'common-cpu').\n    \"\"\"\n    gcp = GCP()\n\n    # Minimal stub with the attributes accessed by make_deploy_resources_variables.\n    resources = types.SimpleNamespace(\n        instance_type=\"n1-standard-1\",\n        accelerators=None,\n        accelerator_args=None,\n        use_spot=False,\n    )\n\n    vars_dict = gcp.make_deploy_resources_variables(resources)\n\n    assert vars_dict[\"image_name\"] == \"common-cpu-ubuntu-2004\", (\n        \"GCP.make_deploy_resources_variables() should set the default CPU \"\n        \"image_name to 'common-cpu-ubuntu-2004' (explicit Ubuntu 20.04). \"\n        f\"Got: {vars_dict['image_name']!r}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_gcp_default_cpu_image_is_ubuntu_2004 FAILED                 [100%]\n\n=================================== FAILURES ===================================\n__________________ test_gcp_default_cpu_image_is_ubuntu_2004 ___________________\ntest_review_comment_0.py:23: in test_gcp_default_cpu_image_is_ubuntu_2004\n    assert vars_dict[\"image_name\"] == \"common-cpu-ubuntu-2004\", (\nE   AssertionError: GCP.make_deploy_resources_variables() should set the default CPU image_name to 'common-cpu-ubuntu-2004' (explicit Ubuntu 20.04). Got: 'common-cpu'\nE   assert 'common-cpu' == 'common-cpu-ubuntu-2004'\nE     \nE     - common-cpu-ubuntu-2004\nE     + common-cpu\n=========================== short test summary info ============================\nFAILED ../dev::test_gcp_default_cpu_image_is_ubuntu_2004 - AssertionError: GC...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.70s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_gcp_default_cpu_image_is_ubuntu_2004 PASSED                 [100%]\n\n============================== 1 passed in 0.66s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 6685,
+        "completion_tokens": 218,
+        "total_tokens": 6903,
+        "cost_usd": 0.01475075
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

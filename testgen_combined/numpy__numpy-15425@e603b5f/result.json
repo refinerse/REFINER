@@ -1,0 +1,35 @@
+{
+  "instance_id": "numpy__numpy-15425@e603b5f",
+  "repo": "numpy/numpy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 8886,
+    "completion_tokens": 154,
+    "total_tokens": 9040,
+    "cost_usd": 0.0177065
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nWhat is this for?\n\n@author:\nThis is to verify that explicitly calling numpy.testing is not adding a second copy of 'testing' to the result of dir.\n\n@user1:\nBut this is started in a separate process, so can have no effect on the rest of the test.\n\n@user2:\nAt this point in the test we probably already did anything bad (e.g. testing is definitely imported), wouldn't it be enough to just test that `len(dir(np)) == len(set(dir(np)))`, with a comment of why?\n\n@author:\n@user3-wieser @user2 I have modified the test to assert len(dir(np)) == len(set(dir(np)))\n\n@user2:\nThanks, seems fair enough to me. If you are still enthusiastic: We try to keep the lines below 80 characters long (so the comment is a bit too long). Might as well rebase/squash the commits (but we can also do both of that).\n\n@author:\n@user2  Thanks for the review. I have modified the comments to be inline with the standards.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "numpy__numpy-15425@e603b5f/test_review_comment_0.py",
+      "test_code": "import inspect\n\nimport numpy.tests.test_public_api as tpa\n\n\ndef test_test_dir_testing_is_not_parametrized_anymore():\n    \"\"\"\n    The reviewed change removes @pytest.mark.parametrize from test_dir_testing,\n    turning it into a single test that checks len(dir(np)) == len(set(dir(np))).\n    This is a style/API change observable via the test function signature.\n    \"\"\"\n    sig = inspect.signature(tpa.test_dir_testing)\n    assert (\n        len(sig.parameters) == 0\n    ), (\n        \"Expected numpy.tests.test_public_api.test_dir_testing to take no \"\n        \"arguments after the review change (no pytest parametrization). \"\n        f\"Found parameters: {list(sig.parameters)}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_test_dir_testing_is_not_parametrized_anymore FAILED         [100%]\n\n=================================== FAILURES ===================================\n______________ test_test_dir_testing_is_not_parametrized_anymore _______________\ntest_review_comment_0.py:13: in test_test_dir_testing_is_not_parametrized_anymore\n    assert (\nE   AssertionError: Expected numpy.tests.test_public_api.test_dir_testing to take no arguments after the review change (no pytest parametrization). Found parameters: ['name']\nE   assert 1 == 0\nE    +  where 1 = len(mappingproxy(OrderedDict([('name', <Parameter \"name\">)])))\nE    +    where mappingproxy(OrderedDict([('name', <Parameter \"name\">)])) = <Signature (name)>.parameters\n=========================== short test summary info ============================\nFAILED ../dev::test_test_dir_testing_is_not_parametrized_anymore - AssertionE...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.26s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_test_dir_testing_is_not_parametrized_anymore PASSED         [100%]\n\n============================== 1 passed in 0.24s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 8886,
+        "completion_tokens": 154,
+        "total_tokens": 9040,
+        "cost_usd": 0.0177065
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

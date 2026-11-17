@@ -1,0 +1,23 @@
+import re
+
+
+def test_complementary_slackness_uses_atol_not_plus_one():
+    """
+    Review change: replace `assert_allclose(resid + 1, 1)` hack with
+    `assert_allclose(resid, 0, atol=1e-12)`.
+
+    This test inspects the source directly because importing SciPy's test module
+    fails in this environment (missing OpenBLAS shared library).
+    """
+    source = open("/workspace/scipy/optimize/tests/test_linprog.py", "r", encoding="utf-8").read()
+
+    assert "assert_allclose(resid + 1, 1)" not in source, (
+        "Expected the old workaround `assert_allclose(resid + 1, 1)` to be removed "
+        "and replaced with an explicit absolute tolerance."
+    )
+
+    pattern = r"assert_allclose\(\s*resid\s*,\s*0\s*,\s*atol\s*=\s*1e-12\s*\)"
+    assert re.search(pattern, source) is not None, (
+        "Expected KKT residual check to use an explicit absolute tolerance: "
+        "`assert_allclose(resid, 0, atol=1e-12)`."
+    )

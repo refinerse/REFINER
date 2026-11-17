@@ -1,0 +1,21 @@
+import re
+
+
+def test_db_auth_frontend_compose_does_not_set_sentry_dsn():
+    """
+    Review comment asks to remove Sentry configuration ("Sentry as well, I don't think we need it :)").
+
+    This test enforces that the e2e mysql docker compose file does NOT include a
+    NEXT_PUBLIC_SENTRY_DSN entry (which would wire Sentry into the frontend service).
+    """
+    source = open("/workspace/tests/e2e_tests/docker-compose-e2e-mysql.yml", "r", encoding="utf-8").read()
+
+    assert "NEXT_PUBLIC_SENTRY_DSN" not in source, (
+        "docker-compose-e2e-mysql.yml should not configure Sentry DSN for e2e tests. "
+        "Remove NEXT_PUBLIC_SENTRY_DSN from the compose environment."
+    )
+
+    # Also ensure no sentry.io DSN URLs linger (covers variants/renames)
+    assert re.search(r"sentry\.io/\d+", source) is None, (
+        "docker-compose-e2e-mysql.yml should not contain any Sentry DSN URLs (sentry.io)."
+    )

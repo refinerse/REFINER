@@ -1,0 +1,49 @@
+import re
+
+
+def _extract_function_block(source: str, funcname: str) -> str:
+    """
+    Return the source text for the named top-level function definition.
+
+    Uses a simple, newline/indentation-based regex (no AST) robust to return
+    annotations and multiline signatures.
+    """
+    pattern = rf"(?ms)^(def {re.escape(funcname)}\b.*?:\n)(?P<body>(?:^[ \t]+.*\n?)*)"
+    m = re.search(pattern, source)
+    assert m is not None, f"Expected to find {funcname} definition in cast.py."
+    return (m.group(1) + m.group("body")).rstrip() + "\n"
+
+
+def test_cast_py_does_not_import_pandas_as_pd_and_avoids_pd_dtypes_usage():
+    source = open("/workspace/pandas/core/dtypes/cast.py").read()
+
+    assert (
+        "import pandas as pd" not in source
+    ), "cast.py should not import pandas as `pd`; use targeted imports instead."
+
+    assert (
+        "pd.BooleanDtype" not in source
+    ), "maybe_cast_result_dtype should not reference `pd.BooleanDtype`; import BooleanDtype directly."
+    assert (
+        "pd.Int64Dtype" not in source
+    ), "maybe_cast_result_dtype should not construct `pd.Int64Dtype()`; use Int64Dtype directly (or return 'Int64')."
+
+
+def test_cast_py_maybe_cast_result_dtype_uses_direct_dtype_imports():
+    source = open("/workspace/pandas/core/dtypes/cast.py").read()
+
+    func_block = _extract_function_block(source, "maybe_cast_result_dtype")
+
+    assert (
+        "from pandas.core.arrays.boolean import BooleanDtype" in func_block
+    ), "Expected maybe_cast_result_dtype to locally import BooleanDtype (no `pd`)."
+    assert (
+        "from pandas.core.arrays.integer import Int64Dtype" in func_block
+    ), "Expected maybe_cast_result_dtype to locally import Int64Dtype (no `pd`)."
+
+    assert (
+        "isinstance(dtype, BooleanDtype)" in func_block
+    ), "maybe_cast_result_dtype should check isinstance(dtype, BooleanDtype) (not pd.BooleanDtype)."
+    assert (
+        "return Int64Dtype()" in func_block
+    ), "maybe_cast_result_dtype should return Int64Dtype() (not pd.Int64Dtype())."

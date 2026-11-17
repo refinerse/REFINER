@@ -1,0 +1,35 @@
+{
+  "instance_id": "pytorch__vision-2596@8859151",
+  "repo": "pytorch/vision",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 10526,
+    "completion_tokens": 463,
+    "total_tokens": 10989,
+    "cost_usd": 0.0249025
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nIt is a bit weird that you pinned the version of `ffmpeg` in the following line but not in this one.\n\n@author:\nI think we can remove the version pinning safely",
+      "comment_type": "structural",
+      "language": "python",
+      "test_file": "pytorch__vision-2596@8859151/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_ffmpeg_version_pinning_is_consistent_with_downloaded_artifacts():\n    source = open(\"/workspace/packaging/pkg_helpers.bash\", \"r\", encoding=\"utf-8\").read()\n\n    # The structural change requested: don't have an unpinned conda install for ffmpeg\n    # while also downloading a pinned tarball. We assert that within download_copy_ffmpeg(),\n    # any active `conda install ... ffmpeg` line must pin a version (e.g., ffmpeg=4.2).\n    func_match = re.search(r\"(?ms)^\\s*download_copy_ffmpeg\\(\\)\\s*\\{.*?^\\s*\\}\\s*$\", source)\n    assert func_match, \"Expected to find download_copy_ffmpeg() function definition in /workspace/packaging/pkg_helpers.bash\"\n    body = func_match.group(0)\n\n    active_conda_ffmpeg_installs = []\n    for line in body.splitlines():\n        stripped = line.strip()\n        if stripped.startswith(\"#\"):\n            continue\n        if \"conda install\" in stripped and re.search(r\"\\bffmpeg\\b\", stripped):\n            active_conda_ffmpeg_installs.append(stripped)\n\n    assert active_conda_ffmpeg_installs, (\n        \"Expected download_copy_ffmpeg() to contain at least one active conda ffmpeg installation line \"\n        \"(or to explicitly disable it). If it was removed entirely, adjust this test to the new structure.\"\n    )\n\n    unpinned = [\n        ln\n        for ln in active_conda_ffmpeg_installs\n        # matches 'ffmpeg' not immediately followed by '=<version>'\n        if re.search(r\"\\bffmpeg\\b(?!\\s*=)\", ln)\n    ]\n    assert not unpinned, (\n        \"Found unpinned conda ffmpeg install(s) inside download_copy_ffmpeg(), which is structurally \"\n        \"inconsistent when the script downloads a pinned ffmpeg tarball. \"\n        \"Pin ffmpeg in conda install (e.g., 'ffmpeg=4.2') or disable/remove the unpinned install line(s). \"\n        f\"Unpinned line(s): {unpinned}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ffmpeg_version_pinning_is_consistent_with_downloaded_artifacts FAILED [100%]\n\n=================================== FAILURES ===================================\n_____ test_ffmpeg_version_pinning_is_consistent_with_downloaded_artifacts ______\ntest_review_comment_0.py:33: in test_ffmpeg_version_pinning_is_consistent_with_downloaded_artifacts\n    assert not unpinned, (\nE   AssertionError: Found unpinned conda ffmpeg install(s) inside download_copy_ffmpeg(), which is structurally inconsistent when the script downloads a pinned ffmpeg tarball. Pin ffmpeg in conda install (e.g., 'ffmpeg=4.2') or disable/remove the unpinned install line(s). Unpinned line(s): ['conda install -yq ffmpeg -c pytorch', 'conda install -yq ffmpeg -c pytorch']\nE   assert not ['conda install -yq ffmpeg -c pytorch', 'conda install -yq ffmpeg -c pytorch']\n=========================== short test summary info ============================\nFAILED ../dev::test_ffmpeg_version_pinning_is_consistent_with_downloaded_artifacts\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ffmpeg_version_pinning_is_consistent_with_downloaded_artifacts PASSED [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 10526,
+        "completion_tokens": 463,
+        "total_tokens": 10989,
+        "cost_usd": 0.0249025
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

@@ -1,0 +1,36 @@
+import re
+
+
+def test_get_timesteps_uses_denoising_start_param_and_not_first_inference_step():
+    """
+    The functional change: replace `first_inference_step` logic with `denoising_start` logic in get_timesteps.
+
+    - BEFORE: get_timesteps(self, num_inference_steps, first_inference_step, strength, device)
+    - AFTER:  get_timesteps(self, num_inference_steps, strength, device, denoising_start=None)
+
+    We source-inspect because importing diffusers fails in this environment.
+    """
+    path = "/workspace/src/diffusers/pipelines/stable_diffusion_xl/pipeline_stable_diffusion_xl_img2img.py"
+    source = open(path, "r", encoding="utf-8").read()
+
+    # Must have the new signature using denoising_start
+    assert (
+        re.search(
+            r"def\s+get_timesteps\s*\(\s*self\s*,\s*num_inference_steps\s*,\s*strength\s*,\s*device\s*,\s*denoising_start\s*=\s*None\s*\)\s*:",
+            source,
+        )
+        is not None
+    ), (
+        "Expected `get_timesteps` to accept `denoising_start=None` as the 4th argument after device, i.e. "
+        "`def get_timesteps(self, num_inference_steps, strength, device, denoising_start=None):`."
+    )
+
+    # Must not have the old signature (first_inference_step)
+    assert (
+        re.search(r"def\s+get_timesteps\s*\([^)]*\bfirst_inference_step\b[^)]*\)\s*:", source) is None
+    ), "Did not expect `get_timesteps` to use `first_inference_step` in its signature anymore."
+
+    # And the call site should pass denoising_start by keyword for clarity
+    assert (
+        re.search(r"self\.get_timesteps\([^)]*denoising_start\s*=\s*denoising_start", source) is not None
+    ), "Expected `__call__` to invoke `get_timesteps(..., denoising_start=denoising_start)`."

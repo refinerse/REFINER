@@ -1,0 +1,35 @@
+{
+  "instance_id": "PostHog__posthog-15345@b104baf",
+  "repo": "PostHog/posthog",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 11605,
+    "completion_tokens": 475,
+    "total_tokens": 12080,
+    "cost_usd": 0.021515549999999998
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\ncommented code \ud83d\ude31 \r\n\r\nassuming you're planning on bringing this back at some point \ud83d\ude0a \n\n@author:\nYeah this isn't finished yet. The buttons are borked which led me to [this PR](https://github.com/PostHog/posthog/pull/15351) but it might not get merged easily....",
+      "comment_type": "documentation",
+      "language": "typescript",
+      "test_file": "PostHog__posthog-15345@b104baf/test_review_comment_0.test.ts",
+      "test_code": "import fs from 'fs'\n\ndescribe('PlayerMetaLinks documentation cleanup (no unfinished commented-out code)', () => {\n    test('should not contain the unfinished commented-out JSX block starting with \"// return (\"', () => {\n        const filePath = '/workspace/frontend/src/scenes/session-recordings/player/PlayerMetaLinks.tsx'\n        const source = fs.readFileSync(filePath, 'utf8')\n\n        expect(source.includes('// return (')).toBe(\n            false\n        )\n    })\n})\n\nexport {}",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "after_output": "Error: Jest: Failed to parse the TypeScript config file /workspace/jest.config.ts\n  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed\nError: Cannot find package 'ts-node' imported from /root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js\n    at readConfigFileAndSetRootDir (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2294:13)\n    at async readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1173:13)\n    at async readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:7)\n    at async readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:26)\n    at async runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:7)\n    at async Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:9)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 11605,
+        "completion_tokens": 475,
+        "total_tokens": 12080,
+        "cost_usd": 0.021515549999999998
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

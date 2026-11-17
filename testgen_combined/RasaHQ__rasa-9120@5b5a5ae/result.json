@@ -1,0 +1,35 @@
+{
+  "instance_id": "RasaHQ__rasa-9120@5b5a5ae",
+  "repo": "RasaHQ/rasa",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 19063,
+    "completion_tokens": 943,
+    "total_tokens": 20006,
+    "cost_usd": 0.03910305
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nthis is still a TODO, isn't it?\n\n@author:\nthanks for catching that! Accidentally removed it. Its back now.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "RasaHQ__rasa-9120@5b5a5ae/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_convert_skip_block_contains_todo_marker_comment():\n    source_path = \"/workspace/tests/nlu/test_train.py\"\n    with open(source_path, \"r\", encoding=\"utf-8\") as f:\n        source = f.read()\n\n    # Find the specific `if \"convert\" in cls.name.lower():` block and assert it contains\n    # the `# TODO` marker comment. This marker was missing in the \"before\" version and\n    # restored in the \"after\" version.\n    block_pattern = re.compile(\n        r'for\\s+cls\\s+in\\s+registry\\.component_classes:\\s*'\n        r'\\n\\s*if\\s+\"convert\"\\s+in\\s+cls\\.name\\.lower\\(\\):'\n        r'(?P<body>(?:\\n[ \\t]+.*)*)',\n        re.MULTILINE,\n    )\n\n    match = block_pattern.search(source)\n    assert match is not None, (\n        \"Could not locate the `for cls in registry.component_classes` loop with the \"\n        '`if \"convert\" in cls.name.lower():` guard in /workspace/tests/nlu/test_train.py.'\n    )\n\n    body = match.group(\"body\")\n    assert re.search(r\"\\n[ \\t]*#\\s*TODO\\b\", body) is not None, (\n        \"Expected a `# TODO` comment inside the \"\n        '`if \"convert\" in cls.name.lower():` skip block. '\n        \"This should be present after the fix and absent before it.\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.8/runpy.py\", line 185, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.8/runpy.py\", line 144, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.8/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.8/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.8/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.8/site-packages/_pytest/_code/code.py\", line 55, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.8/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.8/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.8/site-packages/exceptiongroup/_exceptions.py\", line 12, in <module>\n    _BaseExceptionT_co = TypeVar(\nTypeError: __init__() got an unexpected keyword argument 'default'",
+      "after_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.8/runpy.py\", line 185, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.8/runpy.py\", line 144, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.8/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.8/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.8/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.8/site-packages/_pytest/_code/code.py\", line 55, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.8/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.8/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.8/site-packages/exceptiongroup/_exceptions.py\", line 12, in <module>\n    _BaseExceptionT_co = TypeVar(\nTypeError: __init__() got an unexpected keyword argument 'default'",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 19063,
+        "completion_tokens": 943,
+        "total_tokens": 20006,
+        "cost_usd": 0.03910305
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

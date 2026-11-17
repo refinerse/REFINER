@@ -1,0 +1,95 @@
+{
+  "instance_id": "ansible__ansible-44951@91cfd5c",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 37712,
+    "completion_tokens": 1208,
+    "total_tokens": 38920,
+    "cost_usd": 0.08290800000000001
+  },
+  "num_comments": 4,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nNo spaces. s/new disk name/new_pool_name",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "ansible__ansible-44951@91cfd5c/test_review_comment_0.py",
+      "test_code": "import re\n\n\nSOURCE_PATH = \"/workspace/lib/ansible/modules/cloud/ovirt/ovirt_vmpool.py\"\n\n\ndef test_examples_change_pool_name_uses_new_pool_name_and_no_spaces():\n    source = open(SOURCE_PATH, \"r\", encoding=\"utf-8\").read()\n\n    # The review comment requests replacing 'new disk name' with 'new_pool_name'\n    # in the EXAMPLES YAML snippet.\n    assert 'name: \"new disk name\"' not in source, (\n        \"EXAMPLES should not contain the spaced placeholder name 'new disk name'. \"\n        \"It should be replaced per style guidance.\"\n    )\n\n    assert 'name: \"new_pool_name\"' in source, (\n        \"EXAMPLES should demonstrate renaming the pool using a no-spaces name \"\n        \"like 'new_pool_name' (expected to find: name: \\\"new_pool_name\\\").\"\n    )\n\n    # Ensure the Change Pool Name example block exists and contains the expected name.\n    m = re.search(r\"# Change Pool Name.*?\\n(.*?)(?=\\n'''\\n)\", source, flags=re.S)\n    assert m, \"Expected to find the '# Change Pool Name' example block inside the EXAMPLES string.\"\n    change_block = m.group(0)\n    assert 'name: \"new_pool_name\"' in change_block, (\n        \"The '# Change Pool Name' example block should specifically use name: \\\"new_pool_name\\\".\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_examples_change_pool_name_uses_new_pool_name_and_no_spaces FAILED [100%]\n\n=================================== FAILURES ===================================\n_______ test_examples_change_pool_name_uses_new_pool_name_and_no_spaces ________\ntest_review_comment_0.py:12: in test_examples_change_pool_name_uses_new_pool_name_and_no_spaces\n    assert 'name: \"new disk name\"' not in source, (\nE   AssertionError: EXAMPLES should not contain the spaced placeholder name 'new disk name'. It should be replaced per style guidance.\nE   assert 'name: \"new disk name\"' not in '#!/usr/bin/...    main()\\n'\nE     \nE     'name: \"new disk name\"' is contained here:\nE       #!/usr/bin/python\nE       # -*- coding: utf-8 -*-\nE       #\nE       # Copyright (c) 2016 Red Hat, Inc.\nE       #...\nE     \nE     ...Full output truncated (236 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev::test_examples_change_pool_name_uses_new_pool_name_and_no_spaces\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_examples_change_pool_name_uses_new_pool_name_and_no_spaces PASSED [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 5550,
+        "completion_tokens": 307,
+        "total_tokens": 5857,
+        "cost_usd": 0.0140105
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nThere can't be spaces in cluster name.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "ansible__ansible-44951@91cfd5c/test_review_comment_1.py",
+      "test_code": "import re\n\n\ndef test_ovirt_cluster_examples_cluster_name_has_no_spaces():\n    source = open(\"/workspace/lib/ansible/modules/cloud/ovirt/ovirt_cluster.py\", \"r\", encoding=\"utf-8\").read()\n\n    # The review comment refers to the EXAMPLES YAML snippet for \"Change cluster Name\".\n    # Ensure that example does not show a cluster name with spaces.\n    m = re.search(\n        r\"#\\s*Change cluster Name\\s*\\n\"\n        r\"-\\s*ovirt_cluster:\\s*\\n\"\n        r\"(?:[ \\t]+.*\\n)*?\"\n        r\"[ \\t]+name:\\s*(?P<q>['\\\"])(?P<name>.*?)(?P=q)\",\n        source,\n        flags=re.MULTILINE,\n    )\n    assert m is not None, (\n        \"Expected to find the '# Change cluster Name' example with a quoted 'name' field \"\n        \"in /workspace/lib/ansible/modules/cloud/ovirt/ovirt_cluster.py\"\n    )\n\n    example_name = m.group(\"name\")\n    assert \" \" not in example_name, (\n        \"Cluster name in the 'Change cluster Name' example must not contain spaces. \"\n        f\"Found name={example_name!r}.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ovirt_cluster_examples_cluster_name_has_no_spaces FAILED    [100%]\n\n=================================== FAILURES ===================================\n____________ test_ovirt_cluster_examples_cluster_name_has_no_spaces ____________\ntest_review_comment_1.py:23: in test_ovirt_cluster_examples_cluster_name_has_no_spaces\n    assert \" \" not in example_name, (\nE   AssertionError: Cluster name in the 'Change cluster Name' example must not contain spaces. Found name='new cluster name'.\nE   assert ' ' not in 'new cluster name'\nE     \nE     ' ' is contained here:\nE       new cluster name\nE     ?    +\n=========================== short test summary info ============================\nFAILED ../dev::test_ovirt_cluster_examples_cluster_name_has_no_spaces - Asser...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ovirt_cluster_examples_cluster_name_has_no_spaces PASSED    [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 14959,
+        "completion_tokens": 276,
+        "total_tokens": 15235,
+        "cost_usd": 0.03004225
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\ns/nic/host",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ansible__ansible-44951@91cfd5c/test_review_comment_2.py",
+      "test_code": "import re\n\n\ndef test_ovirt_host_id_option_describes_host_not_nic():\n    \"\"\"\n    Functional intent of review: the 'id' option in DOCUMENTATION should refer to a host,\n    not a NIC. Since importing ansible modules fails in this environment, verify by\n    inspecting the module source text.\n    \"\"\"\n    source = open(\"/workspace/lib/ansible/modules/cloud/ovirt/ovirt_host.py\", \"r\", encoding=\"utf-8\").read()\n\n    # Locate the \"options: id: description\" block and ensure it mentions \"host\", not \"nic\".\n    # Keep the match bounded to avoid false positives from other occurrences of \"host\".\n    m = re.search(\n        r\"(?ms)^options:\\s*\\n\"\n        r\"(?:^[ \\t]+\\w+:\\s*\\n.*?\\n)*?\"  # any options before id\n        r\"^[ \\t]+id:\\s*\\n\"\n        r\"^[ \\t]+description:\\s*\\n\"\n        r\"(?P<desc>(?:^[ \\t]+-\\s+\\\".*?\\\"\\s*\\n)+)\",\n        source,\n    )\n    assert m, \"Could not find DOCUMENTATION options.id.description block in ovirt_host module source.\"\n\n    desc_block = m.group(\"desc\")\n    assert \"ID of the host to manage.\" in desc_block, (\n        \"The 'id' option description should say it manages a host (not a nic). \"\n        f\"Found description block:\\n{desc_block}\"\n    )\n    assert \"ID of the nic to manage.\" not in desc_block, (\n        \"The 'id' option description must not refer to a nic; it should refer to a host. \"\n        f\"Found description block:\\n{desc_block}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ovirt_host_id_option_describes_host_not_nic FAILED          [100%]\n\n=================================== FAILURES ===================================\n_______________ test_ovirt_host_id_option_describes_host_not_nic _______________\ntest_review_comment_2.py:25: in test_ovirt_host_id_option_describes_host_not_nic\n    assert \"ID of the host to manage.\" in desc_block, (\nE   AssertionError: The 'id' option description should say it manages a host (not a nic). Found description block:\nE                 - \"ID of the nic to manage.\"\nE     \nE   assert 'ID of the host to manage.' in '            - \"ID of the nic to manage.\"\\n'\n=========================== short test summary info ============================\nFAILED ../dev::test_ovirt_host_id_option_describes_host_not_nic - AssertionEr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_ovirt_host_id_option_describes_host_not_nic PASSED          [100%]\n\n============================== 1 passed in 0.01s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 11685,
+        "completion_tokens": 378,
+        "total_tokens": 12063,
+        "cost_usd": 0.02574075
+      }
+    },
+    {
+      "comment_index": 3,
+      "comment_text": "@user1:\nNo spaces. s/new tag name/new_cluster_name",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "ansible__ansible-44951@91cfd5c/test_review_comment_3.py",
+      "test_code": "import re\n\n\ndef test_examples_use_snake_case_tag_name_without_spaces():\n    source_path = \"/workspace/lib/ansible/modules/cloud/ovirt/ovirt_tag.py\"\n    source = open(source_path, \"r\", encoding=\"utf-8\").read()\n\n    # The review comment asks to change the example value from \"new tag name\" to \"new_tag_name\"\n    # (\"No spaces. s/new tag name/new_cluster_name\" but the merged code uses new_tag_name).\n    #\n    # We verify the example block no longer contains the spaced string and does contain the\n    # snake_case variant.\n    assert '\"new tag name\"' not in source, (\n        \"EXAMPLES in ovirt_tag.py should not use a tag name with spaces. \"\n        'Expected the example to replace \"new tag name\" with a no-spaces snake_case name.'\n    )\n\n    assert re.search(r'name:\\s*\"new_tag_name\"\\s*$', source, flags=re.MULTILINE), (\n        \"EXAMPLES in ovirt_tag.py should include the updated example line \"\n        'name: \"new_tag_name\" (snake_case, no spaces).'\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_examples_use_snake_case_tag_name_without_spaces FAILED      [100%]\n\n=================================== FAILURES ===================================\n_____________ test_examples_use_snake_case_tag_name_without_spaces _____________\ntest_review_comment_3.py:13: in test_examples_use_snake_case_tag_name_without_spaces\n    assert '\"new tag name\"' not in source, (\nE   AssertionError: EXAMPLES in ovirt_tag.py should not use a tag name with spaces. Expected the example to replace \"new tag name\" with a no-spaces snake_case name.\nE   assert '\"new tag name\"' not in '#!/usr/bin/...    main()\\n'\nE     \nE     '\"new tag name\"' is contained here:\nE       #!/usr/bin/python\nE       # -*- coding: utf-8 -*-\nE       #\nE       # Copyright (c) 2016 Red Hat, Inc.\nE       #...\nE     \nE     ...Full output truncated (255 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev::test_examples_use_snake_case_tag_name_without_spaces - Asserti...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_examples_use_snake_case_tag_name_without_spaces PASSED      [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 5518,
+        "completion_tokens": 247,
+        "total_tokens": 5765,
+        "cost_usd": 0.013114500000000001
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

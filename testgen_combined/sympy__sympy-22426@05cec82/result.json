@@ -1,0 +1,35 @@
+{
+  "instance_id": "sympy__sympy-22426@05cec82",
+  "repo": "sympy/sympy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 17850,
+    "completion_tokens": 450,
+    "total_tokens": 18300,
+    "cost_usd": 0.0375375
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n\"indirect\" is spelled wrong in these variable names.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "sympy__sympy-22426@05cec82/test_review_comment_0.py",
+      "test_code": "import inspect\n\nimport bin.coverage_doctest as cd\n\n\ndef test_indirect_doctest_parameter_names_are_spelled_correctly():\n    \"\"\"\n    The review comment requires fixing the misspelling \"indierect\" -> \"indirect\"\n    in variable/parameter names. This is observable at runtime via function\n    signatures.\n    \"\"\"\n    sig = inspect.signature(cd.print_coverage)\n    params = list(sig.parameters)\n\n    assert \"c_indirect_doctest\" in params, (\n        \"print_coverage should accept parameter 'c_indirect_doctest' \"\n        \"(spelled 'indirect'), not a misspelled variant.\"\n    )\n    assert \"f_indirect_doctest\" in params, (\n        \"print_coverage should accept parameter 'f_indirect_doctest' \"\n        \"(spelled 'indirect'), not a misspelled variant.\"\n    )\n    assert all(\"indierect\" not in p for p in params), (\n        \"No parameter name in print_coverage should contain the misspelling \"\n        \"'indierect'.\"\n    )\n\n    sig_pf = inspect.signature(cd.process_function)\n    pf_params = list(sig_pf.parameters)\n    assert \"f_indirect_doctest\" in pf_params, (\n        \"process_function should accept parameter 'f_indirect_doctest' \"\n        \"(spelled 'indirect'), not a misspelled variant.\"\n    )\n    assert all(\"indierect\" not in p for p in pf_params), (\n        \"No parameter name in process_function should contain the misspelling \"\n        \"'indierect'.\"\n    )\n\n    sig_pc = inspect.signature(cd.process_class)\n    pc_params = list(sig_pc.parameters)\n    assert \"c_indirect_doctest\" in pc_params, (\n        \"process_class should accept parameter 'c_indirect_doctest' \"\n        \"(spelled 'indirect'), not a misspelled variant.\"\n    )\n    assert all(\"indierect\" not in p for p in pc_params), (\n        \"No parameter name in process_class should contain the misspelling \"\n        \"'indierect'.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_indirect_doctest_parameter_names_are_spelled_correctly FAILED [100%]\n\n=================================== FAILURES ===================================\n_________ test_indirect_doctest_parameter_names_are_spelled_correctly __________\ntest_review_comment_0.py:15: in test_indirect_doctest_parameter_names_are_spelled_correctly\n    assert \"c_indirect_doctest\" in params, (\nE   AssertionError: print_coverage should accept parameter 'c_indirect_doctest' (spelled 'indirect'), not a misspelled variant.\nE   assert 'c_indirect_doctest' in ['module_path', 'c', 'c_missing_doc', 'c_missing_doctest', 'c_indierect_doctest', 'c_sph', ...]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35\n  /usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35: DeprecationWarning: mpnumeric is deprecated\n    warnings.warn(f\"{name} is deprecated\", DeprecationWarning)\n\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n  /usr/local/lib/python3.11/site-packages/mpmath/rational.py:4: DeprecationWarning: the rational private module is deprecated\n    warnings.warn(\"the rational private module is deprecated\",\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_indirect_doctest_parameter_names_are_spelled_correctly - ...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 4 warnings in 0.06s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_indirect_doctest_parameter_names_are_spelled_correctly PASSED [100%]\n\n=============================== warnings summary ===============================\n../usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35\n  /usr/local/lib/python3.11/site-packages/mpmath/ctx_mp.py:35: DeprecationWarning: mpnumeric is deprecated\n    warnings.warn(f\"{name} is deprecated\", DeprecationWarning)\n\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n../usr/local/lib/python3.11/site-packages/mpmath/rational.py:4\n  /usr/local/lib/python3.11/site-packages/mpmath/rational.py:4: DeprecationWarning: the rational private module is deprecated\n    warnings.warn(\"the rational private module is deprecated\",\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 4 warnings in 0.03s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 17850,
+        "completion_tokens": 450,
+        "total_tokens": 18300,
+        "cost_usd": 0.0375375
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

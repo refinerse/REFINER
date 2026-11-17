@@ -1,0 +1,35 @@
+{
+  "instance_id": "ccxt__ccxt-14830@1d1701f",
+  "repo": "ccxt/ccxt",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 37870,
+    "completion_tokens": 327,
+    "total_tokens": 38197,
+    "cost_usd": 0.0708505
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n@author in this case you've also inverted the conditional, no?\n\n@author:\noh, I think you're right!",
+      "comment_type": "functional",
+      "language": "javascript",
+      "test_file": "ccxt__ccxt-14830@1d1701f/test_review_comment_0.test.js",
+      "test_code": "const poloniex = require('/workspace/js/poloniex.js');\n\ntest('poloniex.fetchOrderBook parses alternating [price, amount] pairs starting at index 0 (even indices)', async () => {\n    const exchange = new poloniex();\n\n    // Avoid any network calls inside fetchOrderBook\n    exchange.loadMarkets = async () => {\n        exchange.markets = {\n            'BTC/USDT': { id: 'BTC_USDT', symbol: 'BTC/USDT' },\n        };\n        exchange.markets_by_id = { BTC_USDT: exchange.markets['BTC/USDT'] };\n        exchange.symbols = ['BTC/USDT'];\n        return exchange.markets;\n    };\n\n    // Provide a deterministic order book response where:\n    // asks = [price0, amount0, price1, amount1]\n    // Correct parsing should include BOTH pairs.\n    exchange.publicGetMarketsSymbolOrderBook = async () => ({\n        time: 1659695219507,\n        asks: ['10', '1', '11', '2'],\n        bids: ['9', '3', '8', '4'],\n        ts: 1659695219513,\n    });\n\n    const ob = await exchange.fetchOrderBook('BTC/USDT');\n\n    expect(ob.asks).toEqual(\n        [\n            [10, 1],\n            [11, 2],\n        ]\n    );\n\n    expect(ob.bids).toEqual(\n        [\n            [9, 3],\n            [8, 4],\n        ]\n    );\n});",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "jest-haste-map: Haste module naming collision: ccxt\n  The following files share their name; please adjust your hasteImpl:\n    * <rootDir>/package.json\n    * <rootDir>/python/package.json\n\n\nnpm WARN exec The following package was not found and will be installed: jest@30.3.0\nnpm WARN deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm WARN deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nFAIL ./test_review_comment_0.test.js\n  \u2715 poloniex.fetchOrderBook parses alternating [price, amount] pairs starting at index 0 (even indices) (11 ms)\n\n  \u25cf poloniex.fetchOrderBook parses alternating [price, amount] pairs starting at index 0 (even indices)\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 2\n    + Received  + 2\n\n      Array [\n        Array [\n    -     10,\n          1,\n    +     11,\n        ],\n        Array [\n    -     11,\n          2,\n    +     undefined,\n        ],\n      ]\n\n      26 |     const ob = await exchange.fetchOrderBook('BTC/USDT');\n      27 |\n    > 28 |     expect(ob.asks).toEqual(\n         |                     ^\n      29 |         [\n      30 |             [10, 1],\n      31 |             [11, 2],\n\n      at Object.toEqual (test_review_comment_0.test.js:28:21)\n\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        1.284 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "after_output": "PASS ./test_review_comment_0.test.js\n  \u2713 poloniex.fetchOrderBook parses alternating [price, amount] pairs starting at index 0 (even indices) (9 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.481 s, estimated 2 s\nRan all test suites matching /workspace/test_review_comment_0.test.js.",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 37870,
+        "completion_tokens": 327,
+        "total_tokens": 38197,
+        "cost_usd": 0.0708505
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

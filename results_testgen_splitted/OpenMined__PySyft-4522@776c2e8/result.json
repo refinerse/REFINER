@@ -1,0 +1,35 @@
+{
+  "instance_id": "OpenMined__PySyft-4522@776c2e8",
+  "repo": "OpenMined/PySyft",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 3515,
+    "completion_tokens": 146,
+    "total_tokens": 3661,
+    "cost_usd": 0.00819525
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nMAYBE: Please remove the prints :D",
+      "comment_type": "structural",
+      "language": "python",
+      "test_file": "OpenMined__PySyft-4522@776c2e8/test_review_comment_0.py",
+      "test_code": "import inspect\n\nimport syft.frameworks.torch.mpc.falcon.falcon_helper as falcon_helper\n\n\ndef test_select_share_has_no_debug_prints_in_source():\n    \"\"\"\n    Structural check: ensure debug prints were removed from FalconHelper.select_share.\n\n    This is a review-requested structural cleanup with no required functional output changes,\n    so we verify by inspecting the function source directly.\n    \"\"\"\n    src = inspect.getsource(falcon_helper.FalconHelper.select_share)\n\n    assert \"print(\" not in src, (\n        \"FalconHelper.select_share should not contain debug print statements. \"\n        \"Remove any `print(...)` calls to avoid noisy stdout during MPC operations.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_select_share_has_no_debug_prints_in_source FAILED          [100%]\n\n=================================== FAILURES ===================================\n_______________ test_select_share_has_no_debug_prints_in_source ________________\ntest_review_comment_0.py:15: in test_select_share_has_no_debug_prints_in_source\n    assert \"print(\" not in src, (\nE   AssertionError: FalconHelper.select_share should not contain debug print statements. Remove any `print(...)` calls to avoid noisy stdout during MPC operations.\nE   assert 'print(' not in '    @static...lected_val\\n'\nE     'print(' is contained here:\nE           @staticmethod\nE           def select_share(\nE               b: ReplicatedSharingTensor,\nE               x: ReplicatedSharingTensor,\nE               y: ReplicatedSharingTensor,\nE           ) -> ReplicatedSharingTensor:...\nE     \nE     ...Full output truncated (28 lines hidden), use '-vv' to show\n=============================== warnings summary ===============================\n../usr/local/lib/python3.6/site-packages/aiortc/rtcdtlstransport.py:13\n  /usr/local/lib/python3.6/site-packages/aiortc/rtcdtlstransport.py:13: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.\n    from cryptography import x509\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev/::test_select_share_has_no_debug_prints_in_source - AssertionEr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 0.93s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_select_share_has_no_debug_prints_in_source PASSED          [100%]\n\n=============================== warnings summary ===============================\n../usr/local/lib/python3.6/site-packages/aiortc/rtcdtlstransport.py:13\n  /usr/local/lib/python3.6/site-packages/aiortc/rtcdtlstransport.py:13: CryptographyDeprecationWarning: Python 3.6 is no longer supported by the Python core team. Therefore, support for it is deprecated in cryptography. The next release of cryptography will remove support for Python 3.6.\n    from cryptography import x509\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 0.83s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 3515,
+        "completion_tokens": 146,
+        "total_tokens": 3661,
+        "cost_usd": 0.00819525
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

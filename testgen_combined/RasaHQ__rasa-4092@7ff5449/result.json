@@ -1,0 +1,75 @@
+{
+  "instance_id": "RasaHQ__rasa-4092@7ff5449",
+  "repo": "RasaHQ/rasa",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 121977,
+    "completion_tokens": 2639,
+    "total_tokens": 124616,
+    "cost_usd": 0.15121855
+  },
+  "num_comments": 3,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nwould be great if you could add types",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "RasaHQ__rasa-4092@7ff5449/test_review_comment_0.py",
+      "test_code": "import inspect\n\nimport rasa.core.events.__init__ as events\n\n\ndef test_useruttered_from_parse_data_has_type_hints_for_key_params():\n    \"\"\"Ensure UserUttered._from_parse_data has explicit type hints for key params.\"\"\"\n    sig = inspect.signature(events.UserUttered._from_parse_data)\n\n    text_ann = sig.parameters[\"text\"].annotation\n    parse_data_ann = sig.parameters[\"parse_data\"].annotation\n\n    assert (\n        text_ann is events.Text\n    ), f\"Expected 'text' parameter to be annotated as Text, but got {text_ann!r}.\"\n    assert (\n        parse_data_ann == events.Dict[events.Text, events.Any]\n    ), (\n        \"Expected 'parse_data' parameter to be annotated as Dict[Text, Any], \"\n        f\"but got {parse_data_ann!r}.\"\n    )\n\n    assert \"message_id\" in sig.parameters, (\n        \"Expected UserUttered._from_parse_data to accept 'message_id' parameter \"\n        \"(required to pass message IDs through parsing).\"\n    )\n    message_id_ann = sig.parameters[\"message_id\"].annotation\n    assert (\n        message_id_ann == events.Optional[events.Text]\n    ), f\"Expected 'message_id' parameter to be annotated as Optional[Text], but got {message_id_ann!r}.\"",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "ERROR: usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 48076,
+        "completion_tokens": 963,
+        "total_tokens": 49039,
+        "cost_usd": 0.0726166
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\ncan you please also handle the `message_id`",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "RasaHQ__rasa-4092@7ff5449/test_review_comment_1.py",
+      "test_code": "import sys\n\n# The execution environment invokes pytest with `--no-header`, but the pytest\n# version available here doesn't recognize that option. Remove it before pytest\n# parses CLI args. This must happen before importing pytest.\nsys.argv = [a for a in sys.argv if a != \"--no-header\"]\n\nimport pytest  # noqa: E402\n\nfrom rasa.core.events import UserUttered  # noqa: E402\n\n\ndef test_user_uttered_from_parse_data_preserves_message_id_and_metadata():\n    parse_data = {\"intent\": {\"name\": \"greet\"}, \"entities\": []}\n\n    event = UserUttered._from_parse_data(\n        text=\"hi\",\n        parse_data=parse_data,\n        timestamp=123,\n        input_channel=\"rest\",\n        message_id=\"mid-123\",\n        metadata={\"foo\": \"bar\"},\n    )\n\n    assert (\n        event.message_id == \"mid-123\"\n    ), \"UserUttered._from_parse_data should set `message_id` on the created event.\"\n    assert event.metadata == {\n        \"foo\": \"bar\"\n    }, \"UserUttered._from_parse_data should set `metadata` on the created event.\"\n    assert event.parse_data.get(\"message_id\") == \"mid-123\", (\n        \"UserUttered constructed via _from_parse_data should preserve message_id in \"\n        \"`parse_data` (used for persistence/serialization).\"\n    )\n    assert event.parse_data.get(\"metadata\") == {\"foo\": \"bar\"}, (\n        \"UserUttered constructed via _from_parse_data should preserve metadata in \"\n        \"`parse_data` (used for persistence/serialization).\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "ERROR: usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 48099,
+        "completion_tokens": 1049,
+        "total_tokens": 49148,
+        "cost_usd": 0.05027365
+      }
+    },
+    {
+      "comment_index": 2,
+      "comment_text": "@user1:\n```suggestion\r\n            output_channel: the output channel which should be used to send bot responses back to the user.\r\n```",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "RasaHQ__rasa-4092@7ff5449/test_review_comment_2.py",
+      "test_code": "# This repository may have environment-level pytest options injected (e.g. via\n# PYTEST_ADDOPTS) which can break execution when running with `-c /dev/null`.\n# Ensure our test is self-contained by stripping those options.\nimport os\n\nos.environ.pop(\"PYTEST_ADDOPTS\", None)\n\nimport inspect\n\n\ndef test_usermessage_init_docstring_mentions_output_channel_used_to_send_responses():\n    import rasa.core.channels.channel as channel\n\n    doc = inspect.getdoc(channel.UserMessage.__init__)\n    assert doc is not None, \"Expected UserMessage.__init__ to have a docstring.\"\n\n    expected = (\n        \"output_channel: the output channel which should be used to send \"\n        \"bot responses back to the user.\"\n    )\n    assert expected in doc, (\n        \"UserMessage.__init__ docstring should explain that 'output_channel' is used to \"\n        \"send bot responses back to the user.\\n\"\n        f\"Missing expected line:\\n{expected}\\n\\n\"\n        f\"Actual docstring:\\n{doc}\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "ERROR: usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "after_output": "ERROR: usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]\npytest.py: error: unrecognized arguments: --no-header\n  inifile: /dev/null\n  rootdir: /workspace",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 25802,
+        "completion_tokens": 627,
+        "total_tokens": 26429,
+        "cost_usd": 0.028328299999999997
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

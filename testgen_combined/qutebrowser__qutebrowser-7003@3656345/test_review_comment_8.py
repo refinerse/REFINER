@@ -1,0 +1,31 @@
+import re
+
+
+def test_fileselector_step_moved_to_conftest_and_removed_from_test_file():
+    """Ensure the fileselector BDD step helper was moved out of the test module.
+
+    The review comment requested moving it to tests/end2end/features/conftest.py,
+    so it should no longer be present in test_downloads_bdd.py.
+    """
+    source = open("/workspace/tests/end2end/features/test_downloads_bdd.py", encoding="utf-8").read()
+
+    assert (
+        "def set_up_fileselector(" not in source
+    ), "set_up_fileselector step definition should be moved to conftest.py, not kept in test_downloads_bdd.py"
+
+    assert (
+        "I setup a fake {kind} fileselector" not in source
+    ), "fileselector BDD step text should not be defined in test_downloads_bdd.py after moving it to conftest.py"
+
+    assert (
+        "TODO how to share this with test_editor_bdd.py?" not in source
+    ), "the TODO comment about sharing the fileselector helper should be gone after moving it to conftest.py"
+
+
+def test_test_downloads_bdd_no_longer_imports_json():
+    """The helper introduced an extra json import; after moving it away, json should not be imported here."""
+    source = open("/workspace/tests/end2end/features/test_downloads_bdd.py", encoding="utf-8").read()
+
+    assert not re.search(r"^\s*import\s+json\s*$", source, flags=re.MULTILINE), (
+        "test_downloads_bdd.py should not import json anymore once the fileselector helper is moved to conftest.py"
+    )

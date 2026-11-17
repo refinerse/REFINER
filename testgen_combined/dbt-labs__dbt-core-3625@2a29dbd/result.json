@@ -1,0 +1,35 @@
+{
+  "instance_id": "dbt-labs__dbt-core-3625@2a29dbd",
+  "repo": "dbt-labs/dbt-core",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 7966,
+    "completion_tokens": 675,
+    "total_tokens": 8641,
+    "cost_usd": 0.0233905
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@author:\nI replaced yaml with oyaml in order to retain ordering when prompting for user input. Rather than keep both I just replaced every reference with oyaml. It may well be preferred that we leave all other imports as-is, let me know.\n\n@user2:\n@user1 do you have any thoughts here?\n\n@user3:\nIt looks like the switch from `yaml` to `oyaml` has broken one highly specific integration test, which checks the sorting behavior of the `toyaml` Jinja context method. The `sort_keys` argument is not being respected by `oyaml.safe_dump`. Glad we have a test for it!\r\n\r\nhttps://github.com/dbt-labs/dbt/blob/3789acc5a7b3f71b4e333ac6e235c62ee0c957f5/test/integration/013_context_var_tests/tests/to_yaml.sql#L5\r\n\r\nhttps://github.com/dbt-labs/dbt/blob/3789acc5a7b3f71b4e333ac6e235c62ee0c957f5/core/dbt/context/base.py#L416\r\n\r\nI think my preference would probably be to avoid switching from `yaml` to `oyaml` wherever possible. I'm also wondering if there's another way we can preserve prompt order for `target_options.yml`, even if it requires an extra attribute\n\n@author:\nIt would seem my reasoning for using oyaml was misplaced - I've removed it and apart from some changes to the order of dumped yaml in `profiles.yml` the rest of the behaviour is identical. So the order of the questions to the user is still the order of the keys in the `target_options.yml`. Hooray!",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "dbt-labs__dbt-core-3625@2a29dbd/test_review_comment_0.py",
+      "test_code": "import importlib\n\n\ndef test_yaml_helper_uses_pyyaml_not_oyaml():\n    \"\"\"\n    Functional regression check without relying on pytest runtime.\n\n    The behavioral issue discussed in the review comment stems from switching\n    yaml_helper to use oyaml. We assert at runtime that yaml_helper's `yaml`\n    reference is backed by the `yaml` (PyYAML) package, not `oyaml`.\n    \"\"\"\n    yaml_helper = importlib.import_module(\"core.dbt.clients.yaml_helper\")\n    importlib.reload(yaml_helper)  # ensure we observe current module state\n\n    yaml_module_name = getattr(yaml_helper.yaml, \"__name__\", None)\n    assert yaml_module_name == \"yaml\", (\n        \"core.dbt.clients.yaml_helper must use PyYAML (`import yaml`), not oyaml \"\n        \"(`import oyaml as yaml`), because oyaml can change dumping/sorting behavior. \"\n        f\"Observed yaml_helper.yaml.__name__={yaml_module_name!r}.\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.9/runpy.py\", line 188, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 147, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.9/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/code.py\", line 54, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_exceptions.py\", line 12, in <module>\n    _BaseExceptionT_co = TypeVar(\nTypeError: __init__() got an unexpected keyword argument 'default'",
+      "after_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.9/runpy.py\", line 188, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 147, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.9/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/code.py\", line 54, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_exceptions.py\", line 12, in <module>\n    _BaseExceptionT_co = TypeVar(\nTypeError: __init__() got an unexpected keyword argument 'default'",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 7966,
+        "completion_tokens": 675,
+        "total_tokens": 8641,
+        "cost_usd": 0.0233905
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

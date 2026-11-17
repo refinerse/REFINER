@@ -1,0 +1,48 @@
+import pytest
+
+import lib.ansible.modules.crypto.luks_device as luks_device
+
+
+class DummyModule:
+    def __init__(self, params, stdout="/dev/dm-0\n", rc=0):
+        self.params = params
+        self._stdout = stdout
+        self._rc = rc
+        self.commands = []
+
+    def get_bin_path(self, name, required):
+        # return a stable fake path
+        return f"/bin/{name}"
+
+    def run_command(self, command):
+        self.commands.append(command)
+        return (self._rc, self._stdout, "")
+
+
+def test_get_device_by_uuid_uses_blkid_uuid_and_returns_stripped_stdout():
+    """
+    The review requested switching from:
+      blkid -l -t UUID=<uuid> (then parsing before ':')
+    to:
+      blkid --uuid <uuid> (and no postprocessing besides .strip()).
+    """
+    uuid = "03ecd578-fad4-4e6c-9348-842e3e8fa340"
+
+    # If old behavior is used (split on ':'), it will incorrectly return "/dev/disk/by-uuid/XYZ"
+    # New behavior should return the whole stripped stdout, including any ':' characters.
+    expected_device = "/dev/disk/by-uuid/XYZ:extra"
+    m = DummyModule(params={"uuid": uuid, "label": None}, stdout=expected_device + "\n", rc=0)
+
+    h = luks_device.Handler(m)
+    got = h.get_device_by_uuid(uuid)
+
+    assert got == expected_device, (
+        "get_device_by_uuid should call `blkid --uuid <UUID>` and return the device name as-is "
+        "(stripped), not parse output from `blkid -l -t UUID=<UUID>` by splitting on ':'."
+    )
+
+    assert m.commands, "Test setup error: no command was executed by get_device_by_uuid()."
+    assert m.commands[-1] == ["/bin/blkid", "--uuid", uuid], (
+        "get_device_by_uuid must execute blkid with '--uuid <UUID>' (as suggested in review), "
+        f"but executed: {m.commands[-1]!r}"
+    )

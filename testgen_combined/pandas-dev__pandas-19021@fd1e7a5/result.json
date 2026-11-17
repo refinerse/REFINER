@@ -1,0 +1,35 @@
+{
+  "instance_id": "pandas-dev__pandas-19021@fd1e7a5",
+  "repo": "pandas-dev/pandas",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 38119,
+    "completion_tokens": 211,
+    "total_tokens": 38330,
+    "cost_usd": 0.06966225
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\ncan you add the case this is actually addressing (e.g. categorical)",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "pandas-dev__pandas-19021@fd1e7a5/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_whatsnew_append_note_mentions_categorical_example():\n    source = open(\"/workspace/doc/source/whatsnew/v0.23.0.txt\", encoding=\"utf-8\").read()\n\n    # The review asked to \"add the case this is actually addressing (e.g. categorical)\".\n    # The updated release note should explicitly mention an example using CategoricalIndex.\n    pattern = re.compile(\n        r\"-\\s+:meth:`DataFrame\\.append`.*\\(\\s*e\\.g\\.\\s*if both are\\s*``CategoricalIndex``\\s*\\)\",\n        flags=re.IGNORECASE,\n    )\n    assert pattern.search(source), (\n        \"Expected the v0.23.0 whatsnew entry for DataFrame.append to include an explicit \"\n        \"categorical example, e.g. '(e.g. if both are ``CategoricalIndex``)'. This ensures \"\n        \"the release note documents the concrete case the change addresses.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_whatsnew_append_note_mentions_categorical_example FAILED   [100%]\n\n=================================== FAILURES ===================================\n____________ test_whatsnew_append_note_mentions_categorical_example ____________\ntest_review_comment_0.py:13: in test_whatsnew_append_note_mentions_categorical_example\n    assert pattern.search(source), (\nE   AssertionError: Expected the v0.23.0 whatsnew entry for DataFrame.append to include an explicit categorical example, e.g. '(e.g. if both are ``CategoricalIndex``)'. This ensures the release note documents the concrete case the change addresses.\nE   assert None\nE    +  where None = <built-in method search of _sre.SRE_Pattern object at 0x560adf5476a0>(\".. _whatsnew_0230:\\n\\nv0.23.0\\n-------\\n\\nThis is a major release from 0.22.0 and includes a number of API changes,\\ndeprecations, new features, enhancements, and performance improvements along\\nwith a large number of bug fixes. We recommend that all users upgrade to this\\nversion.\\n\\n.. warning::\\n\\n   Starting January 1, 2019, pandas feature releases will support Python 3 only.\\n   See :ref:`install.dropping_27` for more.\\n\\n.. _whatsnew_0230.enhancements:\\n\\nNew features\\n~~~~~~~~~~~~\\n\\n.. _whatsnew_0210.enhancements.limit_area:\\n\\n``DataFrame.interpolate`` has gained the ``limit_area`` kwarg\\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n\\n:meth:`DataFrame.interpolate` has gained a ``limit_area`` parameter to allow further control of which ``NaN`` s are replaced.\\nUse ``limit_area='inside'`` to fill only NaNs surrounded by valid values or use ``limit_area='outside'`` to fill only ``NaN`` s\\noutside the existing valid values while preserving those inside.  (:issue:`16284`) See the :ref:`full documentation here <missing_data.interp_limits>`.\\n\\n\\n.. ipython:: python\\n\\n   ser = pd.Series([np.nan, np.nan, 5, np.nan, np.nan, np.nan, 13, np.nan, np.nan])\\n   ser...ta data with ``NaT`` present raised a ``ValueError`` (:issue:`19768`)\\n- Bug in :func:`DataFrame.iterrows`, which would infers strings not compliant to `ISO8601 <https://en.wikipedia.org/wiki/ISO_8601>`_ to datetimes (:issue:`19671`)\\n- Bug in :class:`Series` constructor with ``Categorical`` where a ```ValueError`` is not raised when an index of different length is given (:issue:`19342`)\\n- Bug in :meth:`DataFrame.astype` where column metadata is lost when converting to categorical or a dictionary of dtypes (:issue:`19920`)\\n- Bug in :func:`cut` and :func:`qcut` where timezone information was dropped (:issue:`19872`)\\n- Bug in :class:`Series` constructor with a ``dtype=str``, previously raised in some cases (:issue:`19853`)\\n\\nOther\\n^^^^^\\n\\n- Improved error message when attempting to use a Python keyword as an identifier in a ``numexpr`` backed query (:issue:`18221`)\\n- Bug in accessing a :func:`pandas.get_option`, which raised ``KeyError`` rather than ``OptionError`` when looking up a non-existant option key in some cases (:issue:`19789`)\\n- Bug in :func:`assert_series_equal` and :func:`assert_frame_equal` for Series or DataFrames with differing unicode data (:issue:`20503`)\\n\")\nE    +    where <built-in method search of _sre.SRE_Pattern object at 0x560adf5476a0> = re.compile('-\\\\s+:meth:`DataFrame\\\\.append`.*\\\\(\\\\s*e\\\\.g\\\\.\\\\s*if both are\\\\s*``CategoricalIndex``\\\\s*\\\\)', re.IGNORECASE).search\n=========================== short test summary info ============================\nFAILED ../dev/::test_whatsnew_append_note_mentions_categorical_example - Asse...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_whatsnew_append_note_mentions_categorical_example PASSED   [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 38119,
+        "completion_tokens": 211,
+        "total_tokens": 38330,
+        "cost_usd": 0.06966225
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

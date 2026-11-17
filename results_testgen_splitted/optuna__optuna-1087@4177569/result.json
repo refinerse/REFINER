@@ -1,0 +1,35 @@
+{
+  "instance_id": "optuna__optuna-1087@4177569",
+  "repo": "optuna/optuna",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 7066,
+    "completion_tokens": 222,
+    "total_tokens": 7288,
+    "cost_usd": 0.0154735
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nIt seems like the keyword argument of `log` is ignored.\r\n\r\nIsn't it better to pass `log` to `self.delegate.suggest_float`?\n\n@author:\nThank you!\r\nI will fix it.",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "optuna__optuna-1087@4177569/test_review_comment_0.py",
+      "test_code": "import optuna.integration.chainermn as chainermn\n\n\nclass _DummyMPIComm:\n    def bcast(self, value):\n        # Rank 0 path: bcast just returns whatever was passed.\n        return value\n\n    def barrier(self):\n        return None\n\n\nclass _DummyComm:\n    rank = 0\n    mpi_comm = _DummyMPIComm()\n\n\nclass _DummyDelegateTrial:\n    def suggest_float(self, name, low, high, *, log=False):\n        # If ChainerMNTrial does not forward `log`, this will stay False.\n        return 123.0 if log else 456.0\n\n\ndef test_chainermntrial_suggest_float_forwards_log_kwarg():\n    trial = chainermn.ChainerMNTrial(_DummyDelegateTrial(), _DummyComm())\n\n    got = trial.suggest_float(\"x\", 1.0, 10.0, log=True)\n\n    assert (\n        got == 123.0\n    ), \"ChainerMNTrial.suggest_float should forward the `log` keyword argument to the delegate trial.\"",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_chainermntrial_suggest_float_forwards_log_kwarg FAILED      [100%]\n\n=================================== FAILURES ===================================\n_____________ test_chainermntrial_suggest_float_forwards_log_kwarg _____________\ntest_review_comment_0.py:29: in test_chainermntrial_suggest_float_forwards_log_kwarg\n    assert (\nE   AssertionError: ChainerMNTrial.suggest_float should forward the `log` keyword argument to the delegate trial.\nE   assert 456.0 == 123.0\n=============================== warnings summary ===============================\noptuna/storages/rdb/models.py:38\n  /workspace/optuna/storages/rdb/models.py:38: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)\n    BaseModel = declarative_base()  # type: Any\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_chainermntrial_suggest_float_forwards_log_kwarg - Asserti...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 1.58s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_chainermntrial_suggest_float_forwards_log_kwarg PASSED      [100%]\n\n=============================== warnings summary ===============================\noptuna/storages/rdb/models.py:38\n  /workspace/optuna/storages/rdb/models.py:38: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)\n    BaseModel = declarative_base()  # type: Any\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 1.51s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 7066,
+        "completion_tokens": 222,
+        "total_tokens": 7288,
+        "cost_usd": 0.0154735
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

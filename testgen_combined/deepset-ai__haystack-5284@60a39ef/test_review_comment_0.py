@@ -1,0 +1,20 @@
+def test_get_task_uses_exception_chaining_raise_from():
+    source = open("/workspace/haystack/nodes/prompt/invocation_layer/hugging_face.py", "r", encoding="utf-8").read()
+
+    # Narrow the search to the get_task() block to avoid false positives/negatives.
+    start = source.find("def get_task(")
+    assert start != -1, "Expected to find get_task() function definition in hugging_face.py"
+
+    end = source.find("\n\nclass HFLocalInvocationLayer", start)
+    assert end != -1, "Expected get_task() to appear before HFLocalInvocationLayer class definition"
+
+    block = source[start:end]
+
+    assert "except Exception as e:" in block, "Expected get_task() to catch exceptions as `except Exception as e:`"
+
+    # The requested change is to use `raise ... from e` to preserve the original exception as __cause__.
+    assert "raise RuntimeError" in block, "Expected get_task() to raise a RuntimeError on exceptions"
+    assert " from e" in block, (
+        "Expected get_task() to use exception chaining (`raise RuntimeError(...) from e`) so the original "
+        "exception is available via __cause__."
+    )

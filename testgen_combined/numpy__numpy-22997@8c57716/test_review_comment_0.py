@@ -1,0 +1,35 @@
+import re
+
+import pytest
+
+
+PXD_PATH = "/workspace/numpy/__init__.cython-30.pxd"
+
+
+def _decl_line(source: str, func_name: str) -> str:
+    """
+    Return the single line containing the function declaration for `func_name`.
+    This is intentionally simple/robust for this pxd style (one decl per line).
+    """
+    m = re.search(rf"^[^\n]*\b{re.escape(func_name)}\b[^\n]*$", source, flags=re.M)
+    assert m is not None, f"Expected to find a declaration line for {func_name} in {PXD_PATH}"
+    return m.group(0)
+
+
+def test_void_api_functions_are_declared_except_star_to_not_swallow_errors():
+    source = open(PXD_PATH, "r", encoding="utf-8").read()
+
+    # The review concern was specifically about "void" (and similar) functions
+    # needing `except *` so that Python errors raised inside are propagated to Cython.
+    #
+    # Key behavior change in the addressed code: void helpers now include `except *`.
+    line = _decl_line(source, "PyArray_FillObjectArray")
+
+    assert "void PyArray_FillObjectArray" in line, (
+        "Sanity check: declaration for PyArray_FillObjectArray should be a void function."
+    )
+    assert "except *" in line, (
+        "PyArray_FillObjectArray is a void-returning C-API function that can set a Python "
+        "exception; the Cython declaration must include `except *` so errors are not swallowed. "
+        f"Found declaration line: {line!r}"
+    )

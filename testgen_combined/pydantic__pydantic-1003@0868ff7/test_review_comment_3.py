@@ -1,0 +1,26 @@
+import os
+
+
+def test_exclude_none_test_structure_updated():
+    """
+    Structural check only.
+
+    We intentionally do NOT import `tests.test_edge_cases` because importing the repository's test
+    package/conftest/plugins can add pytest CLI options; in this execution environment pytest is run
+    with `-c /dev/null`, and such options may be unrecognized and crash the run.
+    """
+    source_path = "/workspace/tests/test_edge_cases.py"
+    assert os.path.exists(source_path), f"Expected file to exist at {source_path}"
+
+    with open(source_path, "r", encoding="utf-8") as f:
+        source = f.read()
+
+    assert (
+        "def test_exclude_none_dict()" not in source
+    ), "Expected legacy test `test_exclude_none_dict` to be removed per review comment."
+
+    assert "def test_exclude_none()" in source, "Expected consolidated test `test_exclude_none` to exist."
+
+    assert (
+        'assert m.json(exclude_none=True) == \'{"b": 3}\'' in source
+    ), "Expected `test_exclude_none` to include a JSON assertion so it actually tests behavior."

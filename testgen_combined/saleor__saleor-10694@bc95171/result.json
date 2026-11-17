@@ -1,0 +1,55 @@
+{
+  "instance_id": "saleor__saleor-10694@bc95171",
+  "repo": "saleor/saleor",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 308088,
+    "completion_tokens": 2023,
+    "total_tokens": 310111,
+    "cost_usd": 0.4106312
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n\ud83d\udc6e\u200d\u2640\ufe0f \r\n```suggestion\r\n        field_name=\"id\", help_text=f\"Filter by ids. {ADDED_IN_38}\"\r\n```",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "saleor__saleor-10694@bc95171/test_review_comment_0.py",
+      "test_code": "# Pytest cannot be imported in this execution environment due to dependency issues.\n# This file is still a valid \"pytest-style\" test module because it only uses plain\n# `assert` statements and reads the repository source directly.\n\ndef test_customerfilter_ids_help_text_has_period_before_added_in_marker():\n    source = open(\"/workspace/saleor/graphql/account/filters.py\", \"r\", encoding=\"utf-8\").read()\n\n    expected = 'help_text=f\"Filter by ids. {ADDED_IN_38}\"'\n    before = 'help_text=f\"Filter by ids {ADDED_IN_38}\"'\n\n    assert expected in source, (\n        \"Style requirement: CustomerFilter.ids help_text should include a period after \"\n        \"'ids' before the ADDED_IN_38 marker. Expected to find:\\n\"\n        f\"  {expected}\"\n    )\n    assert before not in source, (\n        \"Found the pre-review help_text format (missing period after 'ids'). \"\n        \"The help_text should be updated to include the period:\\n\"\n        f\"  Unexpected: {before}\\n\"\n        f\"  Expected:   {expected}\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.9/runpy.py\", line 188, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 147, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.9/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/code.py\", line 54, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_exceptions.py\", line 10, in <module>\n    from typing_extensions import TypeVar\nImportError: cannot import name 'TypeVar' from 'typing_extensions' (/usr/local/lib/python3.9/site-packages/typing_extensions.py)",
+      "after_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.9/runpy.py\", line 188, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 147, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.9/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/code.py\", line 54, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_exceptions.py\", line 10, in <module>\n    from typing_extensions import TypeVar\nImportError: cannot import name 'TypeVar' from 'typing_extensions' (/usr/local/lib/python3.9/site-packages/typing_extensions.py)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 9641,
+        "completion_tokens": 770,
+        "total_tokens": 10411,
+        "cost_usd": 0.025030950000000003
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nHow do know that you get the correct user in response?",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "saleor__saleor-10694@bc95171/test_review_comment_1.py",
+      "test_code": "import re\n\n\ndef test_customers_filter_by_ids_checks_correct_user_returned():\n    source = open(\"/workspace/saleor/graphql/account/tests/test_account.py\").read()\n\n    # The change requested in review: do not only assert that exactly one customer is returned,\n    # but also verify it's the correct user by decoding the returned global ID and comparing it\n    # to the searched user's pk.\n    #\n    # Before: `test_query_customers_with_filter_by_ids` only asserted `len(users) == 1`.\n    # After:  it was replaced with `test_query_customers_with_filter_by_one_id` and includes\n    #         `graphene.Node.from_global_id(...)` + `assert id == str(search_user.pk)`.\n\n    assert (\n        \"def test_query_customers_with_filter_by_ids\" not in source\n    ), (\n        \"Expected the old test `test_query_customers_with_filter_by_ids` to be removed/replaced \"\n        \"because it didn't verify that the returned user is the one requested by id.\"\n    )\n\n    assert (\n        \"def test_query_customers_with_filter_by_one_id\" in source\n    ), \"Expected the new test `test_query_customers_with_filter_by_one_id` to be present.\"\n\n    pattern_decode_and_compare = re.compile(\n        r'def test_query_customers_with_filter_by_one_id[\\s\\S]*?'\n        r'result_user\\s*=\\s*content\\[\"data\"\\]\\[\"customers\"\\]\\[\"edges\"\\]\\[0\\][\\s\\S]*?'\n        r'graphene\\.Node\\.from_global_id\\(\\s*result_user\\[\"node\"\\]\\[\"id\"\\]\\s*\\)[\\s\\S]*?'\n        r\"assert\\s+id\\s*==\\s*str\\(search_user\\.pk\\)\",\n        re.MULTILINE,\n    )\n    assert pattern_decode_and_compare.search(source), (\n        \"Expected `test_query_customers_with_filter_by_one_id` to decode the returned GraphQL \"\n        \"node id (`result_user['node']['id']`) using `graphene.Node.from_global_id` and assert \"\n        \"the decoded id equals `search_user.pk` (stringified). This ensures the response contains \"\n        \"the correct user, not just any single user.\"\n    )",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.9/runpy.py\", line 188, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 147, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.9/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/code.py\", line 54, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_exceptions.py\", line 10, in <module>\n    from typing_extensions import TypeVar\nImportError: cannot import name 'TypeVar' from 'typing_extensions' (/usr/local/lib/python3.9/site-packages/typing_extensions.py)",
+      "after_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.9/runpy.py\", line 188, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 147, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.9/runpy.py\", line 111, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.9/site-packages/pytest/__init__.py\", line 8, in <module>\n    from _pytest._code import ExceptionInfo\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/__init__.py\", line 5, in <module>\n    from .code import Code\n  File \"/usr/local/lib/python3.9/site-packages/_pytest/_code/code.py\", line 54, in <module>\n    from exceptiongroup import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/__init__.py\", line 15, in <module>\n    from ._catch import catch\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_catch.py\", line 11, in <module>\n    from ._exceptions import BaseExceptionGroup\n  File \"/usr/local/lib/python3.9/site-packages/exceptiongroup/_exceptions.py\", line 10, in <module>\n    from typing_extensions import TypeVar\nImportError: cannot import name 'TypeVar' from 'typing_extensions' (/usr/local/lib/python3.9/site-packages/typing_extensions.py)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 298447,
+        "completion_tokens": 1253,
+        "total_tokens": 299700,
+        "cost_usd": 0.38560025
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

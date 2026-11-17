@@ -1,0 +1,35 @@
+{
+  "instance_id": "ansible__ansible-65021@f63c26e",
+  "repo": "ansible/ansible",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 5235,
+    "completion_tokens": 253,
+    "total_tokens": 5488,
+    "cost_usd": 0.01270325
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nCould you please remove the debug statements from this patch?\n\n@author:\nThanks for pointing those debug statements out in a kind way. I thought i had removed them.",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "ansible__ansible-65021@f63c26e/test_review_comment_0.py",
+      "test_code": "import re\n\n\ndef test_no_debug_tasks_left_in_alb_listener_integration_playbook():\n    \"\"\"\n    Style regression test: the integration task file should not contain\n    leftover Ansible 'debug' tasks that were used during development.\n\n    This fails on the pre-fix version where multiple debug blocks exist, and\n    passes once those debug statements are removed.\n    \"\"\"\n    path = \"/workspace/test/integration/targets/elb_application_lb/tasks/test_modifying_alb_listeners.yml\"\n    source = open(path, \"r\", encoding=\"utf-8\").read()\n\n    # Match typical Ansible task snippets like:\n    #   - name:\n    #     debug:\n    #       msg: \"{{ alb }}\"\n    #\n    # as well as any other debug task in this file.\n    debug_task_re = re.compile(r\"(?m)^[ \\t]*debug:[ \\t]*$\", re.MULTILINE)\n    matches = list(debug_task_re.finditer(source))\n\n    assert not matches, (\n        \"Expected no Ansible 'debug:' tasks in \"\n        f\"{path}, but found {len(matches)} occurrence(s). \"\n        \"Remove leftover debug statements from the integration test playbook.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_no_debug_tasks_left_in_alb_listener_integration_playbook FAILED [100%]\n\n=================================== FAILURES ===================================\n________ test_no_debug_tasks_left_in_alb_listener_integration_playbook _________\ntest_review_comment_0.py:24: in test_no_debug_tasks_left_in_alb_listener_integration_playbook\n    assert not matches, (\nE   AssertionError: Expected no Ansible 'debug:' tasks in /workspace/test/integration/targets/elb_application_lb/tasks/test_modifying_alb_listeners.yml, but found 4 occurrence(s). Remove leftover debug statements from the integration test playbook.\nE   assert not [<re.Match object; span=(3308, 3318), match='    debug:'>, <re.Match object; span=(4102, 4112), match='    debug:'>, <re.Match object; span=(4147, 4157), match='    debug:'>, <re.Match object; span=(5251, 5261), match='    debug:'>]\n=========================== short test summary info ============================\nFAILED ../dev::test_no_debug_tasks_left_in_alb_listener_integration_playbook\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_no_debug_tasks_left_in_alb_listener_integration_playbook PASSED [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 5235,
+        "completion_tokens": 253,
+        "total_tokens": 5488,
+        "cost_usd": 0.01270325
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

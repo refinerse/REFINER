@@ -1,0 +1,31 @@
+import inspect
+
+import pandas.tests.frame.methods.test_isin as mod
+
+
+def test_style_no_df3_name_for_series_in_category_isin_test():
+    """
+    Style regression test for GH#34256 test addition.
+
+    The reviewed change requests renaming `df3` because it misleadingly suggests
+    a DataFrame, while it was used for a Series. The fixed version removes the
+    `df3` name (and parametrizes inputs).
+    """
+    cls = mod.TestDataFrameIsIn
+
+    # The "after" version renames the test to `test_isin_category_frame`
+    # The "before" version has `test_isin_against_categoryDataframe`
+    func = getattr(
+        cls,
+        "test_isin_category_frame",
+        getattr(cls, "test_isin_against_categoryDataframe", None),
+    )
+    assert func is not None, "Expected the category isin test to exist on TestDataFrameIsIn."
+
+    src = inspect.getsource(func)
+
+    assert "df3" not in src, (
+        "Style check: the category isin test should not use the variable name `df3` "
+        "because it suggests a DataFrame even though it refers to a Series. "
+        "Rename it (e.g. `values`, `ser`, `cat_ser`) or refactor the test."
+    )

@@ -1,0 +1,19 @@
+import re
+
+def test_utils_public_api_does_not_expose_register_system_job():
+    """
+    Style requirement: system job registration should not be a flat, generic function
+    in netbox.netbox.utils (risking name collisions). The merged change removes it.
+    """
+    source = open("/workspace/netbox/netbox/utils.py", "r", encoding="utf-8").read()
+
+    assert "register_system_job" not in source, (
+        "netbox/netbox/utils.py should not define or export a top-level "
+        "`register_system_job` helper; it was removed to avoid global naming collisions."
+    )
+
+    # Extra guard: ensure no function definition exists even if not exported.
+    assert re.search(r"^\s*def\s+register_system_job\s*\(", source, flags=re.M) is None, (
+        "Found a `def register_system_job(...):` definition in netbox/netbox/utils.py, "
+        "but it should not exist after the style change."
+    )

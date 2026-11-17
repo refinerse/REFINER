@@ -1,0 +1,56 @@
+{
+  "instance_id": "ray-project__ray-49918@04cf1ee",
+  "repo": "ray-project/ray",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 21308,
+    "completion_tokens": 561,
+    "total_tokens": 21869,
+    "cost_usd": 0.045143
+  },
+  "num_comments": 2,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\n```suggestion\r\n  RAY_CHECK(!current_actor_id_.IsNil()) << `SetCurrentActorShouldExit should only be used inside actors`;\r\n```",
+      "comment_type": "unknown",
+      "language": "cpp",
+      "test_file": null,
+      "test_code": null,
+      "error": "Language 'cpp' not supported for test execution",
+      "before_passed": null,
+      "after_passed": null,
+      "success": false,
+      "before_output": "",
+      "after_output": "",
+      "attempts_used": 0,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cost_usd": 0.0
+      }
+    },
+    {
+      "comment_index": 1,
+      "comment_text": "@user1:\nis this intended to be deleted or uncommented?\n\n@author:\nfixed",
+      "comment_type": "functional",
+      "language": "python",
+      "test_file": "ray-project__ray-49918@04cf1ee/test_review_comment_1.py",
+      "test_code": "import re\n\n\ndef test_async_exit_actor_test_is_not_left_commented_out():\n    \"\"\"\n    Regression test for a review comment asking whether code should be deleted\n    or uncommented (\"fixed\" afterwards).\n\n    The \"after\" version restores the assertions in\n    `test_exit_actor_async_actor_raise_immediately` that were commented out in\n    the \"before\" version.\n\n    This test ensures those assertions are present as live code (not commented).\n    \"\"\"\n    source = open(\"/workspace/python/ray/tests/test_actor_failures.py\").read()\n\n    # Extract the body of the specific test function to avoid matching other tests.\n    m = re.search(\n        r\"(?ms)^def test_exit_actor_async_actor_raise_immediately\\(.*?\\):\\n(.*?)(?=^def |\\Z)\",\n        source,\n    )\n    assert m, \"Expected to find test_exit_actor_async_actor_raise_immediately in the file.\"\n\n    body = m.group(1)\n\n    # In the fixed version, the RayActorError expectation is active (uncommented).\n    assert (\n        \"with pytest.raises(ray.exceptions.RayActorError) as exc_info:\" in body\n    ), (\n        \"Expected `test_exit_actor_async_actor_raise_immediately` to actively assert \"\n        \"RayActorError via `with pytest.raises(...)`. In the buggy version this block \"\n        \"was commented out, which the review requested to fix.\"\n    )\n\n    # Also ensure we aren't just matching a commented-out line.\n    assert (\n        \"# with pytest.raises(ray.exceptions.RayActorError) as exc_info:\" not in body\n    ), (\n        \"Found the RayActorError assertion still commented out in \"\n        \"`test_exit_actor_async_actor_raise_immediately`; it should be uncommented.\"\n    )\n\n    # And the post-exit verification should be active (not commented).\n    assert \"wait_for_condition(verify)\" in body, (\n        \"Expected `wait_for_condition(verify)` to be executed to verify atexit handler \"\n        \"ran; in the buggy version it was commented out.\"\n    )\n    assert \"# wait_for_condition(verify)\" not in body, (\n        \"Found `wait_for_condition(verify)` still commented out; it should be active.\"\n    )\n    assert \"assert not temp_file_after_exit_actor.exists()\" in body, (\n        \"Expected the test to assert that code after exit_actor() is not executed; \"\n        \"in the buggy version this assertion was commented out.\"\n    )\n    assert \"# assert not temp_file_after_exit_actor.exists()\" not in body, (\n        \"Found `assert not temp_file_after_exit_actor.exists()` still commented out; \"\n        \"it should be active.\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_async_exit_actor_test_is_not_left_commented_out FAILED     [100%]\n\n=================================== FAILURES ===================================\n_____________ test_async_exit_actor_test_is_not_left_commented_out _____________\ntest_review_comment_1.py:36: in test_async_exit_actor_test_is_not_left_commented_out\n    assert (\nE   AssertionError: Found the RayActorError assertion still commented out in `test_exit_actor_async_actor_raise_immediately`; it should be uncommented.\nE   assert '# with pyte...as exc_info:' not in '    temp_fi...ists()\\n\\n\\n'\nE     '# with pytest.rais...Error) as exc_info:' is contained here:\nE           temp_file_atexit = tmp_path / \"atexit.log\"\nE           temp_file_after_exit_actor = tmp_path / \"after_exit_actor.log\"\nE           assert not temp_file_atexit.exists()\nE           assert not temp_file_after_exit_actor.exists()\nE       \nE           @ray.remote...\nE     \nE     ...Full output truncated (37 lines hidden), use '-vv' to show\n=========================== short test summary info ============================\nFAILED ../dev/::test_async_exit_actor_test_is_not_left_commented_out - Assert...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n============================== 1 failed in 0.02s ===============================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev/::test_async_exit_actor_test_is_not_left_commented_out PASSED     [100%]\n\n============================== 1 passed in 0.00s ===============================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 21308,
+        "completion_tokens": 561,
+        "total_tokens": 21869,
+        "cost_usd": 0.045143
+      }
+    }
+  ],
+  "overall_success_rate": 0.5
+}

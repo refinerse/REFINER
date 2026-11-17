@@ -1,0 +1,35 @@
+{
+  "instance_id": "numpy__numpy-12123@1c2abd3",
+  "repo": "numpy/numpy",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 10653,
+    "completion_tokens": 179,
+    "total_tokens": 10832,
+    "cost_usd": 0.02114875
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nI think we are headed toward using the version deprecated rather than the version in which we intend to remove it. The latter may change, the first is fixed and helps folks downstream know how to set up version dependent workarounds.\n\n@author:\nThanks for fixing",
+      "comment_type": "structural",
+      "language": "python",
+      "test_file": "numpy__numpy-12123@1c2abd3/test_review_comment_0.py",
+      "test_code": "import pytest\nimport numpy as np\n\n\ndef test_asscalar_deprecation_warning_mentions_deprecated_since_version():\n    a = np.array([24])\n\n    with pytest.warns(DeprecationWarning) as rec:\n        out = np.asscalar(a)\n\n    assert out == 24, \"np.asscalar should still return the scalar value via a.item().\"\n\n    msg = str(rec[0].message)\n    assert (\n        \"deprecated since\" in msg and \"v1.16\" in msg\n    ), (\n        \"Deprecation warning for np.asscalar should mention the version where it was \"\n        \"deprecated (fixed reference), e.g. 'deprecated since NumPy v1.16', rather \"\n        \"than a planned removal version which may change. \"\n        f\"Got warning message: {msg!r}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_asscalar_deprecation_warning_mentions_deprecated_since_version FAILED [100%]\n\n=================================== FAILURES ===================================\n_____ test_asscalar_deprecation_warning_mentions_deprecated_since_version ______\ntest_review_comment_0.py:14: in test_asscalar_deprecation_warning_mentions_deprecated_since_version\n    assert (\nE   AssertionError: Deprecation warning for np.asscalar should mention the version where it was deprecated (fixed reference), e.g. 'deprecated since NumPy v1.16', rather than a planned removal version which may change. Got warning message: 'np.asscalar(a) will be removed in v1.18 of numpy, use a.item() instead'\nE   assert ('deprecated since' in 'np.asscalar(a) will be removed in v1.18 of numpy, use a.item() instead')\n=============================== warnings summary ===============================\nnumpy/ma/core.py:4453\n  /workspace/numpy/ma/core.py:4453: SyntaxWarning: \"is\" with a literal. Did you mean \"==\"?\n    if self.shape is ():\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_asscalar_deprecation_warning_mentions_deprecated_since_version\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 0.24s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_asscalar_deprecation_warning_mentions_deprecated_since_version PASSED [100%]\n\n=============================== warnings summary ===============================\nnumpy/ma/core.py:4453\n  /workspace/numpy/ma/core.py:4453: SyntaxWarning: \"is\" with a literal. Did you mean \"==\"?\n    if self.shape is ():\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 0.21s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 10653,
+        "completion_tokens": 179,
+        "total_tokens": 10832,
+        "cost_usd": 0.02114875
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}

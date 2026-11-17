@@ -1,0 +1,35 @@
+{
+  "instance_id": "keephq__keep-2661@ced3ca4",
+  "repo": "keephq/keep",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 15917,
+    "completion_tokens": 532,
+    "total_tokens": 16449,
+    "cost_usd": 0.02764195
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\nThis sends out a request to get incidents for *every* service in the topology map. Sounds a bit problematic in terms of performance\n\n@author:\nfixing this.\n\n@author:\nFixed.",
+      "comment_type": "style",
+      "language": "typescript",
+      "test_file": "keephq__keep-2661@ced3ca4/test_review_comment_0.test.ts",
+      "test_code": "/**\n * @jest-environment node\n */\n\nimport fs from \"fs\";\n\ndescribe(\"ServiceNode incidents fetching performance regression guard\", () => {\n  test(\"service-node.tsx should not fetch incidents per node (no useIncidents/usePollIncidents usage)\", () => {\n    const candidates = [\n      \"/workspace/keep-ui/app/(keep)/topology/ui/map/service-node.tsx\",\n      // Fallback for environments where parentheses are normalized/escaped differently\n      \"/workspace/keep-ui/app/keep/topology/ui/map/service-node.tsx\",\n    ];\n\n    const existingPath = candidates.find((p) => fs.existsSync(p));\n    expect(existingPath).toBeTruthy();\n\n    const source = fs.readFileSync(existingPath as string, \"utf8\");\n\n    expect(source).not.toMatch(\n      /\\buseIncidents\\b|\\busePollIncidents\\b/\n    );\n  });\n});",
+      "before_passed": false,
+      "after_passed": false,
+      "success": false,
+      "before_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "after_output": "Error: Could not find a config file based on provided values:\npath: \"/workspace\"\ncwd: \"/workspace\"\nConfig paths must be specified by either a direct path to a config\nfile, or a path to a directory. If directory is given, Jest will try to\ntraverse directory tree up, until it finds one of those files in exact order: \"jest.config.js\" or \"jest.config.ts\" or \"jest.config.mjs\" or \"jest.config.cjs\" or \"jest.config.cts\" or \"jest.config.json\".\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2513:11)\n    at resolveConfigPathByTraversing (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2517:10)\n    at resolveConfigPath (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:2484:10)\n    at readInitialOptions (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1171:53)\n    at readConfig (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:944:13)\n    at readConfigs (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-config/build/index.js:1194:32)\n    at runCLI (/root/.npm/_npx/b8d86e6551a4f492/node_modules/@jest/core/build/index.js:1402:43)\n    at Object.run (/root/.npm/_npx/b8d86e6551a4f492/node_modules/jest-cli/build/index.js:656:34)",
+      "attempts_used": 3,
+      "usage": {
+        "prompt_tokens": 15917,
+        "completion_tokens": 532,
+        "total_tokens": 16449,
+        "cost_usd": 0.02764195
+      }
+    }
+  ],
+  "overall_success_rate": 0.0
+}

@@ -1,0 +1,35 @@
+{
+  "instance_id": "python-telegram-bot__python-telegram-bot-2335@e64ddb0",
+  "repo": "python-telegram-bot/python-telegram-bot",
+  "model": "gpt-5.2",
+  "usage": {
+    "prompt_tokens": 5245,
+    "completion_tokens": 231,
+    "total_tokens": 5476,
+    "cost_usd": 0.01241275
+  },
+  "num_comments": 1,
+  "results": [
+    {
+      "comment_index": 0,
+      "comment_text": "@user1:\ndoesn't `Bot` have a convenience property for the username? \ud83e\udd14 \n\n@author:\nYou're right, i just followed how it was done for other deeplinking levels without thinking, will change \ud83d\udc4d",
+      "comment_type": "style",
+      "language": "python",
+      "test_file": "python-telegram-bot__python-telegram-bot-2335@e64ddb0/test_review_comment_0.py",
+      "test_code": "import inspect\n\nimport examples.deeplinking as deeplinking\n\n\ndef test_deeplinking_uses_bot_username_property_not_get_me_username():\n    \"\"\"\n    Style requirement from review: use Bot.username convenience property instead of\n    bot.get_me().username when building deep-link URLs.\n\n    This test inspects the source of the module functions to ensure `.get_me().username`\n    is not used in URL creation anymore.\n    \"\"\"\n    functions_to_check = [\n        deeplinking.start,\n        deeplinking.deep_linked_level_1,\n        deeplinking.deep_linked_level_2,\n        deeplinking.deep_link_level_3_callback,\n    ]\n\n    offending = []\n    for func in functions_to_check:\n        src = inspect.getsource(func)\n        if \"get_me().username\" in src:\n            offending.append(func.__name__)\n\n    assert not offending, (\n        \"Deep-linking example should use `bot.username` (Bot convenience property) instead of \"\n        \"`bot.get_me().username`. Offending functions: \"\n        f\"{', '.join(offending)}\"\n    )",
+      "before_passed": false,
+      "after_passed": true,
+      "success": true,
+      "before_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_deeplinking_uses_bot_username_property_not_get_me_username FAILED [100%]\n\n=================================== FAILURES ===================================\n_______ test_deeplinking_uses_bot_username_property_not_get_me_username ________\ntest_review_comment_0.py:27: in test_deeplinking_uses_bot_username_property_not_get_me_username\n    assert not offending, (\nE   AssertionError: Deep-linking example should use `bot.username` (Bot convenience property) instead of `bot.get_me().username`. Offending functions: start, deep_linked_level_1, deep_linked_level_2, deep_link_level_3_callback\nE   assert not ['start', 'deep_linked_level_1', 'deep_linked_level_2', 'deep_link_level_3_callback']\n=============================== warnings summary ===============================\ntelegram/files/inputfile.py:22\n  /workspace/telegram/files/inputfile.py:22: DeprecationWarning: 'imghdr' is deprecated and slated for removal in Python 3.13\n    import imghdr\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED ../dev::test_deeplinking_uses_bot_username_property_not_get_me_username\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 1 failed, 1 warning in 0.48s =========================",
+      "after_output": "============================= test session starts ==============================\ncollecting ... collected 1 item\n\n../dev::test_deeplinking_uses_bot_username_property_not_get_me_username PASSED [100%]\n\n=============================== warnings summary ===============================\ntelegram/files/inputfile.py:22\n  /workspace/telegram/files/inputfile.py:22: DeprecationWarning: 'imghdr' is deprecated and slated for removal in Python 3.13\n    import imghdr\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 1 passed, 1 warning in 0.45s =========================",
+      "attempts_used": 1,
+      "usage": {
+        "prompt_tokens": 5245,
+        "completion_tokens": 231,
+        "total_tokens": 5476,
+        "cost_usd": 0.01241275
+      }
+    }
+  ],
+  "overall_success_rate": 1.0
+}
